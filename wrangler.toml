@@ -1,30 +1,11 @@
-# wrangler.toml — Vallefort Cloudflare Worker
-# Installer Wrangler: npm install -g wrangler
-# Deploy: wrangler deploy
-# KV oppsett: wrangler kv:namespace create VALLEFORT_KV
-
-name = "vallefort-api"
+name = "vallefort"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
-# KV Namespace — kjør først:
-#   wrangler kv:namespace create VALLEFORT_KV
-# Lim inn ID-en du får her:
 [[kv_namespaces]]
 binding = "KV"
-id      = "LIMER_INN_KV_NAMESPACE_ID_HER"
-
-# Miljøvariabler — settes som secrets via:
-#   wrangler secret put DISCORD_CLIENT_ID
-#   wrangler secret put DISCORD_CLIENT_SECRET
-#   wrangler secret put ADMIN_DISCORD_IDS
-#   wrangler secret put JWT_SECRET
-#   wrangler secret put SITE_ORIGIN
-#
-# Eller legg dem inn manuelt i Cloudflare Dashboard:
-# Workers → vallefort-api → Settings → Variables
+id      = "d2cf4c59c6014806aa2363a9ab0c907e"
 
 [vars]
-DISCORD_REDIRECT_URI = "https://vallefort.pages.dev/auth/callback"
-SITE_ORIGIN          = "https://vallefort.pages.dev"
-# ADMIN_DISCORD_IDS  = "DISCORD_ID_1,DISCORD_ID_2"  ← sett som secret!
+DISCORD_REDIRECT_URI = "https://vallefort.brede-espelid.workers.dev/auth/callback"
+SITE_ORIGIN          = "https://bredeespelid.github.io"
