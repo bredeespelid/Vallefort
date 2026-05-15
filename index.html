@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vallefort — Norsk TFT Community</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Sora:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── CONFIG: bytt ut med din Worker URL ─────────────────────────────────────
+   Etter du har deployet worker.js til Cloudflare Workers, lim inn URL her:
+   Eksempel: https://vallefort-api.dittbrukernavn.workers.dev
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --api: 'https://vallefort-api.dittbrukernavn.workers.dev'; /* JS bruker denne */
+  --ink:     #0B0D0F;
+  --ink2:    #111417;
+  --ink3:    #181C21;
+  --ink4:    #21272F;
+  --wire:    rgba(255,255,255,0.07);
+  --wire2:   rgba(255,255,255,0.13);
+  --gold:    #C8A84B;
+  --gold-hi: #E2C46A;
+  --gold-lo: rgba(200,168,75,0.15);
+  --white:   #F0EDE6;
+  --grey:    #6B7280;
+  --grey2:   #3D444E;
+  --discord: #5865F2;
+  --green:   #3DAB6E;
+  --red:     #C94C4C;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;background:var(--ink);color:var(--white);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.025;mix-blend-mode:overlay}
+
+.label{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.label-line{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.label-line::before{content:'';display:block;width:20px;height:2px;background:var(--gold)}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.reveal.on{opacity:1;transform:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;padding:0 clamp(1rem,4vw,3rem);border-bottom:1px solid var(--wire);background:rgba(11,13,15,.9);backdrop-filter:blur(20px);gap:2rem}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.nav-logo img{height:34px;width:34px;object-fit:contain;border-radius:6px}
+.nav-logo span{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--white)}
+.nav-links{display:flex;align-items:center;gap:0;list-style:none;flex:1}
+.nav-links a{display:block;padding:0 1rem;height:58px;line-height:58px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);text-decoration:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--white);border-bottom-color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.btn-discord{display:inline-flex;align-items:center;gap:8px;background:var(--discord);color:#fff;border:none;padding:.45rem 1.1rem;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;text-decoration:none;transition:background .15s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
+.btn-discord:hover{background:#4752C4}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);border:none;padding:.75rem 1.75rem;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .15s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+.btn-primary:hover{background:var(--gold-hi)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--grey);border:1px solid var(--wire2);padding:.75rem 1.75rem;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:color .15s,border-color .15s}
+.btn-ghost:hover{color:var(--white)}
+
+/* USER CHIP in nav */
+.user-chip{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1px solid var(--wire2);background:var(--ink3);cursor:pointer;transition:border-color .15s;position:relative}
+.user-chip:hover{border-color:var(--gold)}
+.user-avatar{width:28px;height:28px;border-radius:2px;object-fit:cover}
+.user-avatar-placeholder{width:28px;height:28px;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;color:var(--gold)}
+.user-name{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;color:var(--white)}
+.admin-pip{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-lo);border:1px solid rgba(200,168,75,.3);padding:1px 5px}
+
+.nav-toggle{display:none;background:none;border:none;color:var(--white);font-size:1.4rem;cursor:pointer;padding:4px}
+
+/* HERO */
+#hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding-top:58px;position:relative;overflow:hidden}
+#hero::after{content:'';position:absolute;top:0;right:18%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.12}
+.hero-content{display:flex;flex-direction:column;justify-content:center;padding:clamp(3rem,8vw,6rem) clamp(1.5rem,6vw,5rem);max-width:900px}
+.hero-kicker{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;animation:fadeUp .5s ease both}
+.hero-kicker::before{content:'';display:block;width:32px;height:1px;background:var(--gold)}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(3.8rem,10vw,8rem);font-weight:800;line-height:.92;text-transform:uppercase;letter-spacing:-.01em;color:var(--white);margin-bottom:2rem;animation:fadeUp .5s .08s ease both}
+h1 em{font-style:italic;color:var(--gold)}
+.hero-body{font-size:1rem;font-weight:300;color:var(--grey);max-width:420px;line-height:1.7;margin-bottom:2.5rem;animation:fadeUp .5s .16s ease both}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp .5s .24s ease both}
+.hero-ticker{border-top:1px solid var(--wire);display:grid;grid-template-columns:repeat(3,1fr);animation:fadeUp .5s .35s ease both}
+.ticker-item{padding:1.4rem clamp(1.5rem,4vw,3rem);border-right:1px solid var(--wire)}
+.ticker-item:last-child{border-right:none}
+.ticker-num{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:800;color:var(--white);line-height:1;margin-bottom:4px}
+.ticker-num span{color:var(--gold);font-size:1.4rem}
+.ticker-label{font-size:.72rem;color:var(--grey);text-transform:uppercase;letter-spacing:.14em}
+
+/* SECTION */
+.section{border-top:1px solid var(--wire);padding:clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem);max-width:1200px;margin:0 auto}
+h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);font-weight:800;text-transform:uppercase;line-height:1.0;color:var(--white);margin-bottom:.6rem}
+.section-lead{font-size:.9rem;font-weight:300;color:var(--grey);max-width:440px;line-height:1.7;margin-bottom:3rem}
+
+/* META */
+.meta-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem}
+.meta-badge{display:flex;align-items:center;gap:8px}
+.set-pill{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border:1px solid var(--wire2);background:var(--ink3);color:var(--grey)}
+.patch-pill{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border:1px solid rgba(200,168,75,.3);background:var(--gold-lo);color:var(--gold)}
+.meta-source-link{font-size:.75rem;color:var(--grey2);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .15s}
+.meta-source-link:hover{color:var(--grey)}
+.meta-source-link::before{content:'↗';font-size:.8rem}
+
+.tier-table{width:100%;border-collapse:collapse}
+.tier-table tr{border-bottom:1px solid var(--wire)}
+.tier-table tr:last-child{border-bottom:none}
+.tier-cell{padding:.85rem 1.25rem;vertical-align:middle}
+.tier-badge{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;width:52px;text-align:center}
+.t-s{color:var(--gold)}.t-a{color:#5AACCC}.t-b{color:#9B6EFF}.t-c{color:var(--grey)}
+.comp-tags{display:flex;flex-wrap:wrap;gap:6px}
+.comp-tag{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--wire2);background:var(--ink3);color:var(--grey);cursor:pointer;text-decoration:none;transition:all .15s}
+.comp-tag:hover{color:var(--white);background:var(--ink4);border-color:var(--wire2)}
+.meta-fallback{background:var(--ink3);border:1px solid rgba(200,168,75,.25);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.meta-fallback-text{font-size:.85rem;color:var(--grey);font-weight:300}
+.meta-fallback-text a{color:var(--gold);text-decoration:none}
+.meta-fallback-text a:hover{text-decoration:underline}
+.meta-skeleton{height:54px;background:var(--ink3);border-bottom:1px solid var(--wire);display:flex;align-items:center;padding:0 1.25rem;gap:1rem}
+.skel-block{background:var(--ink4);border-radius:2px;animation:shimmer 1.4s infinite}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* LOBBYER */
+.lobby-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+.filter-pill{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s}
+.filter-pill:hover,.filter-pill.active{background:var(--gold-lo);border-color:var(--gold);color:var(--gold)}
+.lobby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire)}
+.lobby-card{background:var(--ink2);padding:1.25rem 1.5rem;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;cursor:pointer;transition:background .15s}
+.lobby-card:hover{background:var(--ink3)}
+.rank-tag{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid;white-space:nowrap}
+.r-diamond{color:#9B6EFF;border-color:rgba(155,110,255,.35);background:rgba(155,110,255,.08)}
+.r-plat{color:#5AACCC;border-color:rgba(90,172,204,.35);background:rgba(90,172,204,.08)}
+.r-gold{color:var(--gold);border-color:rgba(200,168,75,.35);background:var(--gold-lo)}
+.r-all{color:var(--grey);border-color:var(--wire2);background:transparent}
+.lc-name{font-size:.9rem;font-weight:500;color:var(--white);margin-bottom:3px}
+.lc-meta{font-size:.75rem;font-weight:300;color:var(--grey)}
+.lc-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.lc-slots{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:600;color:var(--grey)}
+.lc-slots b{color:var(--gold)}
+.join-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s;white-space:nowrap}
+.join-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
+.lobby-create{grid-column:1/-1;background:var(--ink);border:1px dashed var(--wire2);padding:1rem 1.5rem;text-align:center;cursor:pointer;transition:border-color .15s}
+.lobby-create:hover{border-color:var(--gold)}
+.lobby-create p{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);transition:color .15s}
+.lobby-create:hover p{color:var(--gold)}
+
+/* TURNERINGER */
+.tournament-layout{display:grid;grid-template-columns:1fr 340px;gap:1px;background:var(--wire);border:1px solid var(--wire);align-items:start}
+.t-main{background:var(--ink2);padding:2rem 2.5rem}
+.t-side{background:var(--ink3);padding:1.75rem 2rem;border-left:1px solid var(--wire)}
+.t-status{display:inline-flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:1rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite}
+.t-name{font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;text-transform:uppercase;color:var(--white);line-height:1.0;margin-bottom:.5rem}
+.t-date{font-size:.85rem;font-weight:300;color:var(--grey);margin-bottom:2rem}
+.t-spec{display:flex;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--wire);gap:1rem}
+.t-spec:last-child{border-bottom:none}
+.t-spec-k{font-size:.75rem;color:var(--grey);width:100px;flex-shrink:0;text-transform:uppercase;letter-spacing:.08em}
+.t-spec-v{font-size:.875rem;font-weight:500;color:var(--white)}
+.t-side h3{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-bottom:1.25rem}
+.slots-track{height:4px;background:var(--wire2);margin-bottom:8px}
+.slots-fill{height:100%;background:var(--gold);width:37.5%}
+.slots-txt{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:600;color:var(--grey);letter-spacing:.08em;margin-bottom:1.75rem}
+.slots-txt b{color:var(--white)}
+.prize-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--wire);margin-bottom:1.75rem}
+.prize-item{background:var(--ink2);padding:.9rem 1rem}
+.prize-place{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-bottom:4px}
+.prize-val{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;color:var(--gold)}
+
+/* COMMUNITY */
+.feed{display:flex;flex-direction:column;gap:1px;background:var(--wire);border:1px solid var(--wire)}
+.post{background:var(--ink2);padding:1.25rem 1.5rem;cursor:pointer;transition:background .15s;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:start}
+.post:hover{background:var(--ink3)}
+.post-av{width:36px;height:36px;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:2px}
+.post-user{font-size:.78rem;color:var(--grey);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.post-user b{color:var(--white);font-weight:500}
+.rank-pip{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--wire2);color:var(--grey)}
+.post-title{font-size:.9rem;color:var(--white);line-height:1.45;margin-bottom:5px}
+.post-excerpt{font-size:.8rem;font-weight:300;color:var(--grey);line-height:1.65}
+.post-stats{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:2px}
+.post-stat{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--grey2);white-space:nowrap}
+
+/* CTA BAND */
+.cta-band{border-top:1px solid var(--wire);background:var(--ink2);padding:clamp(3rem,6vw,5rem) clamp(1.5rem,6vw,5rem);display:flex;align-items:center;gap:3rem;flex-wrap:wrap}
+.cta-text{flex:1;min-width:260px}
+.cta-text p{font-size:.9rem;font-weight:300;color:var(--grey);max-width:400px;line-height:1.7}
+.cta-text .btns{margin-top:2rem;display:flex;gap:12px;flex-wrap:wrap}
+.cta-note{flex-shrink:0;background:var(--ink3);border:1px solid var(--wire2);padding:1.5rem 2rem;max-width:300px}
+.cta-note h4{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+.cta-note ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.cta-note li{font-size:.8rem;font-weight:300;color:var(--grey);display:flex;align-items:center;gap:8px}
+.cta-note li::before{content:'';display:block;width:6px;height:6px;background:var(--gold);clip-path:polygon(50% 0%,100% 100%,0% 100%);flex-shrink:0}
+
+footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--grey2)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{font-size:.78rem;font-weight:300;color:var(--grey2);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--grey)}
+.footer-copy{font-size:.72rem;color:var(--grey2)}
+
+/* ── ADMIN PANEL ── */
+#admin-panel{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:1.5rem}
+#admin-panel.open{display:flex}
+.admin-modal{background:var(--ink3);border:1px solid rgba(200,168,75,.3);width:100%;max-width:560px;max-height:85vh;overflow-y:auto;position:relative}
+.admin-modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--wire);background:var(--ink2);position:sticky;top:0;z-index:1}
+.admin-modal-head h3{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.admin-close{background:none;border:none;color:var(--grey);font-size:1.2rem;cursor:pointer;padding:4px;transition:color .15s}
+.admin-close:hover{color:var(--white)}
+.admin-body{padding:1.5rem}
+.admin-section{margin-bottom:2rem}
+.admin-section:last-child{margin-bottom:0}
+.admin-section h4{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--wire)}
+.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.admin-field{display:flex;flex-direction:column;gap:4px}
+.admin-field label{font-size:.72rem;font-weight:500;color:var(--grey2);text-transform:uppercase;letter-spacing:.08em}
+.admin-input{background:var(--ink2);border:1px solid var(--wire2);color:var(--white);padding:.55rem .75rem;font-family:'Sora',sans-serif;font-size:.85rem;font-weight:300;transition:border-color .15s;width:100%}
+.admin-input:focus{outline:none;border-color:var(--gold)}
+.admin-btn{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1.25rem;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s}
+.admin-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
+.admin-btn-gold{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.admin-btn-gold:hover{background:var(--gold-hi);color:var(--ink);border-color:var(--gold-hi)}
+.admin-btn-red{border-color:rgba(201,76,76,.4);color:#C94C4C}
+.admin-btn-red:hover{background:rgba(201,76,76,.1)}
+.admin-status{font-size:.78rem;color:var(--green);margin-top:.5rem;min-height:1rem}
+.admin-admins-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.admin-admin-row{display:flex;align-items:center;gap:8px;background:var(--ink2);padding:.6rem .75rem;border:1px solid var(--wire)}
+.admin-admin-row span{flex:1;font-size:.82rem;color:var(--grey);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em}
+.admin-admin-row button{background:none;border:none;color:var(--grey2);cursor:pointer;font-size:.9rem;transition:color .15s;padding:2px 6px}
+.admin-admin-row button:hover{color:var(--red)}
+
+/* ── DISCORD LOGIN MODAL ── */
+.modal-wrap{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-wrap.open{opacity:1;pointer-events:all}
+.modal{background:var(--ink3);border:1px solid var(--wire2);padding:2.5rem;max-width:460px;width:100%;position:relative;transform:translateY(16px);transition:transform .2s}
+.modal-wrap.open .modal{transform:none}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--grey);font-size:1.2rem;cursor:pointer}
+.modal-close:hover{color:var(--white)}
+.modal h3{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--white);margin-bottom:.5rem}
+.modal p{font-size:.875rem;font-weight:300;color:var(--grey);line-height:1.7;margin-bottom:.75rem}
+.modal .btn-discord{margin-top:1rem;width:100%;justify-content:center;clip-path:none;padding:.7rem 1.5rem;font-size:.9rem}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* MOBILE */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-links.open{display:flex;flex-direction:column;position:fixed;top:58px;left:0;right:0;background:rgba(11,13,15,.97);border-bottom:1px solid var(--wire);padding:1rem 0;z-index:199}
+  .nav-links.open a{height:auto;line-height:1;padding:.85rem 1.5rem;border-bottom:none}
+  .nav-toggle{display:block}
+  .tournament-layout{grid-template-columns:1fr}
+  .t-side{border-left:none;border-top:1px solid var(--wire)}
+  .hero-ticker{grid-template-columns:1fr}
+  .ticker-item{border-right:none;border-bottom:1px solid var(--wire)}
+  .ticker-item:last-child{border-bottom:none}
+  .post{grid-template-columns:auto 1fr}
+  .post-stats{display:none}
+  .cta-note{max-width:100%;width:100%}
+  .admin-row{grid-template-columns:1fr}
+}
+@media(max-width:500px){h1{font-size:3.4rem}}
+</style>
+</head>
+<body>
+
+<!-- ── DISCORD LOGIN MODAL ── -->
+<div class="modal-wrap" id="discord-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>Logg inn med Discord</h3>
+    <p>Autentiser med Discord-kontoen din. Du godkjenner tilgang og sendes automatisk tilbake.</p>
+    <p style="font-size:.8rem;color:var(--grey)"><strong style="color:var(--white)">Hva du får:</strong> egne lobbyer, turneringspåmelding, community-profil og norsk TFT-rolle.</p>
+    <button class="btn-discord" onclick="startDiscordAuth()">
+      <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="white"/></svg>
+      Logg inn med Discord
+    </button>
+  </div>
+</div>
+
+<!-- ── ADMIN PANEL ── -->
+<div id="admin-panel">
+  <div class="admin-modal">
+    <div class="admin-modal-head">
+      <h3>⚙ Admin-panel</h3>
+      <button class="admin-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-body">
+
+      <!-- Set / Patch -->
+      <div class="admin-section">
+        <h4>Set &amp; Patch</h4>
+        <div class="admin-row">
+          <div class="admin-field">
+            <label>TFT Set</label>
+            <input class="admin-input" id="admin-set" type="number" placeholder="17">
+          </div>
+          <div class="admin-field">
+            <label>Patch</label>
+            <input class="admin-input" id="admin-patch" type="text" placeholder="17.3">
+          </div>
+        </div>
+        <div class="admin-field" style="margin-bottom:8px">
+          <label>Sesong</label>
+          <input class="admin-input" id="admin-season" type="text" placeholder="Sesong 14">
+        </div>
+        <button class="admin-btn admin-btn-gold" onclick="saveConfig()">Lagre</button>
+        <div class="admin-status" id="config-status"></div>
+      </div>
+
+      <!-- Meta-refresh -->
+      <div class="admin-section">
+        <h4>Meta-data</h4>
+        <p style="font-size:.8rem;color:var(--grey);font-weight:300;margin-bottom:.75rem;line-height:1.6">
+          Tier list-data hentes fra tftactics.gg og caches i 1 time. Trykk for å tvinge ny henting nå.
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="admin-btn" onclick="refreshMeta()">↻ Oppdater meta nå</button>
+          <a href="https://tftactics.gg/tierlist/team-comps/" target="_blank" class="admin-btn" style="text-decoration:none">↗ tftactics.gg</a>
+        </div>
+        <div class="admin-status" id="meta-status"></div>
+      </div>
+
+      <!-- Admins -->
+      <div class="admin-section">
+        <h4>Discord-admins</h4>
+        <p style="font-size:.8rem;color:var(--grey);font-weight:300;margin-bottom:.75rem;line-height:1.6">
+          Legg til Discord User ID-er som skal ha admin-tilgang. Finn ID ved å høyreklikke bruker i Discord → Kopier bruker-ID (krever Developer Mode aktivert).
+        </p>
+        <div class="admin-admins-list" id="admins-list"></div>
+        <div style="display:flex;gap:8px">
+          <input class="admin-input" id="new-admin-id" placeholder="Discord bruker-ID (eks: 123456789012345678)" style="flex:1">
+          <button class="admin-btn" onclick="addAdmin()">+ Legg til</button>
+        </div>
+        <div class="admin-status" id="admin-status"></div>
+        <p style="font-size:.72rem;color:var(--grey2);margin-top:.75rem;line-height:1.6">
+          Merk: Admin-IDer i <code style="font-size:.72rem;color:var(--gold)">ADMIN_DISCORD_IDS</code> i Worker-miljøvariablene er alltid aktive, uavhengig av denne listen.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="logo.png" alt="Vallefort">
+    <span>Vallefort</span>
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#lobbyer">Lobbyer</a></li>
+    <li><a href="#meta">Meta</a></li>
+    <li><a href="#turneringer">Turneringer</a></li>
+    <li><a href="#community">Community</a></li>
+  </ul>
+  <div class="nav-right">
+    <div id="nav-user-area">
+      <!-- Fylles av JS: enten login-knapp eller user-chip -->
+      <button class="btn-discord" onclick="openModal()">
+        <svg width="16" height="12" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="white"/></svg>
+        Logg inn
+      </button>
+    </div>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-kicker">Norsk TFT Community — <span id="hero-season">Sesong 14</span></div>
+    <h1>Finn ditt<br><em>norske</em><br>TFT-lag</h1>
+    <p class="hero-body">Lobbyer, meta-diskusjoner og turneringer for norske Teamfight Tactics-spillere. Alle ranks velkomne.</p>
+    <div class="hero-btns">
+      <a href="#lobbyer" class="btn-primary">Finn en lobby</a>
+      <button class="btn-ghost" onclick="openModal()">
+        <svg width="15" height="12" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="currentColor"/></svg>
+        Logg inn med Discord
+      </button>
+    </div>
+  </div>
+  <div class="hero-ticker">
+    <div class="ticker-item"><div class="ticker-num">340<span>+</span></div><div class="ticker-label">Medlemmer</div></div>
+    <div class="ticker-item"><div class="ticker-num">12</div><div class="ticker-label">Aktive lobbyer</div></div>
+    <div class="ticker-item"><div class="ticker-num">1</div><div class="ticker-label">Turnering planlagt</div></div>
+  </div>
+</section>
+
+<!-- META -->
+<section id="meta" style="background:var(--ink2)">
+  <div class="section">
+    <div class="meta-header">
+      <div>
+        <div class="label-line reveal"><span class="label">Live meta</span></div>
+        <h2 class="reveal">Tier list</h2>
+      </div>
+      <div class="meta-badge reveal">
+        <span class="set-pill" id="meta-set-pill">Set 17</span>
+        <span class="patch-pill" id="meta-patch-pill">Patch …</span>
+        <a class="meta-source-link" href="https://tftactics.gg/tierlist/team-comps/" target="_blank">tftactics.gg</a>
+      </div>
+    </div>
+    <p class="section-lead reveal">Hentes automatisk fra tftactics.gg og oppdateres hver time. Klikk en comp for å se guide.</p>
+
+    <!-- Fallback-banner (skjult som standard) -->
+    <div class="meta-fallback reveal" id="meta-fallback" style="display:none">
+      <span style="font-size:1.2rem">⚠</span>
+      <div class="meta-fallback-text">
+        Live data utilgjengelig — tftactics.gg krever JavaScript-rendering.
+        Se <a href="https://tftactics.gg/tierlist/team-comps/" target="_blank">tftactics.gg</a> direkte, eller konfigurer Worker-backenden for å aktivere live data.
+      </div>
+    </div>
+
+    <table class="tier-table reveal" id="tier-table" style="border:1px solid var(--wire);background:var(--ink3)">
+      <!-- Skeleton mens det laster -->
+      <tbody id="tier-body">
+        <tr class="meta-skeleton"><td><div class="skel-block" style="width:36px;height:28px"></div></td><td><div class="skel-block" style="width:60%;height:16px"></div></td></tr>
+        <tr class="meta-skeleton"><td><div class="skel-block" style="width:36px;height:28px"></div></td><td><div class="skel-block" style="width:50%;height:16px"></div></td></tr>
+        <tr class="meta-skeleton"><td><div class="skel-block" style="width:36px;height:28px"></div></td><td><div class="skel-block" style="width:45%;height:16px"></div></td></tr>
+        <tr class="meta-skeleton"><td><div class="skel-block" style="width:36px;height:28px"></div></td><td><div class="skel-block" style="width:35%;height:16px"></div></td></tr>
+      </tbody>
+    </table>
+    <p class="meta-patch reveal" id="meta-fetched-at" style="margin-top:1.25rem;font-size:.75rem;color:var(--grey2)">Laster…</p>
+  </div>
+</section>
+
+<!-- LOBBYER -->
+<section id="lobbyer">
+  <div class="section">
+    <div class="label-line reveal"><span class="label">Finn et spill</span></div>
+    <h2 class="reveal">Åpne lobbyer</h2>
+    <p class="section-lead reveal">Filtrer etter rank og bli med. Logg inn med Discord for å opprette egen lobby.</p>
+    <div class="lobby-filters reveal">
+      <button class="filter-pill active">Alle</button>
+      <button class="filter-pill">Diamond+</button>
+      <button class="filter-pill">Platinum+</button>
+      <button class="filter-pill">Gold+</button>
+      <button class="filter-pill">Åpne</button>
+    </div>
+    <div class="lobby-grid reveal">
+      <div class="lobby-card">
+        <span class="rank-tag r-diamond">Diamond+</span>
+        <div><div class="lc-name">Rank push — morgenkø</div><div class="lc-meta">Asgard99 · 12 min siden</div></div>
+        <div class="lc-right"><div class="lc-slots"><b>6</b>/8</div><button class="join-btn">Join</button></div>
+      </div>
+      <div class="lobby-card">
+        <span class="rank-tag r-plat">Platinum+</span>
+        <div><div class="lc-name">Casual — ingen stress</div><div class="lc-meta">NordbjørnTFT · 3 min siden</div></div>
+        <div class="lc-right"><div class="lc-slots"><b>3</b>/8</div><button class="join-btn">Join</button></div>
+      </div>
+      <div class="lobby-card">
+        <span class="rank-tag r-gold">Gold+</span>
+        <div><div class="lc-name">Lær comps — newcomers welcome</div><div class="lc-meta">FjordGaming · 28 min siden</div></div>
+        <div class="lc-right"><div class="lc-slots"><b>5</b>/8</div><button class="join-btn">Join</button></div>
+      </div>
+      <div class="lobby-card">
+        <span class="rank-tag r-all">Alle ranks</span>
+        <div><div class="lc-name">Søndagslobby — hyggelig stemning</div><div class="lc-meta">OsloGaming · 1t siden</div></div>
+        <div class="lc-right"><div class="lc-slots"><b>2</b>/8</div><button class="join-btn">Join</button></div>
+      </div>
+      <div class="lobby-create" onclick="requireLogin()"><p>+ Opprett ny lobby — krever Discord-innlogging</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TURNERINGER -->
+<section id="turneringer">
+  <div class="section">
+    <div class="label-line reveal"><span class="label">Konkurranse</span></div>
+    <h2 class="reveal">Turneringer</h2>
+    <p class="section-lead reveal">Norske TFT-turneringer arrangert av community-en.</p>
+    <div class="tournament-layout reveal">
+      <div class="t-main">
+        <div class="t-status"><span class="live-dot"></span> Påmelding åpen</div>
+        <div class="t-name">Vallefort Cup #1</div>
+        <div class="t-date">Dato annonseres · <span id="t-season">Sesong 14</span></div>
+        <div>
+          <div class="t-spec"><span class="t-spec-k">Format</span><span class="t-spec-v">Enkelt utslagsspill</span></div>
+          <div class="t-spec"><span class="t-spec-k">Spillere</span><span class="t-spec-v">16 plasser</span></div>
+          <div class="t-spec"><span class="t-spec-k">Rank-krav</span><span class="t-spec-v">Plat+ anbefalt</span></div>
+          <div class="t-spec"><span class="t-spec-k">Server</span><span class="t-spec-v">EUW</span></div>
+          <div class="t-spec"><span class="t-spec-k">Premie</span><span class="t-spec-v">TBA</span></div>
+        </div>
+      </div>
+      <div class="t-side">
+        <h3>Påmelding</h3>
+        <div class="slots-track"><div class="slots-fill"></div></div>
+        <div class="slots-txt"><b>6</b> / 16 påmeldt</div>
+        <div class="prize-grid">
+          <div class="prize-item"><div class="prize-place">1. plass</div><div class="prize-val">TBA</div></div>
+          <div class="prize-item"><div class="prize-place">2. plass</div><div class="prize-val">TBA</div></div>
+        </div>
+        <button class="btn-discord" onclick="requireLogin()" style="width:100%;justify-content:center;clip-path:none;padding:.7rem;font-size:.85rem">
+          <svg width="16" height="12" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="white"/></svg>
+          Meld deg på
+        </button>
+        <p style="font-size:.72rem;color:var(--grey2);margin-top:10px;text-align:center">Krever Discord-innlogging</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section id="community" style="background:var(--ink2)">
+  <div class="section">
+    <div class="label-line reveal"><span class="label">Diskusjon</span></div>
+    <h2 class="reveal">Fra community-en</h2>
+    <p class="section-lead reveal">Norske TFT-spillere i samtale. Bli med på Discord for å delta.</p>
+    <div class="feed reveal">
+      <div class="post"><div class="post-av">AK</div><div class="post-body"><div class="post-user"><b>Asgard99</b><span class="rank-pip">Diamond II</span></div><div class="post-title">Rebel Bruiser er completely broken nå — noen som har testet variantene?</div><div class="post-excerpt">Prøvde 3x bruiser 2x rebel i går og endte 1st to ganger på rad.</div></div><div class="post-stats"><span class="post-stat">💬 14</span><span class="post-stat">🔥 34</span><span class="post-stat">2t</span></div></div>
+      <div class="post"><div class="post-av">NB</div><div class="post-body"><div class="post-user"><b>NordbjørnTFT</b><span class="rank-pip">Platinum I</span></div><div class="post-title">Guide: Slik spiller du econ-åpning mot aggressive spillere</div><div class="post-excerpt">Mange sliter med å holde HP når folk kjøper hardt fra runde 2.</div></div><div class="post-stats"><span class="post-stat">💬 7</span><span class="post-stat">🔥 21</span><span class="post-stat">5t</span></div></div>
+      <div class="post"><div class="post-av">FG</div><div class="post-body"><div class="post-user"><b>FjordGaming</b><span class="rank-pip">Gold III</span></div><div class="post-title">Første gang top 4 i Diamond-lobby — takk for hjelpen!</div><div class="post-excerpt">Fikk tips om augment-prioritering her forrige uke og det endret alt.</div></div><div class="post-stats"><span class="post-stat">💬 22</span><span class="post-stat">🔥 58</span><span class="post-stat">1d</span></div></div>
+      <div class="post"><div class="post-av">OG</div><div class="post-body"><div class="post-user"><b>OsloGaming</b><span class="rank-pip">Platinum III</span></div><div class="post-title">Vallefort Cup #1 — hva synes dere om formatet?</div><div class="post-excerpt">Vi vurderer enkelt utslagsspill vs round robin til første turnering.</div></div><div class="post-stats"><span class="post-stat">💬 31</span><span class="post-stat">🔥 47</span><span class="post-stat">2d</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-band">
+  <div class="cta-text reveal">
+    <div class="label-line"><span class="label">Bli med</span></div>
+    <h2>Klar til å spille?</h2>
+    <p>Alle norske TFT-spillere er velkomne, fra Iron til Challenger.</p>
+    <div class="btns">
+      <a href="https://discord.gg/" target="_blank" class="btn-primary">Åpne Discord</a>
+      <button class="btn-ghost" onclick="openModal()">Logg inn på siden</button>
+    </div>
+  </div>
+  <div class="cta-note reveal">
+    <h4>Discord-login gir deg</h4>
+    <ul>
+      <li>Opprett og administrer lobbyer</li>
+      <li>Meld deg på turneringer</li>
+      <li>Profil med rank og stats</li>
+      <li>Norsk TFT-rolle automatisk</li>
+      <li>Skriv i community-feeden</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">Vallefort</div>
+  <nav class="footer-links"><a href="#">Om</a><a href="#">Regler</a><a href="https://discord.gg/" target="_blank">Discord</a><a href="#">Kontakt</a></nav>
+  <div class="footer-copy">© 2026 Vallefort</div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   CONFIG — bytt ut med din Worker URL
+   ══════════════════════════════════════════════════════ */
+const API_URL      = 'https://vallefort-api.dittbrukernavn.workers.dev';
+const DISCORD_CLIENT_ID = 'DIN_DISCORD_CLIENT_ID'; // ← bytt ut
+
+/* ══════════════════════════════════════════════════════
+   AUTH
+   ══════════════════════════════════════════════════════ */
+let currentUser = null;
+
+function getToken() { return localStorage.getItem('vf_token'); }
+function setToken(t) { localStorage.setItem('vf_token', t); }
+function clearToken() { localStorage.removeItem('vf_token'); }
+
+async function loadUser() {
+  const t = getToken();
+  if (!t) return renderLoggedOut();
+
+  try {
+    const r = await fetch(`${API_URL}/api/me`, {
+      headers: { Authorization: `Bearer ${t}` }
+    });
+    if (!r.ok) { clearToken(); return renderLoggedOut(); }
+    currentUser = await r.json();
+    renderLoggedIn(currentUser);
+
+    // Last config og vis admin-knapp hvis admin
+    if (currentUser.isAdmin) loadConfig();
+  } catch {
+    renderLoggedOut();
+  }
+}
+
+function renderLoggedOut() {
+  document.getElementById('nav-user-area').innerHTML = `
+    <button class="btn-discord" onclick="openModal()">
+      <svg width="16" height="12" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="white"/></svg>
+      Logg inn
+    </button>`;
+}
+
+function renderLoggedIn(user) {
+  const adminBtn = user.isAdmin
+    ? `<button class="admin-btn" onclick="openAdmin()" style="font-size:.7rem;padding:4px 10px;letter-spacing:.1em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;border:1px solid rgba(200,168,75,.4);background:var(--gold-lo);color:var(--gold);cursor:pointer">⚙ Admin</button>`
+    : '';
+  const initials = user.username.slice(0, 2).toUpperCase();
+  document.getElementById('nav-user-area').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px">
+      ${adminBtn}
+      <div class="user-chip" onclick="handleUserClick()">
+        ${user.avatar
+          ? `<img class="user-avatar" src="${user.avatar}" alt="${user.username}">`
+          : `<div class="user-avatar-placeholder">${initials}</div>`}
+        <span class="user-name">${user.username}</span>
+        ${user.isAdmin ? '<span class="admin-pip">Admin</span>' : ''}
+      </div>
+    </div>`;
+}
+
+function handleUserClick() {
+  if (confirm(`Logg ut som ${currentUser.username}?`)) {
+    clearToken();
+    currentUser = null;
+    renderLoggedOut();
+  }
+}
+
+function requireLogin() {
+  if (!currentUser) openModal();
+}
+
+/* ══════════════════════════════════════════════════════
+   DISCORD OAUTH
+   ══════════════════════════════════════════════════════ */
+function startDiscordAuth() {
+  const state    = Math.random().toString(36).slice(2);
+  const redirect = encodeURIComponent(`${API_URL}/auth/callback`);
+  const scope    = encodeURIComponent('identify guilds.join');
+  sessionStorage.setItem('discord_state', state);
+  window.location.href = `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${state}`;
+}
+
+// Håndter token i URL-hash etter OAuth-redirect
+function handleOAuthReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+  if (token) {
+    setToken(token);
+    window.history.replaceState({}, '', '/');
+    loadUser();
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   META — TIER LIST
+   ══════════════════════════════════════════════════════ */
+const TIER_CLASSES = { S: 't-s', A: 't-a', B: 't-b', C: 't-c' };
+
+async function loadMeta() {
+  try {
+    const r = await fetch(`${API_URL}/api/meta`);
+    if (!r.ok) throw new Error('API feil');
+    const data = await r.json();
+    renderMeta(data);
+  } catch {
+    // Worker ikke satt opp ennå — vis demo-data
+    renderMeta(getDemoMeta());
+  }
+}
+
+function getDemoMeta() {
+  return {
+    set: 17, patch: '17.3',
+    fetchedAt: new Date().toISOString(),
+    fallback: true,
+    sourceUrl: 'https://tftactics.gg/tierlist/team-comps/',
+    tiers: {
+      S: [
+        { name: 'Dark Star Kai\'Sa', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Anima Squad', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Arcanist Reroll', url: 'https://tftactics.gg/tierlist/team-comps/' },
+      ],
+      A: [
+        { name: 'Sorcerer Flex', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Brawler Blaster', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Sniper Fast 8', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Enforcer Carry', url: 'https://tftactics.gg/tierlist/team-comps/' },
+      ],
+      B: [
+        { name: 'Cybernetic Tank', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Vanguard Mage', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Chrono Reroll', url: 'https://tftactics.gg/tierlist/team-comps/' },
+      ],
+      C: [
+        { name: 'Mech Pilot', url: 'https://tftactics.gg/tierlist/team-comps/' },
+        { name: 'Infiltrator', url: 'https://tftactics.gg/tierlist/team-comps/' },
+      ],
+    },
+  };
+}
+
+function renderMeta(data) {
+  // Oppdater badges
+  document.getElementById('meta-set-pill').textContent  = `Set ${data.set}`;
+  document.getElementById('meta-patch-pill').textContent = `Patch ${data.patch}`;
+
+  const ts = new Date(data.fetchedAt);
+  const timeStr = ts.toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('meta-fetched-at').textContent =
+    data.fallback
+      ? `⚠ Eksempeldata — Worker ikke konfigurert. Se tftactics.gg for live data.`
+      : `Hentet: ${timeStr} · Kilde: tftactics.gg`;
+
+  if (data.fallback) {
+    document.getElementById('meta-fallback').style.display = 'flex';
+  }
+
+  const tiers = ['S','A','B','C'];
+  const tbody = document.getElementById('tier-body');
+  tbody.innerHTML = '';
+
+  for (const tier of tiers) {
+    const comps = data.tiers[tier] || [];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="tier-cell" style="width:52px">
+        <div class="tier-badge ${TIER_CLASSES[tier]}">${tier}</div>
+      </td>
+      <td class="tier-cell">
+        <div class="comp-tags">
+          ${comps.length
+            ? comps.map(c =>
+                `<a class="comp-tag" href="${c.url || data.sourceUrl}" target="_blank">${c.name}</a>`
+              ).join('')
+            : `<span style="font-size:.78rem;color:var(--grey2);font-style:italic">Ingen comps</span>`}
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   CONFIG (set/patch/season)
+   ══════════════════════════════════════════════════════ */
+let currentConfig = null;
+
+async function loadConfig() {
+  try {
+    const r = await fetch(`${API_URL}/api/config`);
+    if (!r.ok) return;
+    const cfg = await r.json();
+    currentConfig = cfg;
+    applyConfig(cfg);
+  } catch { /* worker ikke klar */ }
+}
+
+function applyConfig(cfg) {
+  if (cfg.season) {
+    document.getElementById('hero-season').textContent = cfg.season;
+    const tSeason = document.getElementById('t-season');
+    if (tSeason) tSeason.textContent = cfg.season;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   ADMIN PANEL
+   ══════════════════════════════════════════════════════ */
+function openAdmin() {
+  // Fyll inn nåværende verdier
+  if (currentConfig) {
+    document.getElementById('admin-set').value    = currentConfig.set    || '';
+    document.getElementById('admin-patch').value  = currentConfig.patch  || '';
+    document.getElementById('admin-season').value = currentConfig.season || '';
+    renderAdminsList(currentConfig.admins || []);
+  }
+  document.getElementById('admin-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAdmin() {
+  document.getElementById('admin-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('admin-panel').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeAdmin();
+});
+
+function renderAdminsList(admins) {
+  const list = document.getElementById('admins-list');
+  if (!admins.length) { list.innerHTML = '<p style="font-size:.78rem;color:var(--grey2)">Ingen ekstra admins lagt til ennå.</p>'; return; }
+  list.innerHTML = admins.map((id, i) => `
+    <div class="admin-admin-row">
+      <span>${id}</span>
+      <button onclick="removeAdmin(${i})" title="Fjern">✕</button>
+    </div>`).join('');
+}
+
+async function saveConfig() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Lagrer…';
+
+  const body = {
+    set:    Number(document.getElementById('admin-set').value),
+    patch:  document.getElementById('admin-patch').value.trim(),
+    season: document.getElementById('admin-season').value.trim(),
+    admins: currentConfig?.admins || [],
+  };
+
+  try {
+    const r = await fetch(`${API_URL}/api/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const updated = await r.json();
+    currentConfig = updated;
+    applyConfig(updated);
+    showStatus('config-status', '✓ Lagret', 'var(--green)');
+    // Oppdater meta-badges
+    document.getElementById('meta-set-pill').textContent  = `Set ${updated.set}`;
+    document.getElementById('meta-patch-pill').textContent = `Patch ${updated.patch}`;
+  } catch (e) {
+    showStatus('config-status', `Feil: ${e.message}`, 'var(--red)');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Lagre';
+}
+
+async function refreshMeta() {
+  const status = document.getElementById('meta-status');
+  status.textContent = 'Henter…';
+  status.style.color = 'var(--grey)';
+  try {
+    const r = await fetch(`${API_URL}/api/meta/refresh`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    renderMeta(data.data);
+    showStatus('meta-status', '✓ Meta oppdatert', 'var(--green)');
+  } catch (e) {
+    showStatus('meta-status', `Feil: ${e.message}`, 'var(--red)');
+  }
+}
+
+function addAdmin() {
+  const input = document.getElementById('new-admin-id');
+  const id    = input.value.trim();
+  if (!id || !/^\d{17,20}$/.test(id)) {
+    showStatus('admin-status', 'Ugyldig Discord ID (skal være 17–20 siffer)', 'var(--red)');
+    return;
+  }
+  const admins = [...(currentConfig?.admins || [])];
+  if (admins.includes(id)) { showStatus('admin-status', 'Allerede lagt til', 'var(--grey)'); return; }
+  admins.push(id);
+  input.value = '';
+  if (!currentConfig) currentConfig = {};
+  currentConfig.admins = admins;
+  renderAdminsList(admins);
+  saveAdmins(admins);
+}
+
+function removeAdmin(index) {
+  const admins = [...(currentConfig?.admins || [])];
+  admins.splice(index, 1);
+  currentConfig.admins = admins;
+  renderAdminsList(admins);
+  saveAdmins(admins);
+}
+
+async function saveAdmins(admins) {
+  try {
+    await fetch(`${API_URL}/api/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ admins }),
+    });
+    showStatus('admin-status', '✓ Lagret', 'var(--green)');
+  } catch (e) {
+    showStatus('admin-status', `Feil: ${e.message}`, 'var(--red)');
+  }
+}
+
+function showStatus(id, msg, color) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.color = color;
+  setTimeout(() => { el.textContent = ''; }, 4000);
+}
+
+/* ══════════════════════════════════════════════════════
+   DISCORD LOGIN MODAL
+   ══════════════════════════════════════════════════════ */
+function openModal() { document.getElementById('discord-modal').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal() { document.getElementById('discord-modal').classList.remove('open'); document.body.style.overflow=''; }
+document.getElementById('discord-modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL
+   ══════════════════════════════════════════════════════ */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = Array.from(e.target.parentNode.children).indexOf(e.target);
+      e.target.style.transitionDelay = (idx % 4) * 0.06 + 's';
+      e.target.classList.add('on');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+/* FILTER PILLS */
+document.querySelectorAll('.filter-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+/* NAV MOBILE */
+document.getElementById('nav-toggle').addEventListener('click', () => {
+  document.getElementById('nav-links').classList.toggle('open');
+});
+document.querySelectorAll('#nav-links a').forEach(a =>
+  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
+);
+
+/* ══════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════ */
+handleOAuthReturn();
+loadUser();
+loadMeta();
+loadConfig();
+</script>
+</body>
+</html>
