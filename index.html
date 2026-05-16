@@ -1139,7 +1139,8 @@ function renderForumList(comments) {
 
   // Index all comments and group replies under their parent
   comments.forEach(c => { _fc[c.id] = c; });
-  const topLevel = comments.filter(c => !c.replyTo);
+  const topLevel = comments.filter(c => !c.replyTo)
+    .sort((a, b) => (b.likes||[]).length - (a.likes||[]).length);
   const byParent = {};
   comments.filter(c => c.replyTo).forEach(c => {
     (byParent[c.replyTo.id] = byParent[c.replyTo.id] || []).push(c);
@@ -1173,8 +1174,8 @@ function renderFcItem(c, byParent, isReply) {
 
   const replies = byParent[c.id] || [];
   const repliesHtml = replies.length ? `
-    <button class="fc-reply-toggle" id="frt-${c.id}" onclick="toggleReplies('${c.id}')">▾ ${replies.length} svar</button>
-    <div class="fc-replies" id="fc-replies-${c.id}">
+    <button class="fc-reply-toggle" id="frt-${c.id}" onclick="toggleReplies('${c.id}')">▸ ${replies.length} svar</button>
+    <div class="fc-replies" id="fc-replies-${c.id}" style="display:none">
       ${replies.map(r => renderFcItem(r, byParent, true)).join('')}
     </div>` : '';
 
