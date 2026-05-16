@@ -2,7 +2,7 @@
 <html lang="no">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Vallefort — Norsk TFT Community</title>
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <link rel="icon" type="image/png" href="logo.png">
@@ -51,7 +51,7 @@ body::before{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;b
 .reveal.on{opacity:1;transform:none}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;display:flex;align-items:center;padding:0 clamp(1rem,4vw,3rem);border-bottom:1px solid rgba(255,255,255,0.12);background:rgba(16,22,32,0.96);backdrop-filter:blur(24px);gap:2rem;box-shadow:0 1px 24px rgba(0,0,0,.5)}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:calc(62px + env(safe-area-inset-top));display:flex;align-items:flex-end;padding:0 clamp(1rem,4vw,3rem) 0;padding-top:env(safe-area-inset-top);padding-left:clamp(1rem,4vw,3rem);padding-right:clamp(1rem,4vw,3rem);border-bottom:1px solid rgba(255,255,255,0.12);background:rgba(16,22,32,0.96);backdrop-filter:blur(24px);gap:2rem;box-shadow:0 1px 24px rgba(0,0,0,.5)}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
 .nav-logo img{height:34px;width:34px;object-fit:contain;border-radius:6px}
 .nav-logo span{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--white)}
@@ -76,7 +76,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;display:flex;ali
 .admin-pip{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-lo);border:1px solid rgba(200,168,75,.4);padding:1px 5px}
 
 /* HERO */
-#hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding-top:58px;position:relative;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 60% 20%,rgba(200,168,75,0.07) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 10% 80%,rgba(88,101,242,0.06) 0%,transparent 55%),var(--ink)}
+#hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding-top:calc(58px + env(safe-area-inset-top));position:relative;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 60% 20%,rgba(200,168,75,0.07) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 10% 80%,rgba(88,101,242,0.06) 0%,transparent 55%),var(--ink)}
 #hero::after{content:'';position:absolute;top:0;right:18%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.18}
 #hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
 .hero-content{display:flex;flex-direction:column;justify-content:center;padding:clamp(3rem,8vw,6rem) clamp(1.5rem,6vw,5rem);max-width:900px}
@@ -420,7 +420,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 .admin-admin-row button:hover{color:var(--red)}
 
 /* ADMIN SUB-NAV */
-#admin-bar{display:none;position:fixed;top:62px;left:0;right:0;z-index:190;height:38px;background:rgba(26,20,12,0.97);border-bottom:1px solid rgba(200,168,75,0.25);backdrop-filter:blur(12px);align-items:center;padding:0 clamp(1rem,4vw,3rem);gap:4px}
+#admin-bar{display:none;position:fixed;top:calc(62px + env(safe-area-inset-top));left:0;right:0;z-index:190;height:38px;background:rgba(26,20,12,0.97);border-bottom:1px solid rgba(200,168,75,0.25);backdrop-filter:blur(12px);align-items:center;padding:0 clamp(1rem,4vw,3rem);gap:4px}
 #admin-bar.visible{display:flex}
 .admin-bar-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border:1px solid transparent;background:none;color:rgba(200,168,75,0.6);cursor:pointer;transition:all .15s;height:26px;display:inline-flex;align-items:center;gap:6px}
 .admin-bar-btn:hover,.admin-bar-btn.active{color:var(--gold);border-color:rgba(200,168,75,0.3);background:rgba(200,168,75,0.08)}
@@ -1042,7 +1042,8 @@ function renderLoggedIn(user) {
   // Vis admin-bar og juster padding på body
   if (user.isAdmin) {
     document.getElementById('admin-bar').classList.add('visible');
-    document.getElementById('hero').style.paddingTop = '100px';
+    const sai = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sai') || '0') || 0;
+    document.getElementById('hero').style.paddingTop = `calc(100px + env(safe-area-inset-top))`;
   }
 
   // Skjul login-knapper
