@@ -152,68 +152,60 @@ async function scrapeTftAcademy() {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Vallefort/1.0)', 'Accept': 'text/html' },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return parseTierList(await res.text());
+  return parseTierList(res);
 }
 
-function parseTierList(html) {
-  const tiers  = { S: [], A: [], B: [], C: [] };
+// Bruker HTMLRewriter for å parse tier-seksjoner og comp-lenker fra siden.
+// Siden har strukturen: <h2>S tier</h2> ... <a href="/tierlist/comps/set-17-..."> ...
+async function parseTierList(response) {
+  const tiers = { S: [], A: [], B: [], C: [] };
+  const seen  = new Set();
+  let currentTier = null;
+  let setNum      = 17;
+  let patch       = '?';
+  let h2Buf       = '';
 
-  // Patch
-  const patchM = html.match(/>(\d+\.\d+[a-z]?)</);
-  const patch  = patchM ? patchM[1] : '17.3';
-
-  // Set
-  const setM   = html.match(/set-(\d+)-/);
-  const setNum = setM ? parseInt(setM[1]) : 17;
-
-  // Dataen ligger i en stor guides:[...] array i script-taggen.
-  // Hent alle par av {tier:"X", compSlug:"set-17-...", metaTitle:"..."} med regex
-  // Formatet er: tier:"S",...,compSlug:"set-17-dark-star",...,metaTitle:"Dark Star Flex"
-  // eller compSlug først, så tier
-
-  const seen = new Set();
-
-  // Regex: finn alle compSlug + tier kombos
-  // compSlug:"set-17-xxx" kan komme før eller etter tier:"S"
-  // Vi bruker et vindu på ~500 tegn rundt hvert compSlug
-  const slugRe = /compSlug:"(set-\d+-[^"]+)"/g;
-  let sm;
-
-  while ((sm = slugRe.exec(html)) !== null) {
-    const slug = sm[1];
-    if (seen.has(slug) || !slug) continue;
-
-    // Søk i et vindu rundt slug-posisjonen etter tier
-    const start  = Math.max(0, sm.index - 200);
-    const end    = Math.min(html.length, sm.index + 500);
-    const window = html.slice(start, end);
-
-    // Finn tier i vinduet
-    const tierM = window.match(/tier:"([SABCX])"/);
-    if (!tierM) continue;
-
-    const tier = tierM[1];
-    if (!tiers[tier]) continue; // ignorer X-tier
-
-    seen.add(slug);
-
-    // Finn metaTitle i vinduet
-    const titleM = window.match(/metaTitle:"([^"]+)"/);
-    const name   = titleM?.[1] || slug.replace(/^set-\d+-/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-
-    // Ignorer comps uten compSlug (tomme slugs er private/draft)
-    tiers[tier].push({
-      name,
-      url:  `https://tftacademy.com/tierlist/comps/${slug}`,
-      slug,
-    });
-  }
+  await new HTMLRewriter()
+    .on('h2', {
+      element() { h2Buf = ''; currentTier = null; },
+      text(chunk) {
+        h2Buf += chunk.text;
+        const m = h2Buf.match(/([SABC])\s+tier/i);
+        if (m) currentTier = m[1].toUpperCase();
+      },
+    })
+    .on('a', {
+      element(el) {
+        const href = el.getAttribute('href') || '';
+        const m    = href.match(/^\/tierlist\/comps\/(set-(\d+)-[\w-]+)/);
+        if (!m || !currentTier || !tiers[currentTier]) return;
+        const slug = m[1];
+        if (seen.has(slug)) return;
+        seen.add(slug);
+        setNum = parseInt(m[2]);
+        const name = slug
+          .replace(/^set-\d+-/, '')
+          .replace(/-(\d+)-(\d+)(?=-|$)/g, '-$1.$2')
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, c => c.toUpperCase());
+        tiers[currentTier].push({ name, url: `https://tftacademy.com${href}`, slug });
+      },
+    })
+    .on('*', {
+      text(chunk) {
+        if (patch !== '?') return;
+        const m = chunk.text.match(/Patch\s+(\d+\.\d+[a-z]?)/i);
+        if (m) patch = m[1];
+      },
+    })
+    .transform(response)
+    .text();
 
   return {
     source:    'tftacademy.com',
     sourceUrl: SOURCE_URL,
     set:       setNum,
-    patch,
+    patch:     patch !== '?' ? patch : `${setNum}.1`,
     fetchedAt: new Date().toISOString(),
     fallback:  false,
     tiers,
