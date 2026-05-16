@@ -163,6 +163,7 @@ async function handleAdminMembers(request, env) {
       joinedAt: typeof m === 'object' ? m.joinedAt : null,
       isAdmin:       isAdminFull(id, env, cfg),
       isContributor: isContributor(id, cfg),
+      isProtected:   isAdmin(id, env),  // env-defined — cannot be demoted
     };
   });
   return json(members);
@@ -408,7 +409,8 @@ async function handleComments(request, env, patch, slug) {
     const comments = raw ? JSON.parse(raw) : [];
     if (comments.length >= MAX_COMMENTS_PER_COMP) return json({ error: 'Maks antall kommentarer nådd' }, 400);
 
-    const newComment = { id: crypto.randomUUID(), userId: user.id, username: user.username, avatar: user.avatar || null, text, patch, slug, createdAt: new Date().toISOString() };
+    const replyTo = body.replyTo && body.replyTo.id ? { id: body.replyTo.id, username: body.replyTo.username, text: String(body.replyTo.text || '').slice(0, 120) } : null;
+    const newComment = { id: crypto.randomUUID(), userId: user.id, username: user.username, avatar: user.avatar || null, text, replyTo, patch, slug, createdAt: new Date().toISOString() };
     comments.push(newComment);
     await env.KV.put(key, JSON.stringify(comments));
     return json(newComment, 201);
@@ -548,8 +550,13 @@ async function handleConfig(request, env) {
   if (body.set          !== undefined) updated.set          = body.set;
   if (body.patch        !== undefined) updated.patch        = body.patch;
   if (body.season       !== undefined) updated.season       = body.season;
-  if (body.admins       !== undefined) updated.admins       = body.admins;
   if (body.contributors !== undefined) updated.contributors = body.contributors;
+  if (body.admins !== undefined) {
+    // Env-defined admins (ADMIN_DISCORD_IDS) are protected — cannot be removed via config
+    const envAdmins = (env.ADMIN_DISCORD_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
+    const merged = [...new Set([...envAdmins, ...body.admins.filter(id => !envAdmins.includes(String(id)))])];
+    updated.admins = merged;
+  }
   updated.updatedAt = new Date().toISOString();
   updated.updatedBy = user.username;
   await env.KV.put(KV_CONFIG, JSON.stringify(updated));

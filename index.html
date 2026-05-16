@@ -113,15 +113,46 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .comp-chip .comment-count{font-size:.65rem;background:var(--ink4);border:1px solid var(--wire);padding:1px 5px;color:var(--grey2);font-weight:700}
 .comp-chip.active .comment-count{background:var(--gold-lo);border-color:rgba(200,168,75,.3);color:var(--gold)}
 
-/* COMP FORUM PANEL */
-.comp-forum{display:none;border-top:1px solid var(--wire);background:var(--ink);padding:1.25rem 1.5rem}
-.comp-forum.open{display:block}
-.forum-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
-.forum-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--white)}
-.forum-title span{color:var(--gold)}
-.forum-patch-note{font-size:.72rem;color:var(--grey2)}
-.forum-close{background:none;border:none;color:var(--grey);font-size:1rem;cursor:pointer;padding:2px 6px;transition:color .15s}
-.forum-close:hover{color:var(--white)}
+/* COMP FORUM MODAL */
+#forum-modal{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:5rem 1.25rem 1.25rem}
+#forum-modal.open{display:flex}
+.forum-box{background:var(--ink2);border:1px solid var(--wire2);width:100%;max-width:660px;height:min(640px,80vh);display:flex;flex-direction:column}
+.forum-box-head{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem;border-bottom:1px solid var(--wire);background:var(--ink3);flex-shrink:0}
+.forum-box-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--white)}
+.forum-box-title em{color:var(--gold);font-style:normal}
+.forum-box-sub{font-size:.7rem;color:var(--grey2);margin-top:2px}
+.forum-box-body{flex:1;overflow-y:auto;padding:.75rem 1.25rem;display:flex;flex-direction:column;gap:.5rem}
+.forum-box-body::-webkit-scrollbar{width:4px}
+.forum-box-body::-webkit-scrollbar-thumb{background:var(--wire2);border-radius:2px}
+.forum-box-foot{border-top:1px solid var(--wire);padding:.75rem 1.25rem;flex-shrink:0;background:var(--ink3)}
+.fc-item{display:flex;gap:.75rem;align-items:flex-start}
+.fc-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--ink4);border:1px solid var(--wire2)}
+.fc-av-ph{width:30px;height:30px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);flex-shrink:0}
+.fc-bubble{flex:1;min-width:0}
+.fc-meta{font-size:.7rem;color:var(--grey);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.fc-meta b{color:var(--white);font-weight:600}
+.fc-reply-quote{background:rgba(255,255,255,0.04);border-left:2px solid var(--gold);padding:.3rem .6rem;margin-bottom:.4rem;font-size:.75rem;color:var(--grey);border-radius:0 2px 2px 0}
+.fc-reply-quote b{color:rgba(200,210,225,0.7);font-weight:600}
+.fc-text{font-size:.875rem;font-weight:300;color:var(--white);line-height:1.65;word-break:break-word}
+.fc-actions{display:flex;gap:8px;margin-top:5px}
+.fc-reply-btn{background:none;border:none;font-size:.7rem;color:var(--grey2);cursor:pointer;padding:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:color .12s}
+.fc-reply-btn:hover{color:var(--gold)}
+.fc-del-btn{background:none;border:none;font-size:.7rem;color:var(--grey2);cursor:pointer;padding:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:color .12s}
+.fc-del-btn:hover{color:var(--red)}
+.fc-reply-preview{background:rgba(200,168,75,0.07);border:1px solid rgba(200,168,75,0.2);padding:.4rem .75rem;margin-bottom:.5rem;font-size:.78rem;color:var(--grey);display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.fc-reply-preview b{color:var(--gold)}
+.fc-reply-preview button{background:none;border:none;color:var(--grey2);cursor:pointer;font-size:.8rem}
+.fc-input-row{display:flex;gap:8px;align-items:flex-end}
+.fc-textarea{flex:1;background:var(--ink2);border:1px solid var(--wire2);color:var(--white);padding:.55rem .75rem;font-family:'Sora',sans-serif;font-size:.85rem;font-weight:300;resize:none;height:70px;transition:border-color .15s}
+.fc-textarea:focus{outline:none;border-color:var(--gold)}
+.fc-textarea::placeholder{color:var(--grey2)}
+.fc-send-btn{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.1rem;border:1px solid var(--gold);background:var(--gold-lo);color:var(--gold);cursor:pointer;transition:all .15s;white-space:nowrap;align-self:flex-end}
+.fc-send-btn:hover{background:var(--gold);color:var(--ink)}
+.fc-send-btn:disabled{opacity:.4;cursor:not-allowed}
+.fc-char{font-size:.68rem;color:var(--grey2);text-align:right;margin-top:3px}
+.fc-login-prompt{font-size:.85rem;color:var(--grey);text-align:center;padding:.5rem 0}
+.fc-login-prompt button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;text-decoration:underline}
+.fc-empty{font-size:.85rem;color:var(--grey2);text-align:center;padding:2rem 0;font-style:italic}
 
 /* COMMENTS */
 .comments-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;max-height:340px;overflow-y:auto;padding-right:4px}
@@ -639,6 +670,30 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   </div>
 </div>
 
+<!-- FORUM MODAL -->
+<div id="forum-modal">
+  <div class="forum-box">
+    <div class="forum-box-head">
+      <div>
+        <div class="forum-box-title" id="fm-title"></div>
+        <div class="forum-box-sub" id="fm-sub"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <a id="fm-guide-link" href="#" target="_blank" style="font-size:.72rem;color:var(--grey2);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:color .15s" onmouseover="this.style.color='var(--grey)'" onmouseout="this.style.color='var(--grey2)'">↗ Guide</a>
+        <button onclick="closeForumModal()" style="background:none;border:none;color:var(--grey);font-size:1.2rem;cursor:pointer;line-height:1">✕</button>
+      </div>
+    </div>
+    <div class="forum-box-body" id="fm-list"></div>
+    <div class="forum-box-foot">
+      <div id="fm-reply-preview" style="display:none" class="fc-reply-preview">
+        Svarer til <b id="fm-reply-name"></b>: <span id="fm-reply-text" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <button onclick="clearReply()">✕</button>
+      </div>
+      <div id="fm-input-area"></div>
+    </div>
+  </div>
+</div>
+
 <!-- MEMBERS PANEL -->
 <div id="members-panel">
   <div class="members-modal">
@@ -999,14 +1054,13 @@ function renderTierList(data) {
     const row    = document.createElement('div'); row.className = 'tier-row';
     const header = document.createElement('div'); header.className = 'tier-row-header';
     header.innerHTML = `<div class="tier-badge ${TIER_COLORS[tier]}">${tier}</div><div class="tier-comps" id="tier-comps-${tier}"></div>`;
-    const forum  = document.createElement('div'); forum.className = 'comp-forum';
-    row.appendChild(header); row.appendChild(forum); container.appendChild(row);
+    row.appendChild(header); container.appendChild(row);
     const compsDiv = header.querySelector(`#tier-comps-${tier}`);
     comps.forEach(comp => {
       const chip = document.createElement('button');
       chip.className = 'comp-chip';
       chip.innerHTML = `${escHtml(comp.name)} <span class="comment-count" id="cc-${comp.slug}">…</span>`;
-      chip.onclick = () => toggleForum(chip, comp, patch, forum);
+      chip.onclick = () => openForumModal(comp, patch);
       compsDiv.appendChild(chip);
       fetchCommentCount(comp.slug, patch);
     });
@@ -1024,93 +1078,131 @@ async function fetchCommentCount(slug, patch) {
   } catch {}
 }
 
-/* ── COMP FORUM ─────────────────────────────────── */
-let activeChip = null, activeForum = null;
+/* ── COMP FORUM MODAL ───────────────────────────── */
+let forumComp = null, forumPatch = null, forumReplyTo = null;
 
-function toggleForum(chip, comp, patch, forumEl) {
-  if (activeChip && activeChip !== chip) {
-    activeChip.classList.remove('active');
-    if (activeForum) { activeForum.classList.remove('open'); activeForum.innerHTML = ''; }
-  }
-  if (activeChip === chip) {
-    chip.classList.remove('active'); forumEl.classList.remove('open'); forumEl.innerHTML = '';
-    activeChip = null; activeForum = null; return;
-  }
-  chip.classList.add('active'); forumEl.classList.add('open');
-  activeChip = chip; activeForum = forumEl;
-  renderForum(forumEl, comp, patch);
+function openForumModal(comp, patch) {
+  forumComp  = comp;
+  forumPatch = patch;
+  forumReplyTo = null;
+  document.getElementById('fm-title').innerHTML = `<em>${escHtml(comp.name)}</em> — diskusjon`;
+  document.getElementById('fm-sub').textContent = `Patch ${patch} · Kommentarer nullstilles ved ny patch`;
+  document.getElementById('fm-guide-link').href = comp.url || '#';
+  document.getElementById('fm-list').innerHTML  = '<div class="fc-empty">Laster…</div>';
+  clearReply();
+  renderForumInput();
+  document.getElementById('forum-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadForumComments();
 }
 
-async function renderForum(el, comp, patch) {
-  el.innerHTML = `
-    <div class="forum-header">
-      <div><div class="forum-title"><span>${escHtml(comp.name)}</span> — diskusjon</div>
-      <div class="forum-patch-note">Patch ${patch} · Kommentarer nullstilles ved ny patch</div></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <a href="${escHtml(comp.url)}" target="_blank" style="font-size:.72rem;color:var(--grey2);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.06em;text-transform:uppercase">↗ Guide</a>
-        <button class="forum-close" onclick="closeActiveForum()">✕</button>
-      </div>
-    </div>
-    <div class="comments-list" id="clist-${comp.slug}"><div style="padding:.5rem;text-align:center;color:var(--grey2);font-size:.82rem">Laster…</div></div>
-    <div id="cinput-${comp.slug}"></div>`;
-  await loadComments(comp.slug, patch);
-  renderCommentInput(comp.slug, patch, document.getElementById(`cinput-${comp.slug}`));
+function closeForumModal() {
+  document.getElementById('forum-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  forumComp = null; forumPatch = null; forumReplyTo = null;
 }
+document.getElementById('forum-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeForumModal(); });
 
-async function loadComments(slug, patch) {
-  const listEl = document.getElementById(`clist-${slug}`);
-  if (!listEl) return;
+async function loadForumComments() {
+  if (!forumComp) return;
+  const listEl = document.getElementById('fm-list');
   try {
-    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}`);
+    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(forumPatch)}/${encodeURIComponent(forumComp.slug)}`);
     const d = await r.json();
-    renderCommentList(listEl, d.comments, slug, patch);
-    const cc = document.getElementById(`cc-${slug}`);
+    renderForumList(d.comments);
+    const cc = document.getElementById(`cc-${forumComp.slug}`);
     if (cc) cc.textContent = d.count;
-  } catch { listEl.innerHTML = `<div class="no-comments">Kunne ikke laste kommentarer</div>`; }
+  } catch { listEl.innerHTML = '<div class="fc-empty">Kunne ikke laste kommentarer.</div>'; }
 }
 
-function renderCommentList(el, comments, slug, patch) {
-  if (!comments.length) { el.innerHTML = `<div class="no-comments">Ingen kommentarer ennå — vær den første!</div>`; return; }
-  el.innerHTML = comments.map(c => {
+function renderForumList(comments) {
+  const listEl = document.getElementById('fm-list');
+  if (!comments || !comments.length) { listEl.innerHTML = '<div class="fc-empty">Ingen kommentarer ennå — vær den første!</div>'; return; }
+  listEl.innerHTML = comments.map(c => {
     const time   = new Date(c.createdAt).toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
     const canDel = currentUser && (currentUser.id === c.userId || currentUser.isAdmin);
-    const av     = c.avatar ? `<img class="comment-av" src="${escHtml(c.avatar)}" alt="">` : `<div class="comment-av-placeholder">${c.username.slice(0,2).toUpperCase()}</div>`;
-    return `<div class="comment-item" id="cm-${c.id}">${av}<div class="comment-body"><div class="comment-meta"><b>${escHtml(c.username)}</b> ${time}</div><div class="comment-text">${escHtml(c.text)}</div></div>${canDel ? `<button class="comment-delete" onclick="deleteComment('${slug}','${patch}','${c.id}')" title="Slett">✕</button>` : '<div></div>'}</div>`;
+    const av     = c.avatar
+      ? `<img class="fc-av" src="${escHtml(c.avatar)}" alt="">`
+      : `<div class="fc-av-ph">${(c.username||'?').slice(0,2).toUpperCase()}</div>`;
+    const quote  = c.replyTo
+      ? `<div class="fc-reply-quote"><b>${escHtml(c.replyTo.username)}</b>: ${escHtml(c.replyTo.text)}</div>`
+      : '';
+    const delBtn = canDel ? `<button class="fc-del-btn" onclick="deleteForumComment('${c.id}')">Slett</button>` : '';
+    const replyBtn = currentUser ? `<button class="fc-reply-btn" onclick="setReply('${c.id}','${escHtml(c.username).replace(/'/g,"\\'")}','${escHtml(c.text).replace(/'/g,"\\'").slice(0,80)}')">Svar</button>` : '';
+    return `<div class="fc-item" id="fci-${c.id}">
+      ${av}
+      <div class="fc-bubble">
+        <div class="fc-meta"><b>${escHtml(c.username)}</b><span>${time}</span></div>
+        ${quote}
+        <div class="fc-text">${escHtml(c.text)}</div>
+        <div class="fc-actions">${replyBtn}${delBtn}</div>
+      </div>
+    </div>`;
   }).join('');
-  el.scrollTop = el.scrollHeight;
+  listEl.scrollTop = listEl.scrollHeight;
 }
 
-function renderCommentInput(slug, patch, el) {
-  if (!el) return;
-  if (!currentUser) { el.innerHTML = `<div class="comment-login-prompt"><button onclick="openModal()">Logg inn med Discord</button> for å kommentere</div>`; return; }
-  el.innerHTML = `<div class="comment-input-area"><div style="flex:1"><textarea class="comment-textarea" id="ctxt-${slug}" placeholder="Skriv om denne compen… (maks 500 tegn)" maxlength="500" oninput="document.getElementById('cchar-${slug}').textContent=this.value.length+'/500'"></textarea><div class="char-count" id="cchar-${slug}">0/500</div></div><button class="comment-submit" id="csub-${slug}" onclick="submitComment('${slug}','${patch}')">Send</button></div>`;
+function renderForumInput() {
+  const el = document.getElementById('fm-input-area');
+  if (!currentUser) {
+    el.innerHTML = `<div class="fc-login-prompt"><button onclick="closeForumModal();openModal()">Logg inn med Discord</button> for å kommentere</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="fc-input-row">
+      <div style="flex:1">
+        <textarea class="fc-textarea" id="fc-txt" placeholder="Skriv en kommentar… (maks 500 tegn)" maxlength="500" oninput="document.getElementById('fc-char').textContent=this.value.length+'/500'"></textarea>
+        <div class="fc-char" id="fc-char">0/500</div>
+      </div>
+      <button class="fc-send-btn" id="fc-send" onclick="submitForumComment()">Send</button>
+    </div>`;
 }
 
-async function submitComment(slug, patch) {
-  const textarea = document.getElementById(`ctxt-${slug}`);
-  const btn = document.getElementById(`csub-${slug}`);
-  const text = textarea?.value.trim();
-  if (!text || !currentUser) return;
+function setReply(id, username, text) {
+  forumReplyTo = { id, username, text };
+  document.getElementById('fm-reply-preview').style.display = 'flex';
+  document.getElementById('fm-reply-name').textContent  = username;
+  document.getElementById('fm-reply-text').textContent  = text;
+  document.getElementById('fc-txt')?.focus();
+  document.getElementById(`fci-${id}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function clearReply() {
+  forumReplyTo = null;
+  const p = document.getElementById('fm-reply-preview');
+  if (p) p.style.display = 'none';
+}
+
+async function submitForumComment() {
+  const textarea = document.getElementById('fc-txt');
+  const btn      = document.getElementById('fc-send');
+  const text     = textarea?.value.trim();
+  if (!text || !currentUser || !forumComp) return;
   btn.disabled = true; btn.textContent = '…';
   try {
-    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify({text}) });
+    const body = { text };
+    if (forumReplyTo) body.replyTo = forumReplyTo;
+    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(forumPatch)}/${encodeURIComponent(forumComp.slug)}`, {
+      method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body: JSON.stringify(body)
+    });
     if (!r.ok) { const e = await r.json(); alert(e.error || 'Feil'); return; }
-    textarea.value = ''; document.getElementById(`cchar-${slug}`).textContent = '0/500';
-    await loadComments(slug, patch);
+    textarea.value = '';
+    document.getElementById('fc-char').textContent = '0/500';
+    clearReply();
+    await loadForumComments();
   } catch { alert('Noe gikk galt'); }
   finally { btn.disabled = false; btn.textContent = 'Send'; }
 }
 
-async function deleteComment(slug, patch, id) {
+async function deleteForumComment(id) {
   if (!confirm('Slett kommentar?')) return;
   try {
-    await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
-    document.getElementById(`cm-${id}`)?.remove();
-    const listEl = document.getElementById(`clist-${slug}`);
-    const count  = listEl ? listEl.querySelectorAll('.comment-item').length : 0;
-    const cc     = document.getElementById(`cc-${slug}`);
+    await fetch(`${API_URL}/api/comments/${encodeURIComponent(forumPatch)}/${encodeURIComponent(forumComp.slug)}/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
+    document.getElementById(`fci-${id}`)?.remove();
+    const count = document.getElementById('fm-list').querySelectorAll('.fc-item').length;
+    const cc = document.getElementById(`cc-${forumComp.slug}`);
     if (cc) cc.textContent = count;
-    if (!count) listEl.innerHTML = `<div class="no-comments">Ingen kommentarer ennå — vær den første!</div>`;
+    if (!count) document.getElementById('fm-list').innerHTML = '<div class="fc-empty">Ingen kommentarer ennå — vær den første!</div>';
   } catch { alert('Kunne ikke slette'); }
 }
 
@@ -1414,7 +1506,7 @@ function renderMembers(list) {
     if (!m.isAdmin) actions.push(`<button class="member-action-btn" onclick="memberPromote('${m.id}','admin')">+ Admin</button>`);
     if (!m.isContributor && !m.isAdmin) actions.push(`<button class="member-action-btn" onclick="memberPromote('${m.id}','contributor')">+ Contrib</button>`);
     if (m.isContributor && !m.isAdmin) actions.push(`<button class="member-action-btn danger" onclick="memberDemote('${m.id}','contributor')">- Contrib</button>`);
-    if (m.isAdmin) actions.push(`<button class="member-action-btn danger" onclick="memberDemote('${m.id}','admin')">- Admin</button>`);
+    if (m.isAdmin && !m.isProtected) actions.push(`<button class="member-action-btn danger" onclick="memberDemote('${m.id}','admin')">- Admin</button>`);
 
     const joined = m.joinedAt ? new Date(m.joinedAt).toLocaleDateString('nb-NO') : '';
     return `<div class="member-row">
