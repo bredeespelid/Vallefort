@@ -158,92 +158,66 @@ async function scrapeTftAcademy() {
 function parseTierList(html) {
   const tiers  = { S: [], A: [], B: [], C: [] };
 
-  // Patch — finn "Patch 17.3" eller "patch 17.3b" i HTML
-  const patchM = html.match(/[Pp]atch\s+([\d]+\.[\d]+[a-z]?)/);
-  const patch  = patchM ? patchM[1] : '17.3'; // fallback til kjent patch
+  // Patch
+  const patchM = html.match(/>(\d+\.\d+[a-z]?)</);
+  const patch  = patchM ? patchM[1] : '17.3';
 
-  // Set — finn "set-17-" i slug-URLer
-  const setM   = html.match(/\/tierlist\/comps\/set-(\d+)-/);
+  // Set
+  const setM   = html.match(/set-(\d+)-/);
   const setNum = setM ? parseInt(setM[1]) : 17;
 
-  // Splitt HTML på tier-markører
-  // tftacademy.com bruker "S tier", "A tier" etc som ren tekst i HTML
-  // Vi splitter hele HTML-en på disse markørene og henter linker fra hver del
+  // Dataen ligger i en stor guides:[...] array i script-taggen.
+  // Hent alle par av {tier:"X", compSlug:"set-17-...", metaTitle:"..."} med regex
+  // Formatet er: tier:"S",...,compSlug:"set-17-dark-star",...,metaTitle:"Dark Star Flex"
+  // eller compSlug først, så tier
 
-  const tierSplit = html.split(/(?=[SABC]\s+tier)/i);
+  const seen = new Set();
 
-  for (const chunk of tierSplit) {
-    // Finn hvilken tier denne chunken starter med
-    const tierM = chunk.match(/^([SABC])\s+tier/i);
+  // Regex: finn alle compSlug + tier kombos
+  // compSlug:"set-17-xxx" kan komme før eller etter tier:"S"
+  // Vi bruker et vindu på ~500 tegn rundt hvert compSlug
+  const slugRe = /compSlug:"(set-\d+-[^"]+)"/g;
+  let sm;
+
+  while ((sm = slugRe.exec(html)) !== null) {
+    const slug = sm[1];
+    if (seen.has(slug) || !slug) continue;
+
+    // Søk i et vindu rundt slug-posisjonen etter tier
+    const start  = Math.max(0, sm.index - 200);
+    const end    = Math.min(html.length, sm.index + 500);
+    const window = html.slice(start, end);
+
+    // Finn tier i vinduet
+    const tierM = window.match(/tier:"([SABCX])"/);
     if (!tierM) continue;
-    const tier = tierM[1].toUpperCase();
-    if (!tiers[tier]) continue;
 
-    // Stopp ved neste tier eller X tier
-    const stopIdx = chunk.search(/(?<=[SABC]\s+tier[\s\S]{10,})[SABC]\s+tier|X\s+tier/i);
-    const section = stopIdx > 0 ? chunk.slice(0, stopIdx) : chunk;
+    const tier = tierM[1];
+    if (!tiers[tier]) continue; // ignorer X-tier
 
-    // Hent alle /tierlist/comps/set-XX-... linker
-    const linkRe = /href="(\/tierlist\/comps\/(set-\d+-[^"]+))"/g;
-    let m;
-    while ((m = linkRe.exec(section)) !== null) {
-      const slug = m[2];
-      const url  = `https://tftacademy.com${m[1]}`;
-      const name = slug
-        .replace(/^set-\d+-/, '')
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase());
-      if (!tiers[tier].find(c => c.slug === slug)) {
-        tiers[tier].push({ name, url, slug });
-      }
-    }
+    seen.add(slug);
+
+    // Finn metaTitle i vinduet
+    const titleM = window.match(/metaTitle:"([^"]+)"/);
+    const name   = titleM?.[1] || slug.replace(/^set-\d+-/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    // Ignorer comps uten compSlug (tomme slugs er private/draft)
+    tiers[tier].push({
+      name,
+      url:  `https://tftacademy.com/tierlist/comps/${slug}`,
+      slug,
+    });
   }
 
-  // Fallback: hvis split ikke fungerte, prøv enklere metode
-  const totalComps = Object.values(tiers).reduce((s, a) => s + a.length, 0);
-  if (totalComps === 0) {
-    // Finn alle comp-linker og fordel på tier basert på posisjon i HTML
-    const allLinks = [];
-    const linkRe = /href="(\/tierlist\/comps\/(set-\d+-[^"]+))"/g;
-    let m;
-    while ((m = linkRe.exec(html)) !== null) {
-      allLinks.push({ slug: m[2], url: `https://tftacademy.com${m[1]}`, pos: m.index });
-    }
-
-    // Finn posisjoner til tier-overskrifter
-    const tierPositions = {};
-    for (const t of ['S','A','B','C']) {
-      const re = new RegExp(`${t}\\s+tier`, 'i');
-      const tm = html.match(re);
-      if (tm) tierPositions[t] = html.indexOf(tm[0]);
-    }
-
-    const tierOrder = Object.entries(tierPositions).sort((a,b) => a[1]-b[1]);
-
-    for (const link of allLinks) {
-      // Finn riktig tier basert på posisjon
-      let assignedTier = null;
-      for (let i = 0; i < tierOrder.length; i++) {
-        const [t, pos] = tierOrder[i];
-        const nextPos = tierOrder[i+1]?.[1] ?? Infinity;
-        if (link.pos > pos && link.pos < nextPos) {
-          assignedTier = t;
-          break;
-        }
-      }
-      if (assignedTier && tiers[assignedTier]) {
-        const name = link.slug
-          .replace(/^set-\d+-/, '')
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, c => c.toUpperCase());
-        if (!tiers[assignedTier].find(c => c.slug === link.slug)) {
-          tiers[assignedTier].push({ name, url: link.url, slug: link.slug });
-        }
-      }
-    }
-  }
-
-  return { source: 'tftacademy.com', sourceUrl: SOURCE_URL, set: setNum, patch, fetchedAt: new Date().toISOString(), fallback: false, tiers };
+  return {
+    source:    'tftacademy.com',
+    sourceUrl: SOURCE_URL,
+    set:       setNum,
+    patch,
+    fetchedAt: new Date().toISOString(),
+    fallback:  false,
+    tiers,
+  };
 }
 
 // ─── META ─────────────────────────────────────────────────────────────────────
