@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vallefort — Norsk TFT Community</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C8A84B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vallefort">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vallefort">
 <meta property="og:title" content="Vallefort — Norsk TFT Community">
@@ -2171,6 +2179,10 @@ document.querySelectorAll('#nav-links a').forEach(a => a.addEventListener('click
     }
   }
 })();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/Vallefort/sw.js');
+}
 </script>
 </body>
 </html>
