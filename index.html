@@ -498,8 +498,8 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
 <!-- HERO -->
 <section id="hero">
   <div class="hero-content">
-    <div class="hero-kicker">Norsk TFT Community — <span id="hero-season">Sesong 14</span></div>
-    <h1>Finn ditt<br><em>norske</em><br>TFT-lag</h1>
+    <div class="hero-kicker">Norsk TFT Community</div>
+    <h1>Vallefort<br><em>TFT</em></h1>
     <p class="hero-body">Lobbyer, meta-diskusjoner og turneringer for norske Teamfight Tactics-spillere. Alle ranks velkomne.</p>
     <div class="hero-btns">
       <a href="#lobbyer" class="btn-primary">Finn en lobby</a>
@@ -1086,7 +1086,7 @@ async function loadConfig() {
 }
 
 function applyConfig(cfg) {
-  if (cfg.season) document.getElementById('hero-season').textContent = cfg.season;
+  // season display removed
 }
 
 function openAdmin() {
