@@ -279,7 +279,7 @@ function playerScore(p) {
 }
 
 async function riotFetchRank(env, region, puuid, summonerId) {
-  const key = env.RIOT_API_KEY;
+  const key = (env.RIOT_API_KEY || '').trim();
   if (!summonerId) {
     const res = await fetch(`https://${region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/${puuid}`, { headers:{'X-Riot-Token':key} });
     if (!res.ok) return null;
@@ -314,7 +314,8 @@ async function handlePlayers(request, env) {
     const tagLine  = riotId.slice(hashIdx + 1).trim();
     if (!gameName || !tagLine) return json({ error:'Ugyldig Riot ID format' }, 400);
     const cluster = REGION_CLUSTER[region];
-    const accRes = await fetch(`https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, { headers:{'X-Riot-Token':env.RIOT_API_KEY} });
+    const riotKey = (env.RIOT_API_KEY || '').trim();
+    const accRes = await fetch(`https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, { headers:{'X-Riot-Token':riotKey} });
     if (!accRes.ok) {
       if (accRes.status === 404) return json({ error:'Riot ID ikke funnet — sjekk at navn og tag er riktig' }, 404);
       const errBody = await accRes.text().catch(() => '');
