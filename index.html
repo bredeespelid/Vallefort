@@ -239,21 +239,7 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .tier-silver{color:#c0c8d8;border-color:rgba(192,200,216,.35);background:rgba(192,200,216,.06)}
 .tier-bronze{color:#c07d3a;border-color:rgba(192,125,58,.4);background:rgba(192,125,58,.08)}
 .tier-iron{color:#8a8a9a;border-color:rgba(138,138,154,.35);background:rgba(138,138,154,.06)}
-.tier-unranked{color:var(--grey2);border-color:var(--wire2);background:transparent}
-.r-diamond{color:#9B6EFF;border-color:rgba(155,110,255,.35);background:rgba(155,110,255,.08)}
-.r-plat{color:#5AACCC;border-color:rgba(90,172,204,.35);background:rgba(90,172,204,.08)}
-.r-gold{color:var(--gold);border-color:rgba(200,168,75,.35);background:var(--gold-lo)}
-.r-all{color:var(--grey);border-color:var(--wire2);background:transparent}
-.lc-name{font-size:.9rem;font-weight:500;color:var(--white);margin-bottom:3px}
-.lc-meta{font-size:.75rem;font-weight:300;color:var(--grey)}
-.lc-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.lc-slots{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:600;color:var(--grey)}
-.lc-slots b{color:var(--gold)}
-.join-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:var(--white);cursor:pointer;transition:all .15s}
-.join-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
-.join-btn:disabled{opacity:.35;cursor:not-allowed}
-.close-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border:1px solid rgba(201,76,76,.5);background:rgba(201,76,76,.1);color:#e87a7a;cursor:pointer;transition:all .15s}
-.close-btn:hover{background:rgba(201,76,76,.2);border-color:var(--red)}
+.tier-unranked{color:rgba(200,210,225,0.55);border-color:rgba(200,210,225,0.2);background:transparent}
 .lobby-create{grid-column:1/-1;background:var(--ink);border:1px dashed var(--wire2);padding:1rem 1.5rem;text-align:center;cursor:pointer;transition:border-color .15s}
 .lobby-create:hover{border-color:var(--gold)}
 .lobby-create p{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);transition:color .15s}
@@ -1415,7 +1401,7 @@ function renderPlayerLeaderboard() {
   if (!players.length) { listEl.innerHTML = `<div class="player-empty">Ingen spillere i denne divisjonen ennå.</div>`; return; }
   listEl.innerHTML = players.map((p, i) => {
     const av = p.discordAvatar
-      ? `<img class="player-av" src="https://cdn.discordapp.com/avatars/${p.discordId}/${p.discordAvatar}.webp?size=64" alt="">`
+      ? `<img class="player-av" src="${escHtml(p.discordAvatar)}" alt="">`
       : `<div class="player-av-ph">${(p.discordUsername||'?').slice(0,2).toUpperCase()}</div>`;
     const tierLabel = p.tier
       ? `${TIER_NO[p.tier]||p.tier}${!NO_RANK_TIER.has(p.tier)&&p.rank?' '+p.rank:''}`
