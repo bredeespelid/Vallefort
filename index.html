@@ -204,14 +204,42 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .skel{background:var(--ink3);animation:shimmer 1.4s infinite}
 @keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.8}}
 
-/* LOBBYER */
-.lobby-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+/* SPILLERE / LEADERBOARD */
 .filter-pill{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:rgba(200,210,225,0.8);cursor:pointer;transition:all .15s}
 .filter-pill:hover,.filter-pill.active{background:var(--gold-lo);border-color:var(--gold);color:var(--gold)}
-.lobby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire)}
-.lobby-card{background:var(--ink2);padding:1.25rem 1.5rem;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;transition:background .15s;border-left:2px solid transparent}
-.lobby-card:hover{background:var(--ink3);border-left-color:var(--gold)}
-.rank-tag{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid;white-space:nowrap}
+.player-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.player-list{border:1px solid var(--wire)}
+.player-row{display:grid;grid-template-columns:28px 40px 1fr 160px 90px 70px;gap:.75rem;align-items:center;padding:.8rem 1.25rem;background:var(--ink2);border-bottom:1px solid var(--wire);transition:background .15s}
+.player-row:hover{background:var(--ink3)}
+.player-row:last-child{border-bottom:none}
+.player-row-me{background:rgba(200,168,75,.06);border-left:2px solid var(--gold)}
+.player-pos{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;color:var(--grey2);text-align:right}
+.player-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--wire2)}
+.player-av-ph{width:36px;height:36px;border-radius:50%;background:var(--ink3);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--grey);border:1px solid var(--wire2);flex-shrink:0}
+.player-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.player-discord{font-weight:600;font-size:.88rem;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-riot{font-size:.72rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-tier-cell{display:flex;flex-direction:column;gap:3px}
+.player-lp{font-size:.72rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;font-weight:600}
+.player-wr{font-size:.73rem;color:var(--grey);font-family:'Barlow Condensed',sans-serif}
+.player-updated{font-size:.67rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;text-align:right}
+.player-empty{padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem}
+.player-register-panel{background:var(--ink2);border:1px solid var(--wire);padding:1.5rem;margin-bottom:1.25rem}
+.player-register-panel h3{font-size:1rem;margin-bottom:1rem;color:var(--white)}
+.my-player-card{background:var(--ink2);border:1px solid rgba(200,168,75,.2);border-left:3px solid var(--gold);padding:1rem 1.25rem;margin-bottom:1.25rem}
+/* Tier badge */
+.tier-badge{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border:1px solid;display:inline-block;white-space:nowrap}
+.tier-challenger{color:#0ac7e4;border-color:rgba(10,199,228,.4);background:rgba(10,199,228,.08)}
+.tier-grandmaster{color:#e33a3a;border-color:rgba(227,58,58,.4);background:rgba(227,58,58,.08)}
+.tier-master{color:#b66fe8;border-color:rgba(182,111,232,.4);background:rgba(182,111,232,.08)}
+.tier-diamond{color:#6a84d0;border-color:rgba(106,132,208,.4);background:rgba(106,132,208,.08)}
+.tier-emerald{color:#2ecc71;border-color:rgba(46,204,113,.4);background:rgba(46,204,113,.08)}
+.tier-platinum{color:#00c8b4;border-color:rgba(0,200,180,.4);background:rgba(0,200,180,.08)}
+.tier-gold{color:var(--gold);border-color:rgba(200,168,75,.4);background:rgba(200,168,75,.08)}
+.tier-silver{color:#c0c8d8;border-color:rgba(192,200,216,.35);background:rgba(192,200,216,.06)}
+.tier-bronze{color:#c07d3a;border-color:rgba(192,125,58,.4);background:rgba(192,125,58,.08)}
+.tier-iron{color:#8a8a9a;border-color:rgba(138,138,154,.35);background:rgba(138,138,154,.06)}
+.tier-unranked{color:var(--grey2);border-color:var(--wire2);background:transparent}
 .r-diamond{color:#9B6EFF;border-color:rgba(155,110,255,.35);background:rgba(155,110,255,.08)}
 .r-plat{color:#5AACCC;border-color:rgba(90,172,204,.35);background:rgba(90,172,204,.08)}
 .r-gold{color:var(--gold);border-color:rgba(200,168,75,.35);background:var(--gold-lo)}
@@ -533,37 +561,6 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   </div>
 </div>
 
-<!-- LOBBY MODAL -->
-<div class="modal-wrap" id="lobby-modal">
-  <div class="modal" style="max-width:400px">
-    <button class="modal-close" onclick="closeLobbyModal()">✕</button>
-    <h3>Opprett lobby</h3>
-    <p>Lobbyen er aktiv i 4 timer.</p>
-    <div class="form-group" style="margin-top:1rem">
-      <label>Lobbynavn</label>
-      <input class="form-input" id="lm-name" placeholder="F.eks. Rank push — morgenkø" maxlength="60">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Rank-krav</label>
-        <select class="form-input" id="lm-rank">
-          <option>Alle</option><option>Gold+</option><option>Platinum+</option><option>Diamond+</option><option>Master+</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Maks spillere</label>
-        <select class="form-input" id="lm-slots">
-          <option value="4">4</option><option value="6">6</option><option value="8" selected>8</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-cancel" onclick="closeLobbyModal()">Avbryt</button>
-      <button class="btn-submit" id="lm-submit" onclick="submitLobby()">Opprett</button>
-    </div>
-    <div class="admin-status" id="lm-status"></div>
-  </div>
-</div>
 
 <!-- TOURNAMENT MODAL -->
 <div class="modal-wrap" id="tournament-modal">
@@ -770,13 +767,14 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   <button class="admin-bar-btn" onclick="openAdmin()">⚙ Innstillinger</button>
   <button class="admin-bar-btn" onclick="openMembers()">Brukere</button>
   <button class="admin-bar-btn" onclick="refreshMeta()">↻ Oppdater meta</button>
+  <button class="admin-bar-btn" onclick="adminRefreshAllPlayers(event)">↻ Oppdater ranks</button>
 </div>
 
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo"><img src="logo.png" alt="Vallefort"><span>Vallefort</span></a>
   <ul class="nav-links" id="nav-links">
-    <li><a href="#lobbyer">Lobbyer</a></li>
+    <li><a href="#spillere">Spillere</a></li>
     <li><a href="#meta">Meta</a></li>
     <li><a href="#turneringer">Turneringer</a></li>
   </ul>
@@ -796,15 +794,15 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   <div class="hero-content">
     <div class="hero-kicker">Norsk TFT Community</div>
     <h1>Vallefort<br><em>TFT</em></h1>
-    <p class="hero-body">Lobbyer, meta-diskusjoner og turneringer for norske Teamfight Tactics-spillere. Alle ranks velkomne.</p>
+    <p class="hero-body">Leaderboard, meta-diskusjoner og turneringer for norske Teamfight Tactics-spillere. Alle ranks velkomne.</p>
     <div class="hero-btns" id="hero-btns">
-      <a href="#lobbyer" class="btn-primary">Finn en lobby</a>
+      <a href="#spillere" class="btn-primary">Se leaderboard</a>
       <button class="btn-ghost" id="hero-login-btn" onclick="openModal()">Logg inn med Discord</button>
     </div>
   </div>
   <div class="hero-ticker">
     <div class="ticker-item"><div class="ticker-num" id="stat-members">—</div><div class="ticker-label">Medlemmer</div></div>
-    <div class="ticker-item"><div class="ticker-num" id="stat-lobbies">—</div><div class="ticker-label">Aktive lobbyer</div></div>
+    <div class="ticker-item"><div class="ticker-num" id="stat-lobbies">—</div><div class="ticker-label">Registrerte spillere</div></div>
     <div class="ticker-item"><div class="ticker-num" id="stat-tournaments">—</div><div class="ticker-label">Turneringer</div></div>
   </div>
 </section>
@@ -865,20 +863,57 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   </div>
 </section>
 
-<!-- LOBBYER -->
-<section id="lobbyer">
+<!-- SPILLERE -->
+<section id="spillere">
   <div class="section">
-    <div class="label-line reveal"><span class="label">Finn et spill</span></div>
-    <h2 class="reveal">Åpne lobbyer</h2>
-    <p class="section-lead reveal">Filtrer etter rank og bli med. Logg inn med Discord for å opprette egen lobby.</p>
-    <div class="lobby-filters reveal">
-      <button class="filter-pill active" data-rank="Alle">Alle</button>
-      <button class="filter-pill" data-rank="Diamond+">Diamond+</button>
-      <button class="filter-pill" data-rank="Platinum+">Platinum+</button>
-      <button class="filter-pill" data-rank="Gold+">Gold+</button>
+    <div class="label-line reveal"><span class="label">Community</span></div>
+    <h2 class="reveal">Spillere</h2>
+    <p class="section-lead reveal">Registrer din TFT-konto og se deg i leaderboardet. Rank hentes automatisk fra Riot.</p>
+
+    <div id="player-register-panel" class="player-register-panel reveal" style="display:none">
+      <h3>Registrer din Riot-konto</h3>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Riot ID</label>
+          <input class="form-input" id="pr-riotid" placeholder="SpillerNavn#EUW" maxlength="80">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Region</label>
+          <select class="form-input" id="pr-region">
+            <option value="euw1">EUW</option>
+            <option value="eun1">EUNE</option>
+            <option value="na1">NA</option>
+            <option value="kr">KR</option>
+            <option value="jp1">JP</option>
+            <option value="br1">BR</option>
+            <option value="tr1">TR</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:.75rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <button class="btn-submit" id="pr-submit" onclick="registerPlayer()" style="padding:.45rem 1.25rem">Registrer</button>
+        <div class="admin-status" id="pr-status" style="margin:0"></div>
+      </div>
     </div>
-    <div class="lobby-grid reveal" id="lobby-grid">
-      <div class="lobby-empty">Laster lobbyer…</div>
+
+    <div id="player-my-card" style="display:none"></div>
+
+    <div class="player-filters reveal">
+      <button class="filter-pill active" data-tier="Alle" onclick="filterPlayers('Alle')">Alle</button>
+      <button class="filter-pill" data-tier="CHALLENGER" onclick="filterPlayers('CHALLENGER')">Challenger</button>
+      <button class="filter-pill" data-tier="GRANDMASTER" onclick="filterPlayers('GRANDMASTER')">Grandmaster</button>
+      <button class="filter-pill" data-tier="MASTER" onclick="filterPlayers('MASTER')">Master</button>
+      <button class="filter-pill" data-tier="DIAMOND" onclick="filterPlayers('DIAMOND')">Diamond</button>
+      <button class="filter-pill" data-tier="EMERALD" onclick="filterPlayers('EMERALD')">Emerald</button>
+      <button class="filter-pill" data-tier="PLATINUM" onclick="filterPlayers('PLATINUM')">Platinum</button>
+      <button class="filter-pill" data-tier="GOLD" onclick="filterPlayers('GOLD')">Gold</button>
+      <button class="filter-pill" data-tier="SILVER" onclick="filterPlayers('SILVER')">Silver</button>
+      <button class="filter-pill" data-tier="BRONZE" onclick="filterPlayers('BRONZE')">Bronze</button>
+      <button class="filter-pill" data-tier="IRON" onclick="filterPlayers('IRON')">Iron</button>
+      <button class="filter-pill" data-tier="UNRANKED" onclick="filterPlayers('UNRANKED')">Urangert</button>
+    </div>
+    <div class="player-list reveal" id="player-list">
+      <div class="player-empty">Laster spillere…</div>
     </div>
   </div>
 </section>
@@ -983,6 +1018,7 @@ function renderLoggedOut() {
   if (hb) hb.style.display = '';
   const cb = document.getElementById('cta-login-btn');
   if (cb) cb.style.display = '';
+  renderMyPlayerCard();
 }
 
 function renderLoggedIn(user) {
@@ -1023,6 +1059,7 @@ function renderLoggedIn(user) {
     document.getElementById('tournament-create-area').innerHTML =
       `<button class="contributor-btn" onclick="openTournamentModal()">+ Opprett turnering</button>`;
   }
+  renderMyPlayerCard();
 }
 
 function toggleUserMenu() {
@@ -1035,7 +1072,7 @@ function handleLogout() {
   clearToken(); currentUser = null;
   document.getElementById('user-menu') && (document.getElementById('user-menu').style.display = 'none');
   renderLoggedOut();
-  loadLobbies();
+  loadPlayers();
   renderTournaments(allTournaments);
 }
 
@@ -1070,7 +1107,7 @@ async function loadStats() {
     if (!r.ok) return;
     const d = await r.json();
     document.getElementById('stat-members').textContent    = d.members || 0;
-    document.getElementById('stat-lobbies').textContent    = d.activeLobbies || 0;
+    document.getElementById('stat-lobbies').textContent    = d.registeredPlayers || 0;
     document.getElementById('stat-tournaments').textContent = d.tournaments || 0;
   } catch {}
 }
@@ -1347,83 +1384,133 @@ function closeActiveForum() {
   activeChip = null; activeForum = null;
 }
 
-/* ── LOBBYER ────────────────────────────────────── */
-let allLobbies    = [];
-let lobbyFilter   = 'Alle';
+/* ── SPILLERE / LEADERBOARD ─────────────────────── */
+let allPlayers  = [];
+let playerFilter = 'Alle';
 
-async function loadLobbies() {
+const TIER_NO   = { CHALLENGER:'Challenger', GRANDMASTER:'Grandmaster', MASTER:'Master', DIAMOND:'Diamond', EMERALD:'Emerald', PLATINUM:'Platinum', GOLD:'Gold', SILVER:'Silver', BRONZE:'Bronze', IRON:'Iron' };
+const REGION_NO = { euw1:'EUW', eun1:'EUNE', na1:'NA', kr:'KR', jp1:'JP', br1:'BR', tr1:'TR' };
+const NO_RANK_TIER = new Set(['MASTER','GRANDMASTER','CHALLENGER']);
+
+async function loadPlayers() {
   try {
-    const r = await fetch(`${API_URL}/api/lobbies`);
-    allLobbies = r.ok ? await r.json() : [];
-  } catch { allLobbies = []; }
-  renderLobbies();
+    const r = await fetch(`${API_URL}/api/players`);
+    allPlayers = r.ok ? await r.json() : [];
+  } catch { allPlayers = []; }
+  renderPlayerLeaderboard();
+  renderMyPlayerCard();
 }
 
-function renderLobbies() {
-  const grid = document.getElementById('lobby-grid');
-  const list = lobbyFilter === 'Alle' ? allLobbies : allLobbies.filter(l => l.rank === lobbyFilter);
+function filterPlayers(tier) {
+  playerFilter = tier;
+  document.querySelectorAll('.player-filters .filter-pill').forEach(b => b.classList.toggle('active', b.dataset.tier === tier));
+  renderPlayerLeaderboard();
+}
 
-  const rankClass = { 'Diamond+':'r-diamond','Master+':'r-diamond','Platinum+':'r-plat','Gold+':'r-gold','Alle':'r-all','Iron+':'r-all','Bronze+':'r-all','Silver+':'r-all' };
-
-  const cards = list.map(l => {
-    const filled  = l.joiners.length + 1;
-    const isHost  = currentUser?.id === l.hostId;
-    const joined  = currentUser && l.joiners.includes(currentUser.id);
-    const full    = l.joiners.length >= l.maxSlots - 1;
-    const ago     = timeAgo(l.createdAt);
-    const rc      = rankClass[l.rank] || 'r-all';
-    const joinBtn = isHost
-      ? `<button class="close-btn" onclick="closeLobby('${l.id}')">Steng</button>`
-      : `<button class="join-btn" onclick="joinLobby('${l.id}')" ${joined||full?'disabled':''} title="${joined?'Du er med':full?'Full':''}">${joined?'Med':'Join'}</button>`;
-    return `<div class="lobby-card">
-      <span class="rank-tag ${rc}">${escHtml(l.rank)}</span>
-      <div><div class="lc-name">${escHtml(l.name)}</div><div class="lc-meta">${escHtml(l.hostName)} · ${ago}</div></div>
-      <div class="lc-right"><div class="lc-slots"><b>${filled}</b>/${l.maxSlots}</div>${joinBtn}</div>
+function renderPlayerLeaderboard() {
+  const listEl = document.getElementById('player-list');
+  const players = playerFilter === 'Alle' ? allPlayers
+    : playerFilter === 'UNRANKED' ? allPlayers.filter(p => !p.tier)
+    : allPlayers.filter(p => p.tier === playerFilter);
+  if (!players.length) { listEl.innerHTML = `<div class="player-empty">Ingen spillere i denne divisjonen ennå.</div>`; return; }
+  listEl.innerHTML = players.map((p, i) => {
+    const av = p.discordAvatar
+      ? `<img class="player-av" src="https://cdn.discordapp.com/avatars/${p.discordId}/${p.discordAvatar}.webp?size=64" alt="">`
+      : `<div class="player-av-ph">${(p.discordUsername||'?').slice(0,2).toUpperCase()}</div>`;
+    const tierLabel = p.tier
+      ? `${TIER_NO[p.tier]||p.tier}${!NO_RANK_TIER.has(p.tier)&&p.rank?' '+p.rank:''}`
+      : 'Urangert';
+    const tierClass = p.tier ? `tier-${p.tier.toLowerCase()}` : 'tier-unranked';
+    const lpStr  = p.tier ? `${p.lp} LP` : '—';
+    const total  = p.wins + p.losses;
+    const wr     = total > 0 ? ` · ${Math.round(p.wins/total*100)}%` : '';
+    const isMe   = currentUser?.id === p.discordId;
+    return `<div class="player-row${isMe?' player-row-me':''}" id="plr-${p.discordId}">
+      <span class="player-pos">${i+1}</span>
+      ${av}
+      <div class="player-info">
+        <span class="player-discord">${escHtml(p.discordUsername)}</span>
+        <span class="player-riot">${escHtml(p.riotId)} · ${REGION_NO[p.region]||p.region}</span>
+      </div>
+      <div class="player-tier-cell">
+        <span class="tier-badge ${tierClass}">${tierLabel}</span>
+        <span class="player-lp">${lpStr}</span>
+      </div>
+      <div class="player-wr">${p.wins}W ${p.losses}L${wr}</div>
+      <span class="player-updated">${timeAgo(p.updatedAt)}</span>
     </div>`;
   }).join('');
-
-  const createBtn = `<div class="lobby-create" onclick="${currentUser ? 'openLobbyModal()' : 'openModal()'}"><p>+ Opprett ny lobby${currentUser ? '' : ' — krever Discord-innlogging'}</p></div>`;
-
-  grid.innerHTML = (list.length ? cards : `<div class="lobby-empty">Ingen aktive lobbyer akkurat nå.</div>`) + createBtn;
 }
 
-async function joinLobby(id) {
-  if (!currentUser) return openModal();
+function renderMyPlayerCard() {
+  const panel  = document.getElementById('player-register-panel');
+  const myCard = document.getElementById('player-my-card');
+  if (!panel || !myCard) return;
+  if (!currentUser) { panel.style.display = 'none'; myCard.style.display = 'none'; return; }
+  const me = allPlayers.find(p => p.discordId === currentUser.id);
+  if (me) {
+    panel.style.display = 'none';
+    const tierLabel = me.tier ? `${TIER_NO[me.tier]||me.tier}${!NO_RANK_TIER.has(me.tier)&&me.rank?' '+me.rank:''}` : 'Urangert';
+    const tierClass = me.tier ? `tier-${me.tier.toLowerCase()}` : 'tier-unranked';
+    myCard.style.display = '';
+    myCard.innerHTML = `<div class="my-player-card">
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <span class="tier-badge ${tierClass}" style="font-size:.82rem;padding:3px 12px">${tierLabel}</span>
+        <span style="color:var(--grey);font-size:.8rem">${escHtml(me.riotId)} · ${REGION_NO[me.region]||me.region}</span>
+        ${me.tier?`<span style="color:var(--grey2);font-size:.8rem">${me.lp} LP — ${me.wins}W ${me.losses}L</span>`:''}
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:.6rem;flex-wrap:wrap">
+        <button class="btn-edit-t" onclick="refreshMyRank()">Oppdater rank</button>
+        <button class="btn-del-t" onclick="unregisterPlayer()">Fjern konto</button>
+        <span id="pr-refresh-status" style="font-size:.75rem;color:var(--grey)"></span>
+      </div>
+    </div>`;
+  } else {
+    panel.style.display = '';
+    myCard.style.display = 'none';
+  }
+}
+
+async function registerPlayer() {
+  const riotId = document.getElementById('pr-riotid').value.trim();
+  const region = document.getElementById('pr-region').value;
+  if (!riotId.includes('#')) { showStatus('pr-status','Format: SpillerNavn#TAG','var(--red)'); return; }
+  const btn = document.getElementById('pr-submit'); btn.disabled = true; btn.textContent = '…';
   try {
-    const r = await fetch(`${API_URL}/api/lobbies/${id}/join`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
-    if (!r.ok) { const e = await r.json(); alert(e.error); return; }
-    await loadLobbies(); loadStats();
+    const r = await fetch(`${API_URL}/api/players`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${getToken()}`}, body:JSON.stringify({riotId,region}) });
+    const data = await r.json();
+    if (!r.ok) { showStatus('pr-status', data.error, 'var(--red)'); return; }
+    await loadPlayers(); loadStats();
+  } catch { showStatus('pr-status','Noe gikk galt','var(--red)'); }
+  finally { btn.disabled = false; btn.textContent = 'Registrer'; }
+}
+
+async function refreshMyRank() {
+  const statusEl = document.getElementById('pr-refresh-status');
+  if (statusEl) statusEl.textContent = 'Oppdaterer…';
+  try {
+    const r = await fetch(`${API_URL}/api/players/me`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
+    if (!r.ok) { const e = await r.json(); if (statusEl) statusEl.textContent = e.error; return; }
+    await loadPlayers();
+  } catch { if (statusEl) statusEl.textContent = 'Noe gikk galt'; }
+}
+
+async function unregisterPlayer() {
+  if (!confirm('Fjern din TFT-konto fra leaderboardet?')) return;
+  try {
+    await fetch(`${API_URL}/api/players/me`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
+    await loadPlayers(); loadStats();
   } catch { alert('Noe gikk galt'); }
 }
 
-async function closeLobby(id) {
-  if (!confirm('Steng lobbyen?')) return;
+async function adminRefreshAllPlayers(e) {
+  const btn = e.target; btn.disabled = true; btn.textContent = '…';
   try {
-    await fetch(`${API_URL}/api/lobbies/${id}/close`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
-    await loadLobbies(); loadStats();
+    const r = await fetch(`${API_URL}/api/admin/players/refresh-all`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
+    const d = await r.json();
+    if (r.ok) { await loadPlayers(); } else { alert(d.error); }
   } catch { alert('Noe gikk galt'); }
-}
-
-function openLobbyModal() {
-  document.getElementById('lm-name').value = '';
-  document.getElementById('lm-status').textContent = '';
-  document.getElementById('lobby-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLobbyModal() { document.getElementById('lobby-modal').classList.remove('open'); document.body.style.overflow = ''; }
-
-async function submitLobby() {
-  const name     = document.getElementById('lm-name').value.trim();
-  const rank     = document.getElementById('lm-rank').value;
-  const maxSlots = document.getElementById('lm-slots').value;
-  if (!name) { showStatus('lm-status', 'Navn er påkrevd', 'var(--red)'); return; }
-  const btn = document.getElementById('lm-submit'); btn.disabled = true; btn.textContent = '…';
-  try {
-    const r = await fetch(`${API_URL}/api/lobbies`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify({name, rank, maxSlots:parseInt(maxSlots)}) });
-    if (!r.ok) { const e = await r.json(); showStatus('lm-status', e.error, 'var(--red)'); return; }
-    closeLobbyModal(); await loadLobbies(); loadStats();
-  } catch { showStatus('lm-status', 'Noe gikk galt', 'var(--red)'); }
-  finally { btn.disabled = false; btn.textContent = 'Opprett'; }
+  finally { btn.disabled = false; btn.textContent = '↻ Oppdater ranks'; }
 }
 
 /* ── TURNERINGER ────────────────────────────────── */
@@ -1853,7 +1940,6 @@ async function saveRoles(key, values, statusId) {
 function openModal()  { document.getElementById('discord-modal').classList.add('open');    document.body.style.overflow = 'hidden'; }
 function closeModal() { document.getElementById('discord-modal').classList.remove('open'); document.body.style.overflow = ''; }
 document.getElementById('discord-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-document.getElementById('lobby-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeLobbyModal(); });
 document.getElementById('tournament-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeTournamentModal(); });
 document.getElementById('finish-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeFinishModal(); });
 
@@ -2040,7 +2126,7 @@ document.querySelectorAll('#nav-links a').forEach(a => a.addEventListener('click
   await loadUser();
   loadStats();
   loadMeta();
-  loadLobbies();
+  loadPlayers();
   await loadTournaments();
   loadConfig();
   loadPosts();

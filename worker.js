@@ -1,7 +1,7 @@
 /**
  * VALLEFORT — Cloudflare Worker
  * ─────────────────────────────
- * GET  /api/stats                          → Medlemmer, lobbyer, turneringer
+ * GET  /api/stats                          → Medlemmer, spillere, turneringer
  * GET  /api/meta                           → Tier list
  * GET  /api/meta/refresh                   → Tving refresh (admin)
  * GET  /api/config                         → Set/patch/sesong/admins/contributors
@@ -11,10 +11,11 @@
  * GET  /api/comments/:patch/:slug          → Hent kommentarer
  * POST /api/comments/:patch/:slug          → Legg til kommentar (login)
  * DELETE /api/comments/:patch/:slug/:id    → Slett kommentar (admin/eier)
- * GET  /api/lobbies                        → Liste aktive lobbyer
- * POST /api/lobbies                        → Opprett lobby (login)
- * POST /api/lobbies/:id/join               → Bli med i lobby (login)
- * POST /api/lobbies/:id/close              → Steng lobby (eier/admin)
+ * GET  /api/players                        → Leaderboard
+ * POST /api/players                        → Registrer Riot ID (login)
+ * POST /api/players/me                     → Oppdater egen rank (login)
+ * DELETE /api/players/me                   → Avregistrer (login)
+ * POST /api/admin/players/refresh-all      → Refresh alle spillere (admin)
  * GET  /api/tournaments                    → Liste turneringer
  * POST /api/tournaments                    → Opprett turnering (contributor/admin)
  * PUT  /api/tournaments/:id               → Rediger turnering (eier contributor/admin)
@@ -32,15 +33,22 @@ const CORS = {
 const KV_META        = 'meta:tierlist';
 const KV_META_TS     = 'meta:timestamp';
 const KV_CONFIG      = 'config';
-const KV_LOBBIES     = 'lobbies';
 const KV_TOURNAMENTS = 'tournaments';
 const KV_MEMBERS     = 'members';
 const KV_POSTS       = 'posts';
+const KV_PLAYERS     = 'players';
 const SOURCE_URL     = 'https://tftacademy.com/tierlist/comps';
 
-const MAX_COMMENT_LEN      = 500;
+const MAX_COMMENT_LEN       = 500;
 const MAX_COMMENTS_PER_COMP = 200;
-const LOBBY_TTL_MS         = 4 * 60 * 60 * 1000; // 4 timer
+
+const REGION_CLUSTER = {
+  euw1:'europe', eun1:'europe', tr1:'europe', ru:'europe',
+  na1:'americas', br1:'americas', la1:'americas', la2:'americas',
+  kr:'asia', jp1:'asia', oc1:'sea',
+};
+const TIER_SCORE = { CHALLENGER:9000, GRANDMASTER:8000, MASTER:7000, DIAMOND:6000, EMERALD:5000, PLATINUM:4000, GOLD:3000, SILVER:2000, BRONZE:1000, IRON:0 };
+const RANK_SCORE = { I:300, II:200, III:100, IV:0 };
 
 const VALID_RANKS   = ['Alle', 'Iron+', 'Bronze+', 'Silver+', 'Gold+', 'Platinum+', 'Diamond+', 'Master+'];
 const VALID_FORMATS = ['Enkelt utslagsspill', 'Dobbel utslagsspill', 'Roundrobin', 'Sveitsisk'];
@@ -60,9 +68,11 @@ export default {
       if (path === '/api/meta/refresh') return handleMetaRefresh(request, env);
       if (path === '/api/config')       return handleConfig(request, env);
       if (path === '/auth/callback')    return handleDiscordCallback(request, env);
-      if (path === '/api/me')           return handleMe(request, env);
-      if (path === '/api/lobbies')      return handleLobbies(request, env);
-      if (path === '/api/tournaments')  return handleTournaments(request, env);
+      if (path === '/api/me')                          return handleMe(request, env);
+      if (path === '/api/players')                     return handlePlayers(request, env);
+      if (path === '/api/players/me')                  return handlePlayerMe(request, env);
+      if (path === '/api/admin/players/refresh-all')   return handleAdminRefreshAllPlayers(request, env);
+      if (path === '/api/tournaments')                 return handleTournaments(request, env);
       if (path === '/api/posts')        return handlePosts(request, env);
       if (path === '/api/admin/members') return handleAdminMembers(request, env);
 
@@ -78,8 +88,6 @@ export default {
       const cmDelMatch = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)\/([^/]+)$/);
       if (cmDelMatch) return handleDeleteComment(request, env, cmDelMatch[1], cmDelMatch[2], cmDelMatch[3]);
 
-      const lobbyActM = path.match(/^\/api\/lobbies\/([^/]+)\/(join|close)$/);
-      if (lobbyActM) return handleLobbyAction(request, env, lobbyActM[1], lobbyActM[2]);
 
       const tByIdM = path.match(/^\/api\/tournaments\/([^/]+)$/);
       if (tByIdM) return handleTournamentById(request, env, tByIdM[1]);
@@ -173,20 +181,16 @@ async function handleAdminMembers(request, env) {
 }
 
 async function handleStats(request, env) {
-  const [membersRaw, lobbiesRaw, tournamentsRaw] = await Promise.all([
+  const [membersRaw, playersRaw, tournamentsRaw] = await Promise.all([
     env.KV.get(KV_MEMBERS),
-    env.KV.get(KV_LOBBIES),
+    env.KV.get(KV_PLAYERS),
     env.KV.get(KV_TOURNAMENTS),
   ]);
   const members     = membersRaw     ? JSON.parse(membersRaw)     : [];
-  const allLobbies  = lobbiesRaw     ? JSON.parse(lobbiesRaw)     : [];
+  const players     = playersRaw     ? JSON.parse(playersRaw)     : [];
   const tournaments = tournamentsRaw ? JSON.parse(tournamentsRaw) : [];
-
-  const cutoff       = Date.now() - LOBBY_TTL_MS;
-  const activeLobbies = allLobbies.filter(l => new Date(l.createdAt).getTime() > cutoff);
-  const activeTours  = tournaments.filter(t => t.status !== 'cancelled');
-
-  return json({ members: members.length, activeLobbies: activeLobbies.length, tournaments: activeTours.length });
+  const activeTours = tournaments.filter(t => t.status !== 'cancelled');
+  return json({ members: members.length, registeredPlayers: players.length, tournaments: activeTours.length });
 }
 
 // ─── LOBBIES ──────────────────────────────────────────────────────────────────
@@ -266,6 +270,111 @@ async function handleLobbyAction(request, env, lobbyId, action) {
   }
 
   return json({ error: 'Ukjent handling' }, 400);
+}
+
+// ─── PLAYERS / LEADERBOARD ────────────────────────────────────────────────────
+function playerScore(p) {
+  if (!p.tier) return -1;
+  return (TIER_SCORE[p.tier] || 0) + (RANK_SCORE[p.rank] || 0) + (p.lp || 0);
+}
+
+async function riotFetchRank(env, region, puuid, summonerId) {
+  const key = env.RIOT_API_KEY;
+  if (!summonerId) {
+    const res = await fetch(`https://${region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/${puuid}`, { headers:{'X-Riot-Token':key} });
+    if (!res.ok) return null;
+    summonerId = (await res.json()).id;
+  }
+  const lRes = await fetch(`https://${region}.api.riotgames.com/tft/league/v1/entries/by-summoner/${summonerId}`, { headers:{'X-Riot-Token':key} });
+  if (!lRes.ok) return { summonerId, tier:null, rank:null, lp:0, wins:0, losses:0 };
+  const entries = await lRes.json();
+  const entry = entries.find(e => e.queueType === 'RANKED_TFT') || entries[0];
+  if (!entry) return { summonerId, tier:null, rank:null, lp:0, wins:0, losses:0 };
+  return { summonerId, tier:entry.tier, rank:entry.rank, lp:entry.leaguePoints, wins:entry.wins, losses:entry.losses };
+}
+
+async function handlePlayers(request, env) {
+  if (request.method === 'GET') {
+    const raw = await env.KV.get(KV_PLAYERS);
+    const players = raw ? JSON.parse(raw) : [];
+    players.sort((a, b) => playerScore(b) - playerScore(a));
+    return json(players);
+  }
+
+  if (request.method === 'POST') {
+    const user = await getUser(request, env);
+    if (!user) return json({ error:'Ikke innlogget' }, 401);
+    const body = await request.json().catch(() => ({}));
+    const riotId = (body.riotId || '').trim();
+    const region = (body.region || 'euw1').toLowerCase();
+    if (!riotId.includes('#')) return json({ error:'Riot ID må ha format: Navn#TAG' }, 400);
+    if (!REGION_CLUSTER[region]) return json({ error:'Ugyldig region' }, 400);
+    const [gameName, tagLine] = riotId.split('#');
+    const cluster = REGION_CLUSTER[region];
+    const accRes = await fetch(`https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, { headers:{'X-Riot-Token':env.RIOT_API_KEY} });
+    if (!accRes.ok) return accRes.status === 404 ? json({ error:'Riot ID ikke funnet' }, 404) : json({ error:'Riot API feil, prøv igjen' }, 502);
+    const acc = await accRes.json();
+    const rankData = await riotFetchRank(env, region, acc.puuid, null);
+    const raw = await env.KV.get(KV_PLAYERS);
+    const players = raw ? JSON.parse(raw) : [];
+    const player = {
+      discordId: user.id, discordUsername: user.username, discordAvatar: user.avatar || null,
+      riotId: `${acc.gameName}#${acc.tagLine}`, gameName: acc.gameName, tagLine: acc.tagLine,
+      region, puuid: acc.puuid, summonerId: rankData?.summonerId || null,
+      tier: rankData?.tier || null, rank: rankData?.rank || null,
+      lp: rankData?.lp || 0, wins: rankData?.wins || 0, losses: rankData?.losses || 0,
+      updatedAt: new Date().toISOString(),
+    };
+    const idx = players.findIndex(p => p.discordId === user.id);
+    if (idx >= 0) players[idx] = player; else players.push(player);
+    await env.KV.put(KV_PLAYERS, JSON.stringify(players));
+    return json(player);
+  }
+
+  return json({ error:'Method not allowed' }, 405);
+}
+
+async function handlePlayerMe(request, env) {
+  const user = await getUser(request, env);
+  if (!user) return json({ error:'Ikke innlogget' }, 401);
+  const raw = await env.KV.get(KV_PLAYERS);
+  const players = raw ? JSON.parse(raw) : [];
+  const idx = players.findIndex(p => p.discordId === user.id);
+
+  if (request.method === 'DELETE') {
+    if (idx >= 0) { players.splice(idx, 1); await env.KV.put(KV_PLAYERS, JSON.stringify(players)); }
+    return json({ ok:true });
+  }
+
+  if (request.method === 'POST') {
+    if (idx === -1) return json({ error:'Ikke registrert' }, 404);
+    const p = players[idx];
+    const rankData = await riotFetchRank(env, p.region, p.puuid, p.summonerId);
+    if (rankData) {
+      Object.assign(players[idx], { summonerId:rankData.summonerId, tier:rankData.tier, rank:rankData.rank, lp:rankData.lp, wins:rankData.wins, losses:rankData.losses, updatedAt:new Date().toISOString() });
+      await env.KV.put(KV_PLAYERS, JSON.stringify(players));
+    }
+    return json(players[idx]);
+  }
+
+  return json({ error:'Method not allowed' }, 405);
+}
+
+async function handleAdminRefreshAllPlayers(request, env) {
+  if (request.method !== 'POST') return json({ error:'Method not allowed' }, 405);
+  const user = await getUser(request, env);
+  if (!user) return json({ error:'Ikke innlogget' }, 401);
+  const cfg = await getConfig(env);
+  if (!isAdminFull(user.id, env, cfg)) return json({ error:'Krever admin' }, 403);
+  const raw = await env.KV.get(KV_PLAYERS);
+  const players = raw ? JSON.parse(raw) : [];
+  for (let i = 0; i < players.length; i++) {
+    const p = players[i];
+    const rankData = await riotFetchRank(env, p.region, p.puuid, p.summonerId);
+    if (rankData) Object.assign(players[i], { summonerId:rankData.summonerId, tier:rankData.tier, rank:rankData.rank, lp:rankData.lp, wins:rankData.wins, losses:rankData.losses, updatedAt:new Date().toISOString() });
+  }
+  await env.KV.put(KV_PLAYERS, JSON.stringify(players));
+  return json({ ok:true, count:players.length });
 }
 
 // ─── TOURNAMENTS ──────────────────────────────────────────────────────────────
