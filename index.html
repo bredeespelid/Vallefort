@@ -155,7 +155,7 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .filter-pill{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s}
 .filter-pill:hover,.filter-pill.active{background:var(--gold-lo);border-color:var(--gold);color:var(--gold)}
 .lobby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire)}
-.lobby-card{background:var(--ink2);padding:1.25rem 1.5rem;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;cursor:pointer;transition:background .15s}
+.lobby-card{background:var(--ink2);padding:1.25rem 1.5rem;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;transition:background .15s}
 .lobby-card:hover{background:var(--ink3)}
 .rank-tag{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid;white-space:nowrap}
 .r-diamond{color:#9B6EFF;border-color:rgba(155,110,255,.35);background:rgba(155,110,255,.08)}
@@ -169,10 +169,49 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .lc-slots b{color:var(--gold)}
 .join-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s}
 .join-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
+.join-btn:disabled{opacity:.4;cursor:not-allowed}
+.close-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(201,76,76,.3);background:transparent;color:var(--red);cursor:pointer;transition:all .15s}
+.close-btn:hover{background:rgba(201,76,76,.1)}
 .lobby-create{grid-column:1/-1;background:var(--ink);border:1px dashed var(--wire2);padding:1rem 1.5rem;text-align:center;cursor:pointer;transition:border-color .15s}
 .lobby-create:hover{border-color:var(--gold)}
 .lobby-create p{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);transition:color .15s}
 .lobby-create:hover p{color:var(--gold)}
+.lobby-empty{grid-column:1/-1;padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem}
+
+/* TURNERINGSKORT */
+.tournament-card{background:var(--ink2);border:1px solid var(--wire);margin-bottom:1px}
+.tournament-card-head{padding:1.5rem 2rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start}
+.tournament-card-body{border-top:1px solid var(--wire);display:grid;grid-template-columns:1fr 280px;gap:0;background:var(--wire)}
+.t-card-main{background:var(--ink2);padding:1.25rem 2rem}
+.t-card-side{background:var(--ink3);padding:1.25rem 1.5rem}
+.t-card-actions{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.btn-reg{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.25rem;border:1px solid var(--discord);background:transparent;color:var(--discord);cursor:pointer;transition:all .15s}
+.btn-reg:hover{background:var(--discord);color:#fff}
+.btn-reg.registered{border-color:var(--green);color:var(--green)}
+.btn-reg.registered:hover{background:rgba(61,171,110,.1)}
+.btn-reg:disabled{opacity:.4;cursor:not-allowed}
+.btn-edit-t{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s}
+.btn-edit-t:hover{border-color:var(--gold);color:var(--gold)}
+.btn-del-t{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid rgba(201,76,76,.3);background:transparent;color:var(--red);cursor:pointer;transition:all .15s}
+.btn-del-t:hover{background:rgba(201,76,76,.1)}
+.t-empty{padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem;border:1px solid var(--wire)}
+.status-open{color:var(--green)}.status-closed{color:var(--grey)}.status-ongoing{color:var(--gold)}.status-finished{color:var(--grey2)}
+
+/* FORM MODALS */
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:.72rem;font-weight:500;color:var(--grey2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.form-input{width:100%;background:var(--ink2);border:1px solid var(--wire2);color:var(--white);padding:.55rem .75rem;font-family:'Sora',sans-serif;font-size:.85rem;font-weight:300;transition:border-color .15s}
+.form-input:focus{outline:none;border-color:var(--gold)}
+.form-input option{background:var(--ink2)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem}
+.btn-cancel{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.25rem;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s}
+.btn-cancel:hover{color:var(--white)}
+.btn-submit{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.25rem;border:none;background:var(--gold);color:var(--ink);cursor:pointer;transition:background .15s}
+.btn-submit:hover{background:var(--gold-hi)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.contributor-btn{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;padding:4px 10px;letter-spacing:.1em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;border:1px solid rgba(90,172,204,.4);background:rgba(90,172,204,.08);color:#5AACCC;cursor:pointer;transition:all .15s}
+.contributor-btn:hover{background:rgba(90,172,204,.15)}
 
 /* TURNERINGER */
 .tournament-layout{display:grid;grid-template-columns:1fr 340px;gap:1px;background:var(--wire);border:1px solid var(--wire);align-items:start}
@@ -274,6 +313,107 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
 </head>
 <body>
 
+<!-- LOBBY MODAL -->
+<div class="modal-wrap" id="lobby-modal">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-close" onclick="closeLobbyModal()">✕</button>
+    <h3>Opprett lobby</h3>
+    <p>Lobbyen er aktiv i 4 timer.</p>
+    <div class="form-group" style="margin-top:1rem">
+      <label>Lobbynavn</label>
+      <input class="form-input" id="lm-name" placeholder="F.eks. Rank push — morgenkø" maxlength="60">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Rank-krav</label>
+        <select class="form-input" id="lm-rank">
+          <option>Alle</option><option>Gold+</option><option>Platinum+</option><option>Diamond+</option><option>Master+</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Maks spillere</label>
+        <select class="form-input" id="lm-slots">
+          <option value="4">4</option><option value="6">6</option><option value="8" selected>8</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeLobbyModal()">Avbryt</button>
+      <button class="btn-submit" id="lm-submit" onclick="submitLobby()">Opprett</button>
+    </div>
+    <div class="admin-status" id="lm-status"></div>
+  </div>
+</div>
+
+<!-- TOURNAMENT MODAL -->
+<div class="modal-wrap" id="tournament-modal">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeTournamentModal()">✕</button>
+    <h3 id="tm-title">Opprett turnering</h3>
+    <div class="form-group" style="margin-top:1rem">
+      <label>Navn</label>
+      <input class="form-input" id="tm-name" placeholder="F.eks. Vallefort Cup #2" maxlength="80">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Dato</label>
+        <input class="form-input" id="tm-date" type="date">
+      </div>
+      <div class="form-group">
+        <label>Format</label>
+        <select class="form-input" id="tm-format">
+          <option>Enkelt utslagsspill</option><option>Dobbel utslagsspill</option><option>Roundrobin</option><option>Sveitsisk</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Maks spillere</label>
+        <select class="form-input" id="tm-maxplayers">
+          <option value="4">4</option><option value="8">8</option><option value="16" selected>16</option><option value="32">32</option><option value="64">64</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rank-krav</label>
+        <select class="form-input" id="tm-rank">
+          <option>Alle</option><option>Gold+</option><option>Platinum+</option><option>Diamond+</option><option>Master+</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Server</label>
+        <input class="form-input" id="tm-server" value="EUW" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-input" id="tm-status">
+          <option value="open">Påmelding åpen</option><option value="closed">Påmelding stengt</option><option value="ongoing">Pågår</option><option value="finished">Ferdig</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>1. plass premie</label>
+        <input class="form-input" id="tm-prize1" placeholder="TBA" maxlength="60">
+      </div>
+      <div class="form-group">
+        <label>2. plass premie</label>
+        <input class="form-input" id="tm-prize2" placeholder="TBA" maxlength="60">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Beskrivelse (valgfri)</label>
+      <textarea class="form-input" id="tm-desc" rows="2" placeholder="Kort info om turneringen…" maxlength="300" style="resize:none"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeTournamentModal()">Avbryt</button>
+      <button class="btn-submit" id="tm-submit" onclick="submitTournament()">Lagre</button>
+    </div>
+    <div class="admin-status" id="tm-status-msg"></div>
+  </div>
+</div>
+
 <!-- DISCORD LOGIN MODAL -->
 <div class="modal-wrap" id="discord-modal">
   <div class="modal">
@@ -323,6 +463,15 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
         </div>
         <div class="admin-status" id="admin-status"></div>
       </div>
+      <div class="admin-section">
+        <h4>Contributors <span style="font-size:.65rem;color:var(--grey2);font-weight:400;letter-spacing:0;text-transform:none">— kan opprette og redigere turneringer</span></h4>
+        <div class="admin-admins-list" id="contributors-list"></div>
+        <div style="display:flex;gap:8px">
+          <input class="admin-input" id="new-contributor-id" placeholder="Discord bruker-ID" style="flex:1">
+          <button class="admin-btn" onclick="addContributor()">+ Legg til</button>
+        </div>
+        <div class="admin-status" id="contributor-status"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -358,9 +507,9 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
     </div>
   </div>
   <div class="hero-ticker">
-    <div class="ticker-item"><div class="ticker-num">340<span>+</span></div><div class="ticker-label">Medlemmer</div></div>
-    <div class="ticker-item"><div class="ticker-num">12</div><div class="ticker-label">Aktive lobbyer</div></div>
-    <div class="ticker-item"><div class="ticker-num">1</div><div class="ticker-label">Turnering planlagt</div></div>
+    <div class="ticker-item"><div class="ticker-num" id="stat-members">—</div><div class="ticker-label">Medlemmer</div></div>
+    <div class="ticker-item"><div class="ticker-num" id="stat-lobbies">—</div><div class="ticker-label">Aktive lobbyer</div></div>
+    <div class="ticker-item"><div class="ticker-num" id="stat-tournaments">—</div><div class="ticker-label">Turneringer</div></div>
   </div>
 </section>
 
@@ -409,17 +558,13 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
     <h2 class="reveal">Åpne lobbyer</h2>
     <p class="section-lead reveal">Filtrer etter rank og bli med. Logg inn med Discord for å opprette egen lobby.</p>
     <div class="lobby-filters reveal">
-      <button class="filter-pill active">Alle</button>
-      <button class="filter-pill">Diamond+</button>
-      <button class="filter-pill">Platinum+</button>
-      <button class="filter-pill">Gold+</button>
+      <button class="filter-pill active" data-rank="Alle">Alle</button>
+      <button class="filter-pill" data-rank="Diamond+">Diamond+</button>
+      <button class="filter-pill" data-rank="Platinum+">Platinum+</button>
+      <button class="filter-pill" data-rank="Gold+">Gold+</button>
     </div>
-    <div class="lobby-grid reveal">
-      <div class="lobby-card"><span class="rank-tag r-diamond">Diamond+</span><div><div class="lc-name">Rank push — morgenkø</div><div class="lc-meta">Asgard99 · 12 min siden</div></div><div class="lc-right"><div class="lc-slots"><b>6</b>/8</div><button class="join-btn">Join</button></div></div>
-      <div class="lobby-card"><span class="rank-tag r-plat">Platinum+</span><div><div class="lc-name">Casual — ingen stress</div><div class="lc-meta">NordbjørnTFT · 3 min siden</div></div><div class="lc-right"><div class="lc-slots"><b>3</b>/8</div><button class="join-btn">Join</button></div></div>
-      <div class="lobby-card"><span class="rank-tag r-gold">Gold+</span><div><div class="lc-name">Lær comps — newcomers welcome</div><div class="lc-meta">FjordGaming · 28 min siden</div></div><div class="lc-right"><div class="lc-slots"><b>5</b>/8</div><button class="join-btn">Join</button></div></div>
-      <div class="lobby-card"><span class="rank-tag r-all">Alle ranks</span><div><div class="lc-name">Søndagslobby — hyggelig stemning</div><div class="lc-meta">OsloGaming · 1t siden</div></div><div class="lc-right"><div class="lc-slots"><b>2</b>/8</div><button class="join-btn">Join</button></div></div>
-      <div class="lobby-create" onclick="requireLogin()"><p>+ Opprett ny lobby — krever Discord-innlogging</p></div>
+    <div class="lobby-grid reveal" id="lobby-grid">
+      <div class="lobby-empty">Laster lobbyer…</div>
     </div>
   </div>
 </section>
@@ -427,32 +572,16 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
 <!-- TURNERINGER -->
 <section id="turneringer">
   <div class="section">
-    <div class="label-line reveal"><span class="label">Konkurranse</span></div>
-    <h2 class="reveal">Turneringer</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem">
+      <div>
+        <div class="label-line reveal"><span class="label">Konkurranse</span></div>
+        <h2 class="reveal">Turneringer</h2>
+      </div>
+      <div id="tournament-create-area"></div>
+    </div>
     <p class="section-lead reveal">Norske TFT-turneringer arrangert av community-en.</p>
-    <div class="tournament-layout reveal">
-      <div class="t-main">
-        <div class="t-status"><span class="live-dot"></span> Påmelding åpen</div>
-        <div class="t-name">Vallefort Cup #1</div>
-        <div class="t-date">Dato annonseres · <span id="t-season">Sesong 14</span></div>
-        <div>
-          <div class="t-spec"><span class="t-spec-k">Format</span><span class="t-spec-v">Enkelt utslagsspill</span></div>
-          <div class="t-spec"><span class="t-spec-k">Spillere</span><span class="t-spec-v">16 plasser</span></div>
-          <div class="t-spec"><span class="t-spec-k">Rank-krav</span><span class="t-spec-v">Plat+ anbefalt</span></div>
-          <div class="t-spec"><span class="t-spec-k">Server</span><span class="t-spec-v">EUW</span></div>
-          <div class="t-spec"><span class="t-spec-k">Premie</span><span class="t-spec-v">TBA</span></div>
-        </div>
-      </div>
-      <div class="t-side">
-        <h3>Påmelding</h3>
-        <div class="slots-track"><div class="slots-fill"></div></div>
-        <div class="slots-txt"><b>6</b> / 16 påmeldt</div>
-        <div class="prize-grid">
-          <div class="prize-item"><div class="prize-place">1. plass</div><div class="prize-val">TBA</div></div>
-          <div class="prize-item"><div class="prize-place">2. plass</div><div class="prize-val">TBA</div></div>
-        </div>
-        <button class="btn-discord" onclick="requireLogin()" style="width:100%;justify-content:center;clip-path:none;padding:.7rem;font-size:.85rem">Meld deg på</button>
-      </div>
+    <div id="tournament-list">
+      <div class="t-empty">Laster turneringer…</div>
     </div>
   </div>
 </section>
@@ -487,17 +616,13 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
 </footer>
 
 <script>
-/* ══════════════════════════════════════════════════
-   CONFIG
-══════════════════════════════════════════════════ */
 const API_URL           = 'https://vallefort.brede-espelid.workers.dev';
 const DISCORD_CLIENT_ID = '1504941162715418625';
 
-/* ══════════════════════════════════════════════════
-   AUTH
-══════════════════════════════════════════════════ */
-let currentUser   = null;
-let currentPatch  = null;
+/* ── AUTH ───────────────────────────────────────── */
+let currentUser  = null;
+let currentPatch = null;
+let currentConfig = null;
 
 function getToken()  { return localStorage.getItem('vf_token'); }
 function setToken(t) { localStorage.setItem('vf_token', t); }
@@ -515,129 +640,113 @@ async function loadUser() {
   } catch { renderLoggedOut(); }
 }
 
+const DISCORD_SVG = `<svg width="16" height="12" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="white"/></svg>`;
+
 function renderLoggedOut() {
-  document.getElementById('nav-user-area').innerHTML = `
-    <button class="btn-discord" onclick="openModal()">
-      <svg width="16" height="12" viewBox="0 0 18 14" fill="none"><path d="M15.25 1.17A14.83 14.83 0 0 0 11.5.08a.06.06 0 0 0-.06.03c-.16.29-.34.66-.46.96a13.7 13.7 0 0 0-4 0 9.6 9.6 0 0 0-.47-.96.06.06 0 0 0-.06-.03A14.8 14.8 0 0 0 2.75 1.17a.05.05 0 0 0-.03.02C.44 4.56-.27 7.86.08 11.12c0 .01.01.03.03.04a14.9 14.9 0 0 0 4.44 2.18.06.06 0 0 0 .07-.02c.34-.46.65-.94.91-1.45a.06.06 0 0 0-.03-.08 9.8 9.8 0 0 1-1.4-.65.06.06 0 0 1-.01-.1l.28-.22a.06.06 0 0 1 .06 0c2.94 1.31 6.12 1.31 9.03 0a.06.06 0 0 1 .06.01l.27.22a.06.06 0 0 1-.01.1c-.45.26-.92.47-1.4.65a.06.06 0 0 0-.03.08c.27.51.58.99.91 1.45a.06.06 0 0 0 .07.02 14.87 14.87 0 0 0 4.45-2.18.06.06 0 0 0 .03-.04c.41-3.8-.68-7.09-2.64-10.01a.05.05 0 0 0-.03-.01ZM6.01 9.14c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.7 1.72-1.57 1.72Zm5.99 0c-.86 0-1.57-.77-1.57-1.72s.7-1.71 1.57-1.71c.88 0 1.58.77 1.57 1.71 0 .95-.69 1.72-1.57 1.72Z" fill="white"/></svg>
-      Logg inn
-    </button>`;
+  document.getElementById('nav-user-area').innerHTML =
+    `<button class="btn-discord" onclick="openModal()">${DISCORD_SVG} Logg inn</button>`;
+  document.getElementById('tournament-create-area').innerHTML = '';
 }
 
 function renderLoggedIn(user) {
-  const admin = user.isAdmin
+  const initials = user.username.slice(0,2).toUpperCase();
+  const adminBtn = user.isAdmin
     ? `<button style="font-size:.7rem;padding:4px 10px;letter-spacing:.1em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;border:1px solid rgba(200,168,75,.4);background:var(--gold-lo);color:var(--gold);cursor:pointer" onclick="openAdmin()">⚙ Admin</button>`
     : '';
-  const initials = user.username.slice(0,2).toUpperCase();
+  const contribPip = user.isContributor && !user.isAdmin
+    ? '<span style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5AACCC;background:rgba(90,172,204,.08);border:1px solid rgba(90,172,204,.3);padding:1px 5px">Contributor</span>'
+    : '';
   document.getElementById('nav-user-area').innerHTML = `
     <div style="display:flex;align-items:center;gap:8px">
-      ${admin}
+      ${adminBtn}
       <div class="user-chip" onclick="handleUserClick()">
-        ${user.avatar
-          ? `<img class="user-avatar" src="${user.avatar}" alt="">`
-          : `<div class="user-avatar-placeholder">${initials}</div>`}
-        <span class="user-name">${user.username}</span>
-        ${user.isAdmin ? '<span class="admin-pip">Admin</span>' : ''}
+        ${user.avatar ? `<img class="user-avatar" src="${escHtml(user.avatar)}" alt="">` : `<div class="user-avatar-placeholder">${initials}</div>`}
+        <span class="user-name">${escHtml(user.username)}</span>
+        ${user.isAdmin ? '<span class="admin-pip">Admin</span>' : contribPip}
       </div>
     </div>`;
+
+  if (user.isAdmin || user.isContributor) {
+    document.getElementById('tournament-create-area').innerHTML =
+      `<button class="contributor-btn" onclick="openTournamentModal()">+ Opprett turnering</button>`;
+  }
 }
 
 function handleUserClick() {
   if (confirm(`Logg ut som ${currentUser.username}?`)) {
-    clearToken(); currentUser = null; renderLoggedOut();
+    clearToken(); currentUser = null; renderLoggedOut(); loadLobbies(); renderTournaments([]);
   }
 }
 
 function requireLogin() { if (!currentUser) openModal(); }
 
 function startDiscordAuth() {
-  const state    = Math.random().toString(36).slice(2);
-  const redirect = encodeURIComponent(`${API_URL}/auth/callback`);
+  const state = Math.random().toString(36).slice(2);
   sessionStorage.setItem('discord_state', state);
-  window.location.href = `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${redirect}&response_type=code&scope=identify%20guilds.join&state=${state}`;
+  window.location.href = `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(API_URL+'/auth/callback')}&response_type=code&scope=identify%20guilds.join&state=${state}`;
 }
 
 function handleOAuthReturn() {
   const p = new URLSearchParams(window.location.search);
   const t = p.get('token');
-  if (t) { setToken(t); window.history.replaceState({}, '', window.location.pathname); loadUser(); }
+  if (t) { setToken(t); window.history.replaceState({}, '', window.location.pathname); }
 }
 
-/* ══════════════════════════════════════════════════
-   META TIER LIST
-══════════════════════════════════════════════════ */
+/* ── STATS ──────────────────────────────────────── */
+async function loadStats() {
+  try {
+    const r = await fetch(`${API_URL}/api/stats`);
+    if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById('stat-members').textContent    = d.members || 0;
+    document.getElementById('stat-lobbies').textContent    = d.activeLobbies || 0;
+    document.getElementById('stat-tournaments').textContent = d.tournaments || 0;
+  } catch {}
+}
+
+/* ── META TIER LIST ─────────────────────────────── */
 const TIER_COLORS = { S: 't-s', A: 't-a', B: 't-b', C: 't-c' };
-let commentCounts = {}; // slug → count cache
+let commentCounts = {};
 
 async function loadMeta() {
   try {
     const r = await fetch(`${API_URL}/api/meta`);
     if (!r.ok) throw new Error();
-    const data = await r.json();
-    renderTierList(data);
-  } catch {
-    renderTierList(null);
-  }
+    renderTierList(await r.json());
+  } catch { renderTierList(null); }
 }
 
 function renderTierList(data) {
   const patch = data?.patch || '?';
   currentPatch = patch;
-
-  document.getElementById('meta-set-pill').textContent  = data?.set   ? `Set ${data.set}` : 'Set ?';
+  document.getElementById('meta-set-pill').textContent   = data?.set ? `Set ${data.set}` : 'Set ?';
   document.getElementById('meta-patch-pill').textContent = `Patch ${patch}`;
-
   if (data?.cachedAt) {
     const d = new Date(data.cachedAt);
     document.getElementById('meta-fetched-at').textContent =
       `Oppdatert: ${d.toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })} · Kilde: tftacademy.com`;
   }
-
   const container = document.getElementById('tier-list');
   container.innerHTML = '';
-
   if (!data || data.fallback) {
-    container.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem">
-      Tier list utilgjengelig — <a href="https://tftacademy.com/tierlist/comps" target="_blank" style="color:var(--gold)">se tftacademy.com</a>
-    </div>`;
+    container.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem">Tier list utilgjengelig — <a href="https://tftacademy.com/tierlist/comps" target="_blank" style="color:var(--gold)">se tftacademy.com</a></div>`;
     return;
   }
-
   for (const tier of ['S','A','B','C']) {
     const comps = data.tiers[tier] || [];
     if (!comps.length) continue;
-
-    const row = document.createElement('div');
-    row.className = 'tier-row';
-
-    // Header row
-    const header = document.createElement('div');
-    header.className = 'tier-row-header';
-    header.innerHTML = `<div class="tier-badge ${TIER_COLORS[tier]}">${tier}</div>
-      <div class="tier-comps" id="tier-comps-${tier}"></div>`;
-    row.appendChild(header);
-
-    // Forum panel placeholder
-    const forum = document.createElement('div');
-    forum.className = 'comp-forum';
-    forum.id = `forum-panel`;
-    row.appendChild(forum);
-
-    container.appendChild(row);
-
-    // Render comp chips
+    const row    = document.createElement('div'); row.className = 'tier-row';
+    const header = document.createElement('div'); header.className = 'tier-row-header';
+    header.innerHTML = `<div class="tier-badge ${TIER_COLORS[tier]}">${tier}</div><div class="tier-comps" id="tier-comps-${tier}"></div>`;
+    const forum  = document.createElement('div'); forum.className = 'comp-forum';
+    row.appendChild(header); row.appendChild(forum); container.appendChild(row);
     const compsDiv = header.querySelector(`#tier-comps-${tier}`);
     comps.forEach(comp => {
       const chip = document.createElement('button');
       chip.className = 'comp-chip';
-      chip.dataset.slug  = comp.slug;
-      chip.dataset.name  = comp.name;
-      chip.dataset.patch = patch;
-      chip.dataset.url   = comp.url;
-      chip.innerHTML = `${comp.name} <span class="comment-count" id="cc-${comp.slug}">…</span>`;
+      chip.innerHTML = `${escHtml(comp.name)} <span class="comment-count" id="cc-${comp.slug}">…</span>`;
       chip.onclick = () => toggleForum(chip, comp, patch, forum);
       compsDiv.appendChild(chip);
-
-      // Fetch comment count
       fetchCommentCount(comp.slug, patch);
     });
   }
@@ -647,61 +756,42 @@ async function fetchCommentCount(slug, patch) {
   try {
     const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}`);
     if (!r.ok) return;
-    const d = await r.json();
+    const d  = await r.json();
     const el = document.getElementById(`cc-${slug}`);
     if (el) el.textContent = d.count;
     commentCounts[slug] = d.count;
-  } catch { /* ignore */ }
+  } catch {}
 }
 
-/* ══════════════════════════════════════════════════
-   COMP FORUM
-══════════════════════════════════════════════════ */
-let activeChip  = null;
-let activeForum = null;
+/* ── COMP FORUM ─────────────────────────────────── */
+let activeChip = null, activeForum = null;
 
 function toggleForum(chip, comp, patch, forumEl) {
-  // Lukk aktivt forum
   if (activeChip && activeChip !== chip) {
     activeChip.classList.remove('active');
     if (activeForum) { activeForum.classList.remove('open'); activeForum.innerHTML = ''; }
   }
-
   if (activeChip === chip) {
-    // Lukk dette
-    chip.classList.remove('active');
-    forumEl.classList.remove('open');
-    forumEl.innerHTML = '';
-    activeChip  = null;
-    activeForum = null;
-    return;
+    chip.classList.remove('active'); forumEl.classList.remove('open'); forumEl.innerHTML = '';
+    activeChip = null; activeForum = null; return;
   }
-
-  // Åpne nytt forum
-  chip.classList.add('active');
-  forumEl.classList.add('open');
-  activeChip  = chip;
-  activeForum = forumEl;
-
+  chip.classList.add('active'); forumEl.classList.add('open');
+  activeChip = chip; activeForum = forumEl;
   renderForum(forumEl, comp, patch);
 }
 
 async function renderForum(el, comp, patch) {
   el.innerHTML = `
     <div class="forum-header">
-      <div>
-        <div class="forum-title"><span>${comp.name}</span> — diskusjon</div>
-        <div class="forum-patch-note">Patch ${patch} · Kommentarer nullstilles ved ny patch</div>
-      </div>
+      <div><div class="forum-title"><span>${escHtml(comp.name)}</span> — diskusjon</div>
+      <div class="forum-patch-note">Patch ${patch} · Kommentarer nullstilles ved ny patch</div></div>
       <div style="display:flex;gap:8px;align-items:center">
-        <a href="${comp.url}" target="_blank" style="font-size:.72rem;color:var(--grey2);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.06em;text-transform:uppercase">↗ Guide</a>
+        <a href="${escHtml(comp.url)}" target="_blank" style="font-size:.72rem;color:var(--grey2);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.06em;text-transform:uppercase">↗ Guide</a>
         <button class="forum-close" onclick="closeActiveForum()">✕</button>
       </div>
     </div>
-    <div class="comments-list" id="clist-${comp.slug}"><div style="padding:.5rem;text-align:center;color:var(--grey2);font-size:.82rem">Laster kommentarer…</div></div>
+    <div class="comments-list" id="clist-${comp.slug}"><div style="padding:.5rem;text-align:center;color:var(--grey2);font-size:.82rem">Laster…</div></div>
     <div id="cinput-${comp.slug}"></div>`;
-
-  // Last kommentarer
   await loadComments(comp.slug, patch);
   renderCommentInput(comp.slug, patch, document.getElementById(`cinput-${comp.slug}`));
 }
@@ -713,91 +803,48 @@ async function loadComments(slug, patch) {
     const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}`);
     const d = await r.json();
     renderCommentList(listEl, d.comments, slug, patch);
-    // Oppdater teller
     const cc = document.getElementById(`cc-${slug}`);
     if (cc) cc.textContent = d.count;
-  } catch {
-    listEl.innerHTML = `<div class="no-comments">Kunne ikke laste kommentarer</div>`;
-  }
+  } catch { listEl.innerHTML = `<div class="no-comments">Kunne ikke laste kommentarer</div>`; }
 }
 
 function renderCommentList(el, comments, slug, patch) {
-  if (!comments.length) {
-    el.innerHTML = `<div class="no-comments">Ingen kommentarer ennå — vær den første!</div>`;
-    return;
-  }
+  if (!comments.length) { el.innerHTML = `<div class="no-comments">Ingen kommentarer ennå — vær den første!</div>`; return; }
   el.innerHTML = comments.map(c => {
-    const time = new Date(c.createdAt).toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const time   = new Date(c.createdAt).toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
     const canDel = currentUser && (currentUser.id === c.userId || currentUser.isAdmin);
-    const av = c.avatar
-      ? `<img class="comment-av" src="${c.avatar}" alt="">`
-      : `<div class="comment-av-placeholder">${c.username.slice(0,2).toUpperCase()}</div>`;
-    return `
-      <div class="comment-item" id="cm-${c.id}">
-        ${av}
-        <div class="comment-body">
-          <div class="comment-meta"><b>${escHtml(c.username)}</b> ${time}</div>
-          <div class="comment-text">${escHtml(c.text)}</div>
-        </div>
-        ${canDel ? `<button class="comment-delete" onclick="deleteComment('${slug}','${patch}','${c.id}')" title="Slett">✕</button>` : '<div></div>'}
-      </div>`;
+    const av     = c.avatar ? `<img class="comment-av" src="${escHtml(c.avatar)}" alt="">` : `<div class="comment-av-placeholder">${c.username.slice(0,2).toUpperCase()}</div>`;
+    return `<div class="comment-item" id="cm-${c.id}">${av}<div class="comment-body"><div class="comment-meta"><b>${escHtml(c.username)}</b> ${time}</div><div class="comment-text">${escHtml(c.text)}</div></div>${canDel ? `<button class="comment-delete" onclick="deleteComment('${slug}','${patch}','${c.id}')" title="Slett">✕</button>` : '<div></div>'}</div>`;
   }).join('');
-
-  // Scroll til bunnen
   el.scrollTop = el.scrollHeight;
 }
 
 function renderCommentInput(slug, patch, el) {
   if (!el) return;
-  if (!currentUser) {
-    el.innerHTML = `<div class="comment-login-prompt">
-      <button onclick="openModal()">Logg inn med Discord</button> for å kommentere
-    </div>`;
-    return;
-  }
-  el.innerHTML = `
-    <div class="comment-input-area">
-      <div style="flex:1">
-        <textarea class="comment-textarea" id="ctxt-${slug}" placeholder="Skriv om denne compen… (maks 500 tegn)" maxlength="500"
-          oninput="document.getElementById('cchar-${slug}').textContent = this.value.length + '/500'"></textarea>
-        <div class="char-count" id="cchar-${slug}">0/500</div>
-      </div>
-      <button class="comment-submit" id="csub-${slug}" onclick="submitComment('${slug}','${patch}')">Send</button>
-    </div>`;
+  if (!currentUser) { el.innerHTML = `<div class="comment-login-prompt"><button onclick="openModal()">Logg inn med Discord</button> for å kommentere</div>`; return; }
+  el.innerHTML = `<div class="comment-input-area"><div style="flex:1"><textarea class="comment-textarea" id="ctxt-${slug}" placeholder="Skriv om denne compen… (maks 500 tegn)" maxlength="500" oninput="document.getElementById('cchar-${slug}').textContent=this.value.length+'/500'"></textarea><div class="char-count" id="cchar-${slug}">0/500</div></div><button class="comment-submit" id="csub-${slug}" onclick="submitComment('${slug}','${patch}')">Send</button></div>`;
 }
 
 async function submitComment(slug, patch) {
   const textarea = document.getElementById(`ctxt-${slug}`);
-  const btn      = document.getElementById(`csub-${slug}`);
-  const text     = textarea?.value.trim();
+  const btn = document.getElementById(`csub-${slug}`);
+  const text = textarea?.value.trim();
   if (!text || !currentUser) return;
-
-  btn.disabled   = true;
-  btn.textContent = '…';
-
+  btn.disabled = true; btn.textContent = '…';
   try {
-    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-      body:    JSON.stringify({ text }),
-    });
+    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify({text}) });
     if (!r.ok) { const e = await r.json(); alert(e.error || 'Feil'); return; }
-    textarea.value = '';
-    document.getElementById(`cchar-${slug}`).textContent = '0/500';
+    textarea.value = ''; document.getElementById(`cchar-${slug}`).textContent = '0/500';
     await loadComments(slug, patch);
   } catch { alert('Noe gikk galt'); }
   finally { btn.disabled = false; btn.textContent = 'Send'; }
 }
 
-async function deleteComment(slug, patch, commentId) {
+async function deleteComment(slug, patch, id) {
   if (!confirm('Slett kommentar?')) return;
   try {
-    await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}/${commentId}`, {
-      method:  'DELETE',
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    document.getElementById(`cm-${commentId}`)?.remove();
-    // Oppdater teller
+    await fetch(`${API_URL}/api/comments/${encodeURIComponent(patch)}/${encodeURIComponent(slug)}/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
+    document.getElementById(`cm-${id}`)?.remove();
     const listEl = document.getElementById(`clist-${slug}`);
     const count  = listEl ? listEl.querySelectorAll('.comment-item').length : 0;
     const cc     = document.getElementById(`cc-${slug}`);
@@ -809,19 +856,226 @@ async function deleteComment(slug, patch, commentId) {
 function closeActiveForum() {
   if (activeChip)  activeChip.classList.remove('active');
   if (activeForum) { activeForum.classList.remove('open'); activeForum.innerHTML = ''; }
-  activeChip  = null;
-  activeForum = null;
+  activeChip = null; activeForum = null;
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+/* ── LOBBYER ────────────────────────────────────── */
+let allLobbies    = [];
+let lobbyFilter   = 'Alle';
+
+async function loadLobbies() {
+  try {
+    const r = await fetch(`${API_URL}/api/lobbies`);
+    allLobbies = r.ok ? await r.json() : [];
+  } catch { allLobbies = []; }
+  renderLobbies();
 }
 
-/* ══════════════════════════════════════════════════
-   CONFIG & ADMIN
-══════════════════════════════════════════════════ */
-let currentConfig = null;
+function renderLobbies() {
+  const grid = document.getElementById('lobby-grid');
+  const list = lobbyFilter === 'Alle' ? allLobbies : allLobbies.filter(l => l.rank === lobbyFilter);
 
+  const rankClass = { 'Diamond+':'r-diamond','Master+':'r-diamond','Platinum+':'r-plat','Gold+':'r-gold','Alle':'r-all','Iron+':'r-all','Bronze+':'r-all','Silver+':'r-all' };
+
+  const cards = list.map(l => {
+    const filled  = l.joiners.length + 1;
+    const isHost  = currentUser?.id === l.hostId;
+    const joined  = currentUser && l.joiners.includes(currentUser.id);
+    const full    = l.joiners.length >= l.maxSlots - 1;
+    const ago     = timeAgo(l.createdAt);
+    const rc      = rankClass[l.rank] || 'r-all';
+    const joinBtn = isHost
+      ? `<button class="close-btn" onclick="closeLobby('${l.id}')">Steng</button>`
+      : `<button class="join-btn" onclick="joinLobby('${l.id}')" ${joined||full?'disabled':''} title="${joined?'Du er med':full?'Full':''}">${joined?'Med':'Join'}</button>`;
+    return `<div class="lobby-card">
+      <span class="rank-tag ${rc}">${escHtml(l.rank)}</span>
+      <div><div class="lc-name">${escHtml(l.name)}</div><div class="lc-meta">${escHtml(l.hostName)} · ${ago}</div></div>
+      <div class="lc-right"><div class="lc-slots"><b>${filled}</b>/${l.maxSlots}</div>${joinBtn}</div>
+    </div>`;
+  }).join('');
+
+  const createBtn = `<div class="lobby-create" onclick="${currentUser ? 'openLobbyModal()' : 'openModal()'}"><p>+ Opprett ny lobby${currentUser ? '' : ' — krever Discord-innlogging'}</p></div>`;
+
+  grid.innerHTML = (list.length ? cards : `<div class="lobby-empty">Ingen aktive lobbyer akkurat nå.</div>`) + createBtn;
+}
+
+async function joinLobby(id) {
+  if (!currentUser) return openModal();
+  try {
+    const r = await fetch(`${API_URL}/api/lobbies/${id}/join`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
+    if (!r.ok) { const e = await r.json(); alert(e.error); return; }
+    await loadLobbies(); loadStats();
+  } catch { alert('Noe gikk galt'); }
+}
+
+async function closeLobby(id) {
+  if (!confirm('Steng lobbyen?')) return;
+  try {
+    await fetch(`${API_URL}/api/lobbies/${id}/close`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
+    await loadLobbies(); loadStats();
+  } catch { alert('Noe gikk galt'); }
+}
+
+function openLobbyModal() {
+  document.getElementById('lm-name').value = '';
+  document.getElementById('lm-status').textContent = '';
+  document.getElementById('lobby-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLobbyModal() { document.getElementById('lobby-modal').classList.remove('open'); document.body.style.overflow = ''; }
+
+async function submitLobby() {
+  const name     = document.getElementById('lm-name').value.trim();
+  const rank     = document.getElementById('lm-rank').value;
+  const maxSlots = document.getElementById('lm-slots').value;
+  if (!name) { showStatus('lm-status', 'Navn er påkrevd', 'var(--red)'); return; }
+  const btn = document.getElementById('lm-submit'); btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(`${API_URL}/api/lobbies`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify({name, rank, maxSlots:parseInt(maxSlots)}) });
+    if (!r.ok) { const e = await r.json(); showStatus('lm-status', e.error, 'var(--red)'); return; }
+    closeLobbyModal(); await loadLobbies(); loadStats();
+  } catch { showStatus('lm-status', 'Noe gikk galt', 'var(--red)'); }
+  finally { btn.disabled = false; btn.textContent = 'Opprett'; }
+}
+
+/* ── TURNERINGER ────────────────────────────────── */
+let allTournaments = [];
+let editingTournamentId = null;
+
+async function loadTournaments() {
+  try {
+    const r = await fetch(`${API_URL}/api/tournaments`);
+    allTournaments = r.ok ? await r.json() : [];
+  } catch { allTournaments = []; }
+  renderTournaments(allTournaments);
+}
+
+const STATUS_LABEL = { open:'Påmelding åpen', closed:'Påmelding stengt', ongoing:'Pågår nå', finished:'Ferdig' };
+const STATUS_CLASS = { open:'status-open', closed:'status-closed', ongoing:'status-ongoing', finished:'status-finished' };
+
+function renderTournaments(list) {
+  const container = document.getElementById('tournament-list');
+  if (!list.length) { container.innerHTML = `<div class="t-empty">Ingen turneringer ennå.</div>`; return; }
+
+  container.innerHTML = list.map(t => {
+    const regCount   = t.registrations.length;
+    const fillPct    = Math.min((regCount / t.maxPlayers) * 100, 100).toFixed(0);
+    const isReg      = currentUser && t.registrations.some(r => r.userId === currentUser.id);
+    const canEdit    = currentUser && (currentUser.isAdmin || (currentUser.isContributor && t.createdBy === currentUser.id));
+    const canReg     = t.status === 'open' && regCount < t.maxPlayers;
+    const dateStr    = t.date ? new Date(t.date).toLocaleDateString('nb-NO', {day:'2-digit',month:'long',year:'numeric'}) : 'Dato annonseres';
+
+    const regBtn = currentUser
+      ? (isReg
+          ? `<button class="btn-reg registered" onclick="unregisterTournament('${t.id}')">✓ Påmeldt — Meld av</button>`
+          : `<button class="btn-reg" onclick="registerTournament('${t.id}')" ${canReg?'':'disabled'}>${canReg?'Meld deg på':'Fullt'}</button>`)
+      : `<button class="btn-reg" onclick="openModal()">Logg inn for å melde på</button>`;
+
+    const editBtns = canEdit ? `<button class="btn-edit-t" onclick="openTournamentModal('${t.id}')">Rediger</button><button class="btn-del-t" onclick="deleteTournament('${t.id}')">Slett</button>` : '';
+
+    return `<div class="tournament-card" id="tc-${t.id}">
+      <div class="tournament-card-head">
+        <div>
+          <div class="t-status ${STATUS_CLASS[t.status]}"><span class="live-dot" style="background:currentColor"></span> ${STATUS_LABEL[t.status]||t.status}</div>
+          <div class="t-name">${escHtml(t.name)}</div>
+          <div class="t-date">${dateStr}${t.description ? ' · ' + escHtml(t.description) : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start">${editBtns}</div>
+      </div>
+      <div class="tournament-card-body">
+        <div class="t-card-main">
+          <div class="t-spec"><span class="t-spec-k">Format</span><span class="t-spec-v">${escHtml(t.format)}</span></div>
+          <div class="t-spec"><span class="t-spec-k">Spillere</span><span class="t-spec-v">${t.maxPlayers} plasser</span></div>
+          <div class="t-spec"><span class="t-spec-k">Rank-krav</span><span class="t-spec-v">${escHtml(t.rankReq)}</span></div>
+          <div class="t-spec"><span class="t-spec-k">Server</span><span class="t-spec-v">${escHtml(t.server)}</span></div>
+          <div class="t-card-actions">${regBtn}</div>
+        </div>
+        <div class="t-card-side">
+          <h3>Påmelding</h3>
+          <div class="slots-track"><div class="slots-fill" style="width:${fillPct}%"></div></div>
+          <div class="slots-txt"><b>${regCount}</b> / ${t.maxPlayers} påmeldt</div>
+          <div class="prize-grid">
+            <div class="prize-item"><div class="prize-place">1. plass</div><div class="prize-val">${escHtml(t.prize1||'TBA')}</div></div>
+            <div class="prize-item"><div class="prize-place">2. plass</div><div class="prize-val">${escHtml(t.prize2||'TBA')}</div></div>
+          </div>
+          <p style="font-size:.72rem;color:var(--grey2)">Opprettet av ${escHtml(t.createdByUsername)}</p>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function registerTournament(id) {
+  if (!currentUser) return openModal();
+  try {
+    const r = await fetch(`${API_URL}/api/tournaments/${id}/register`, { method:'POST', headers:{Authorization:`Bearer ${getToken()}`} });
+    if (!r.ok) { const e = await r.json(); alert(e.error); return; }
+    await loadTournaments(); loadStats();
+  } catch { alert('Noe gikk galt'); }
+}
+
+async function unregisterTournament(id) {
+  if (!confirm('Meld deg av turneringen?')) return;
+  try {
+    await fetch(`${API_URL}/api/tournaments/${id}/register`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
+    await loadTournaments(); loadStats();
+  } catch { alert('Noe gikk galt'); }
+}
+
+async function deleteTournament(id) {
+  if (!confirm('Slett turneringen permanent?')) return;
+  try {
+    await fetch(`${API_URL}/api/tournaments/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
+    await loadTournaments(); loadStats();
+  } catch { alert('Noe gikk galt'); }
+}
+
+function openTournamentModal(id) {
+  editingTournamentId = id || null;
+  const tm = id ? allTournaments.find(t => t.id === id) : null;
+  document.getElementById('tm-title').textContent = tm ? 'Rediger turnering' : 'Opprett turnering';
+  document.getElementById('tm-name').value        = tm?.name        || '';
+  document.getElementById('tm-date').value        = tm?.date        || '';
+  document.getElementById('tm-format').value      = tm?.format      || 'Enkelt utslagsspill';
+  document.getElementById('tm-maxplayers').value  = tm?.maxPlayers  || 16;
+  document.getElementById('tm-rank').value        = tm?.rankReq     || 'Alle';
+  document.getElementById('tm-server').value      = tm?.server      || 'EUW';
+  document.getElementById('tm-prize1').value      = tm?.prize1      || '';
+  document.getElementById('tm-prize2').value      = tm?.prize2      || '';
+  document.getElementById('tm-desc').value        = tm?.description || '';
+  document.getElementById('tm-status').value      = tm?.status      || 'open';
+  document.getElementById('tm-status-msg').textContent = '';
+  document.getElementById('tournament-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTournamentModal() { document.getElementById('tournament-modal').classList.remove('open'); document.body.style.overflow = ''; }
+
+async function submitTournament() {
+  const body = {
+    name:        document.getElementById('tm-name').value.trim(),
+    date:        document.getElementById('tm-date').value || null,
+    format:      document.getElementById('tm-format').value,
+    maxPlayers:  parseInt(document.getElementById('tm-maxplayers').value),
+    rankReq:     document.getElementById('tm-rank').value,
+    server:      document.getElementById('tm-server').value.trim(),
+    prize1:      document.getElementById('tm-prize1').value.trim(),
+    prize2:      document.getElementById('tm-prize2').value.trim(),
+    description: document.getElementById('tm-desc').value.trim(),
+    status:      document.getElementById('tm-status').value,
+  };
+  if (!body.name) { showStatus('tm-status-msg', 'Navn er påkrevd', 'var(--red)'); return; }
+  const btn = document.getElementById('tm-submit'); btn.disabled = true; btn.textContent = '…';
+  try {
+    const url    = editingTournamentId ? `${API_URL}/api/tournaments/${editingTournamentId}` : `${API_URL}/api/tournaments`;
+    const method = editingTournamentId ? 'PUT' : 'POST';
+    const r = await fetch(url, { method, headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify(body) });
+    if (!r.ok) { const e = await r.json(); showStatus('tm-status-msg', e.error, 'var(--red)'); return; }
+    closeTournamentModal(); await loadTournaments(); loadStats();
+  } catch { showStatus('tm-status-msg', 'Noe gikk galt', 'var(--red)'); }
+  finally { btn.disabled = false; btn.textContent = 'Lagre'; }
+}
+
+/* ── CONFIG & ADMIN ─────────────────────────────── */
 async function loadConfig() {
   try {
     const r = await fetch(`${API_URL}/api/config`);
@@ -832,11 +1086,7 @@ async function loadConfig() {
 }
 
 function applyConfig(cfg) {
-  if (cfg.season) {
-    document.getElementById('hero-season').textContent = cfg.season;
-    const ts = document.getElementById('t-season');
-    if (ts) ts.textContent = cfg.season;
-  }
+  if (cfg.season) document.getElementById('hero-season').textContent = cfg.season;
 }
 
 function openAdmin() {
@@ -845,19 +1095,13 @@ function openAdmin() {
     document.getElementById('admin-patch').value  = currentConfig.patch  || '';
     document.getElementById('admin-season').value = currentConfig.season || '';
     renderAdminsList(currentConfig.admins || []);
+    renderContributorsList(currentConfig.contributors || []);
   }
   document.getElementById('admin-panel').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
-function closeAdmin() {
-  document.getElementById('admin-panel').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-document.getElementById('admin-panel').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeAdmin();
-});
+function closeAdmin() { document.getElementById('admin-panel').classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('admin-panel').addEventListener('click', e => { if (e.target === e.currentTarget) closeAdmin(); });
 
 function renderAdminsList(admins) {
   const list = document.getElementById('admins-list');
@@ -866,16 +1110,23 @@ function renderAdminsList(admins) {
     : '<p style="font-size:.78rem;color:var(--grey2)">Ingen ekstra admins lagt til.</p>';
 }
 
+function renderContributorsList(contributors) {
+  const list = document.getElementById('contributors-list');
+  list.innerHTML = contributors.length
+    ? contributors.map((id, i) => `<div class="admin-admin-row"><span>${id}</span><button onclick="removeContributor(${i})">✕</button></div>`).join('')
+    : '<p style="font-size:.78rem;color:var(--grey2)">Ingen contributors lagt til.</p>';
+}
+
 async function saveConfig() {
   const btn = event.target; btn.disabled = true; btn.textContent = 'Lagrer…';
   try {
-    const body = { set: Number(document.getElementById('admin-set').value), patch: document.getElementById('admin-patch').value.trim(), season: document.getElementById('admin-season').value.trim(), admins: currentConfig?.admins || [] };
-    const r = await fetch(`${API_URL}/api/config`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` }, body: JSON.stringify(body) });
+    const body = { set: Number(document.getElementById('admin-set').value), patch: document.getElementById('admin-patch').value.trim(), season: document.getElementById('admin-season').value.trim(), admins: currentConfig?.admins || [], contributors: currentConfig?.contributors || [] };
+    const r = await fetch(`${API_URL}/api/config`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify(body) });
     if (!r.ok) throw new Error(await r.text());
     currentConfig = await r.json();
     applyConfig(currentConfig);
     showStatus('config-status', '✓ Lagret', 'var(--green)');
-    document.getElementById('meta-set-pill').textContent  = `Set ${currentConfig.set}`;
+    document.getElementById('meta-set-pill').textContent   = `Set ${currentConfig.set}`;
     document.getElementById('meta-patch-pill').textContent = `Patch ${currentConfig.patch}`;
   } catch (e) { showStatus('config-status', `Feil: ${e.message}`, 'var(--red)'); }
   btn.disabled = false; btn.textContent = 'Lagre';
@@ -884,41 +1135,69 @@ async function saveConfig() {
 async function refreshMeta() {
   showStatus('meta-status', 'Henter…', 'var(--grey)');
   try {
-    const r = await fetch(`${API_URL}/api/meta/refresh`, { headers: { Authorization: `Bearer ${getToken()}` } });
+    const r = await fetch(`${API_URL}/api/meta/refresh`, { headers:{Authorization:`Bearer ${getToken()}`} });
     if (!r.ok) throw new Error(await r.text());
-    const d = await r.json();
-    renderTierList(d.data);
+    renderTierList((await r.json()).data);
     showStatus('meta-status', '✓ Meta oppdatert', 'var(--green)');
   } catch (e) { showStatus('meta-status', `Feil: ${e.message}`, 'var(--red)'); }
 }
 
 function addAdmin() {
-  const input = document.getElementById('new-admin-id');
-  const id    = input.value.trim();
-  if (!id || !/^\d{17,20}$/.test(id)) { showStatus('admin-status', 'Ugyldig Discord ID', 'var(--red)'); return; }
-  const admins = [...(currentConfig?.admins || [])];
+  const id = document.getElementById('new-admin-id').value.trim();
+  if (!id || !/^\d{17,20}$/.test(id)) { showStatus('admin-status','Ugyldig Discord ID','var(--red)'); return; }
+  const admins = [...(currentConfig?.admins||[])];
   if (admins.includes(id)) return;
-  admins.push(id);
-  input.value = '';
+  admins.push(id); document.getElementById('new-admin-id').value = '';
   if (!currentConfig) currentConfig = {};
-  currentConfig.admins = admins;
-  renderAdminsList(admins);
-  saveAdmins(admins);
+  currentConfig.admins = admins; renderAdminsList(admins);
+  saveRoles('admins', admins, 'admin-status');
 }
-
 function removeAdmin(i) {
-  const admins = [...(currentConfig?.admins || [])];
-  admins.splice(i, 1);
-  currentConfig.admins = admins;
-  renderAdminsList(admins);
-  saveAdmins(admins);
+  const admins = [...(currentConfig?.admins||[])]; admins.splice(i,1);
+  currentConfig.admins = admins; renderAdminsList(admins);
+  saveRoles('admins', admins, 'admin-status');
 }
 
-async function saveAdmins(admins) {
+function addContributor() {
+  const id = document.getElementById('new-contributor-id').value.trim();
+  if (!id || !/^\d{17,20}$/.test(id)) { showStatus('contributor-status','Ugyldig Discord ID','var(--red)'); return; }
+  const contributors = [...(currentConfig?.contributors||[])];
+  if (contributors.includes(id)) return;
+  contributors.push(id); document.getElementById('new-contributor-id').value = '';
+  if (!currentConfig) currentConfig = {};
+  currentConfig.contributors = contributors; renderContributorsList(contributors);
+  saveRoles('contributors', contributors, 'contributor-status');
+}
+function removeContributor(i) {
+  const contributors = [...(currentConfig?.contributors||[])]; contributors.splice(i,1);
+  currentConfig.contributors = contributors; renderContributorsList(contributors);
+  saveRoles('contributors', contributors, 'contributor-status');
+}
+
+async function saveRoles(key, values, statusId) {
   try {
-    await fetch(`${API_URL}/api/config`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` }, body: JSON.stringify({ admins }) });
-    showStatus('admin-status', '✓ Lagret', 'var(--green)');
-  } catch (e) { showStatus('admin-status', `Feil: ${e.message}`, 'var(--red)'); }
+    await fetch(`${API_URL}/api/config`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body:JSON.stringify({[key]:values}) });
+    showStatus(statusId,'✓ Lagret','var(--green)');
+  } catch (e) { showStatus(statusId,`Feil: ${e.message}`,'var(--red)'); }
+}
+
+/* ── MODALS ─────────────────────────────────────── */
+function openModal()  { document.getElementById('discord-modal').classList.add('open');    document.body.style.overflow = 'hidden'; }
+function closeModal() { document.getElementById('discord-modal').classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('discord-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('lobby-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeLobbyModal(); });
+document.getElementById('tournament-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeTournamentModal(); });
+
+/* ── HELPERS ────────────────────────────────────── */
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff/60000);
+  if (m < 1)  return 'akkurat nå';
+  if (m < 60) return `${m} min siden`;
+  const h = Math.floor(m/60);
+  return `${h}t siden`;
 }
 
 function showStatus(id, msg, color) {
@@ -928,23 +1207,12 @@ function showStatus(id, msg, color) {
   setTimeout(() => { el.textContent = ''; }, 4000);
 }
 
-/* ══════════════════════════════════════════════════
-   MODALS
-══════════════════════════════════════════════════ */
-function openModal()  { document.getElementById('discord-modal').classList.add('open');    document.body.style.overflow = 'hidden'; }
-function closeModal() { document.getElementById('discord-modal').classList.remove('open'); document.body.style.overflow = ''; }
-document.getElementById('discord-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-
-/* ══════════════════════════════════════════════════
-   SCROLL REVEAL
-══════════════════════════════════════════════════ */
+/* ── SCROLL REVEAL ──────────────────────────────── */
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
-      const i = Array.from(e.target.parentNode.children).indexOf(e.target);
-      e.target.style.transitionDelay = (i % 4) * 0.06 + 's';
-      e.target.classList.add('on');
-      obs.unobserve(e.target);
+      e.target.style.transitionDelay = (Array.from(e.target.parentNode.children).indexOf(e.target) % 4) * 0.06 + 's';
+      e.target.classList.add('on'); obs.unobserve(e.target);
     }
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
@@ -955,23 +1223,22 @@ document.querySelectorAll('.filter-pill').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    lobbyFilter = btn.dataset.rank || 'Alle';
+    renderLobbies();
   });
 });
 
 /* NAV MOBILE */
-document.getElementById('nav-toggle').addEventListener('click', () => {
-  document.getElementById('nav-links').classList.toggle('open');
-});
-document.querySelectorAll('#nav-links a').forEach(a =>
-  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'))
-);
+document.getElementById('nav-toggle').addEventListener('click', () => document.getElementById('nav-links').classList.toggle('open'));
+document.querySelectorAll('#nav-links a').forEach(a => a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open')));
 
-/* ══════════════════════════════════════════════════
-   INIT
-══════════════════════════════════════════════════ */
+/* ── INIT ───────────────────────────────────────── */
 handleOAuthReturn();
 loadUser();
+loadStats();
 loadMeta();
+loadLobbies();
+loadTournaments();
 loadConfig();
 </script>
 </body>
