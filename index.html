@@ -247,12 +247,46 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .cta-note li{font-size:.8rem;font-weight:300;color:var(--grey);display:flex;align-items:center;gap:8px}
 .cta-note li::before{content:'';display:block;width:6px;height:6px;background:var(--gold);clip-path:polygon(50% 0%,100% 100%,0% 100%);flex-shrink:0}
 
-footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--grey2)}
+footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,6vw,5rem);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:var(--ink3)}
+.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,210,225,0.6)}
 .footer-links{display:flex;gap:1.5rem}
-.footer-links a{font-size:.78rem;font-weight:300;color:var(--grey2);text-decoration:none;transition:color .15s}
-.footer-links a:hover{color:var(--grey)}
-.footer-copy{font-size:.72rem;color:var(--grey2)}
+.footer-links a{font-size:.82rem;font-weight:500;color:rgba(200,210,225,0.65);text-decoration:none;transition:color .15s;letter-spacing:.04em}
+.footer-links a:hover{color:var(--white)}
+.footer-copy{font-size:.72rem;color:rgba(200,210,225,0.4)}
+
+/* KARUSELL */
+.carousel-section{background:var(--ink2);border-bottom:1px solid var(--wire);position:relative;overflow:hidden}
+.carousel-inner{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.carousel-slide{min-width:100%;display:grid;grid-template-columns:1fr 1fr;min-height:340px;position:relative}
+.carousel-slide.no-img{grid-template-columns:1fr}
+.carousel-slide-img{background-size:cover;background-position:center;position:relative}
+.carousel-slide-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--ink2))}
+.carousel-slide-body{padding:clamp(2rem,5vw,3.5rem) clamp(1.5rem,4vw,3rem);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
+.carousel-slide.no-img .carousel-slide-body{max-width:720px}
+.carousel-author{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.carousel-author img,.carousel-author-av{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.carousel-author-av{background:var(--gold-lo);border:1px solid rgba(200,168,75,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;color:var(--gold)}
+.carousel-author-name{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.carousel-date{font-size:.7rem;color:var(--grey2)}
+.carousel-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:800;text-transform:uppercase;line-height:1.0;color:var(--white);margin-bottom:.75rem}
+.carousel-content{font-size:.9rem;font-weight:300;color:rgba(200,210,225,0.8);line-height:1.7;max-width:480px}
+.carousel-controls{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem;border-top:1px solid var(--wire);background:var(--ink)}
+.carousel-dots{display:flex;gap:6px;align-items:center}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:var(--wire2);cursor:pointer;transition:all .2s}
+.carousel-dot.active{background:var(--gold);width:20px;border-radius:3px}
+.carousel-nav{display:flex;gap:4px}
+.carousel-btn{width:32px;height:32px;border:1px solid var(--wire2);background:rgba(255,255,255,0.05);color:var(--white);cursor:pointer;font-size:1rem;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.carousel-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
+.carousel-btn:disabled{opacity:.3;cursor:default}
+.carousel-admin-bar{display:flex;align-items:center;gap:8px;padding:.6rem 1.5rem;background:rgba(200,168,75,0.06);border-bottom:1px solid rgba(200,168,75,0.15)}
+.carousel-empty{padding:3rem;text-align:center;color:var(--grey2);font-size:.9rem}
+.slide-del-btn{position:absolute;top:.75rem;right:.75rem;background:rgba(0,0,0,.5);border:1px solid rgba(201,76,76,.4);color:#e87a7a;font-size:.7rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;cursor:pointer;transition:all .15s;z-index:2}
+.slide-del-btn:hover{background:rgba(201,76,76,.3)}
+
+@media(max-width:640px){
+  .carousel-slide{grid-template-columns:1fr}
+  .carousel-slide-img{display:none}
+}
 
 /* MODAL */
 .modal-wrap{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -313,6 +347,31 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
 </style>
 </head>
 <body>
+
+<!-- POST MODAL -->
+<div class="modal-wrap" id="post-modal">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close" onclick="closePostModal()">✕</button>
+    <h3>Nytt innlegg</h3>
+    <div class="form-group" style="margin-top:1rem">
+      <label>Tittel</label>
+      <input class="form-input" id="pm-title" placeholder="F.eks. Patch 17.2 ute nå!" maxlength="100">
+    </div>
+    <div class="form-group">
+      <label>Tekst</label>
+      <textarea class="form-input" id="pm-content" rows="4" placeholder="Hva vil du fortelle community-en?" maxlength="1000" style="resize:none"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Bildelenke (valgfri)</label>
+      <input class="form-input" id="pm-image" placeholder="https://..." maxlength="500">
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closePostModal()">Avbryt</button>
+      <button class="btn-submit" id="pm-submit" onclick="submitPost()">Publiser</button>
+    </div>
+    <div class="admin-status" id="pm-status"></div>
+  </div>
+</div>
 
 <!-- LOBBY MODAL -->
 <div class="modal-wrap" id="lobby-modal">
@@ -513,6 +572,24 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
     <div class="ticker-item"><div class="ticker-num" id="stat-tournaments">—</div><div class="ticker-label">Turneringer</div></div>
   </div>
 </section>
+
+<!-- KARUSELL / INNLEGG -->
+<div class="carousel-section" id="carousel-section" style="display:none">
+  <div id="carousel-admin-bar" style="display:none" class="carousel-admin-bar">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)">⚙ Innlegg</span>
+    <button class="contributor-btn" onclick="openPostModal()">+ Nytt innlegg</button>
+  </div>
+  <div style="overflow:hidden" id="carousel-viewport">
+    <div class="carousel-inner" id="carousel-inner"></div>
+  </div>
+  <div class="carousel-controls">
+    <div class="carousel-dots" id="carousel-dots"></div>
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="carousel-prev" onclick="carouselMove(-1)">&#8592;</button>
+      <button class="carousel-btn" id="carousel-next" onclick="carouselMove(1)">&#8594;</button>
+    </div>
+  </div>
+</div>
 
 <!-- META -->
 <section id="meta" style="background:var(--ink2)">
@@ -1246,6 +1323,139 @@ function showStatus(id, msg, color) {
   setTimeout(() => { el.textContent = ''; }, 4000);
 }
 
+/* ── INNLEGG / KARUSELL ─────────────────────────── */
+let allPosts    = [];
+let carouselIdx = 0;
+let carouselTimer = null;
+
+async function loadPosts() {
+  try {
+    const r = await fetch(`${API_URL}/api/posts`);
+    allPosts = r.ok ? await r.json() : [];
+  } catch { allPosts = []; }
+  renderCarousel();
+}
+
+function renderCarousel() {
+  const section = document.getElementById('carousel-section');
+  const adminBar = document.getElementById('carousel-admin-bar');
+  const canPost  = currentUser && (currentUser.isAdmin || currentUser.isContributor);
+
+  if (adminBar) adminBar.style.display = canPost ? 'flex' : 'none';
+
+  if (!allPosts.length && !canPost) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  const inner = document.getElementById('carousel-inner');
+  const dots  = document.getElementById('carousel-dots');
+
+  if (!allPosts.length) {
+    inner.innerHTML = `<div class="carousel-slide no-img" style="min-width:100%"><div class="carousel-slide-body"><div class="carousel-empty">Ingen innlegg ennå. Klikk «+ Nytt innlegg» for å publisere.</div></div></div>`;
+    dots.innerHTML  = '';
+    return;
+  }
+
+  inner.innerHTML = allPosts.map((p, i) => {
+    const canDel = currentUser && (currentUser.isAdmin || currentUser.id === p.createdBy);
+    const delBtn = canDel ? `<button class="slide-del-btn" onclick="deletePost('${p.id}')">✕ Slett</button>` : '';
+    const date   = new Date(p.createdAt).toLocaleDateString('nb-NO', { day:'2-digit', month:'long', year:'numeric' });
+    const av     = p.createdByAvatar
+      ? `<img src="${escHtml(p.createdByAvatar)}" class="carousel-author img">`
+      : `<div class="carousel-author-av">${p.createdByUsername.slice(0,2).toUpperCase()}</div>`;
+
+    if (p.imageUrl) {
+      return `<div class="carousel-slide" style="min-width:100%">
+        ${delBtn}
+        <div class="carousel-slide-img" style="background-image:url('${escHtml(p.imageUrl)}')"></div>
+        <div class="carousel-slide-body">
+          <div class="carousel-author">${av}<span class="carousel-author-name">${escHtml(p.createdByUsername)}</span><span class="carousel-date">${date}</span></div>
+          <div class="carousel-title">${escHtml(p.title)}</div>
+          <div class="carousel-content">${escHtml(p.content)}</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="carousel-slide no-img" style="min-width:100%">
+      ${delBtn}
+      <div class="carousel-slide-body">
+        <div class="carousel-author">${av}<span class="carousel-author-name">${escHtml(p.createdByUsername)}</span><span class="carousel-date">${date}</span></div>
+        <div class="carousel-title">${escHtml(p.title)}</div>
+        <div class="carousel-content">${escHtml(p.content)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  dots.innerHTML = allPosts.map((_, i) =>
+    `<div class="carousel-dot${i === carouselIdx ? ' active' : ''}" onclick="carouselGo(${i})"></div>`
+  ).join('');
+
+  carouselGo(Math.min(carouselIdx, allPosts.length - 1), false);
+  startCarouselTimer();
+}
+
+function carouselGo(idx, animate = true) {
+  if (!allPosts.length) return;
+  carouselIdx = (idx + allPosts.length) % allPosts.length;
+  const inner = document.getElementById('carousel-inner');
+  if (inner) inner.style.transform = `translateX(-${carouselIdx * 100}%)`;
+  document.querySelectorAll('.carousel-dot').forEach((d, i) =>
+    d.classList.toggle('active', i === carouselIdx));
+  document.getElementById('carousel-prev').disabled = false;
+  document.getElementById('carousel-next').disabled = false;
+}
+
+function carouselMove(dir) {
+  carouselGo(carouselIdx + dir);
+  restartCarouselTimer();
+}
+
+function startCarouselTimer() {
+  clearInterval(carouselTimer);
+  if (allPosts.length > 1) carouselTimer = setInterval(() => carouselMove(1), 6000);
+}
+
+function restartCarouselTimer() { startCarouselTimer(); }
+
+function openPostModal() {
+  document.getElementById('pm-title').value   = '';
+  document.getElementById('pm-content').value = '';
+  document.getElementById('pm-image').value   = '';
+  document.getElementById('pm-status').textContent = '';
+  document.getElementById('post-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePostModal() { document.getElementById('post-modal').classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('post-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePostModal(); });
+
+async function submitPost() {
+  const title    = document.getElementById('pm-title').value.trim();
+  const content  = document.getElementById('pm-content').value.trim();
+  const imageUrl = document.getElementById('pm-image').value.trim();
+  if (!title)   { showStatus('pm-status', 'Tittel er påkrevd', 'var(--red)'); return; }
+  if (!content) { showStatus('pm-status', 'Tekst er påkrevd',  'var(--red)'); return; }
+  const btn = document.getElementById('pm-submit'); btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(`${API_URL}/api/posts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ title, content, imageUrl: imageUrl || null }),
+    });
+    if (!r.ok) { const e = await r.json(); showStatus('pm-status', e.error, 'var(--red)'); return; }
+    closePostModal();
+    carouselIdx = 0;
+    await loadPosts();
+  } catch { showStatus('pm-status', 'Noe gikk galt', 'var(--red)'); }
+  finally { btn.disabled = false; btn.textContent = 'Publiser'; }
+}
+
+async function deletePost(id) {
+  if (!confirm('Slett innlegget?')) return;
+  try {
+    await fetch(`${API_URL}/api/posts/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` } });
+    carouselIdx = 0;
+    await loadPosts();
+  } catch { alert('Kunne ikke slette'); }
+}
+
 /* ── SCROLL REVEAL ──────────────────────────────── */
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
@@ -1280,6 +1490,7 @@ document.querySelectorAll('#nav-links a').forEach(a => a.addEventListener('click
   loadLobbies();
   loadTournaments();
   loadConfig();
+  loadPosts();
 })();
 </script>
 </body>

@@ -35,6 +35,7 @@ const KV_CONFIG      = 'config';
 const KV_LOBBIES     = 'lobbies';
 const KV_TOURNAMENTS = 'tournaments';
 const KV_MEMBERS     = 'members';
+const KV_POSTS       = 'posts';
 const SOURCE_URL     = 'https://tftacademy.com/tierlist/comps';
 
 const MAX_COMMENT_LEN      = 500;
@@ -62,6 +63,10 @@ export default {
       if (path === '/api/me')           return handleMe(request, env);
       if (path === '/api/lobbies')      return handleLobbies(request, env);
       if (path === '/api/tournaments')  return handleTournaments(request, env);
+      if (path === '/api/posts')        return handlePosts(request, env);
+
+      const postDelM = path.match(/^\/api\/posts\/([^/]+)$/);
+      if (postDelM) return handlePostById(request, env, postDelM[1]);
 
       const cmMatch = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)$/);
       if (cmMatch) return handleComments(request, env, cmMatch[1], cmMatch[2]);
@@ -88,6 +93,56 @@ export default {
     ctx.waitUntil(runDailyScrape(env));
   },
 };
+
+// ─── POSTS ────────────────────────────────────────────────────────────────────
+async function handlePosts(request, env) {
+  if (request.method === 'GET') {
+    const raw = await env.KV.get(KV_POSTS);
+    return json(raw ? JSON.parse(raw) : []);
+  }
+  if (request.method === 'POST') {
+    const user = await getUser(request, env);
+    if (!user) return json({ error: 'Ikke innlogget' }, 401);
+    const cfg = await getConfig(env);
+    if (!isAdminFull(user.id, env, cfg) && !isContributor(user.id, cfg)) return json({ error: 'Ingen tilgang' }, 403);
+    const body = await request.json().catch(() => ({}));
+    const title = (body.title || '').trim();
+    const content = (body.content || '').trim();
+    if (!title)   return json({ error: 'Tittel er påkrevd' }, 400);
+    if (!content) return json({ error: 'Innhold er påkrevd' }, 400);
+    const post = {
+      id: crypto.randomUUID(),
+      title:   title.slice(0, 100),
+      content: content.slice(0, 1000),
+      imageUrl: (body.imageUrl || '').trim().slice(0, 500) || null,
+      createdBy: user.id,
+      createdByUsername: user.username,
+      createdByAvatar: user.avatar || null,
+      createdAt: new Date().toISOString(),
+    };
+    const raw  = await env.KV.get(KV_POSTS);
+    const posts = raw ? JSON.parse(raw) : [];
+    posts.unshift(post); // Nyeste først
+    if (posts.length > 20) posts.pop(); // Maks 20 innlegg
+    await env.KV.put(KV_POSTS, JSON.stringify(posts));
+    return json(post, 201);
+  }
+  return json({ error: 'Method not allowed' }, 405);
+}
+
+async function handlePostById(request, env, id) {
+  if (request.method !== 'DELETE') return json({ error: 'Method not allowed' }, 405);
+  const user = await getUser(request, env);
+  if (!user) return json({ error: 'Ikke innlogget' }, 401);
+  const raw   = await env.KV.get(KV_POSTS);
+  const posts = raw ? JSON.parse(raw) : [];
+  const post  = posts.find(p => p.id === id);
+  if (!post) return json({ error: 'Innlegg ikke funnet' }, 404);
+  const cfg = await getConfig(env);
+  if (post.createdBy !== user.id && !isAdminFull(user.id, env, cfg)) return json({ error: 'Ingen tilgang' }, 403);
+  await env.KV.put(KV_POSTS, JSON.stringify(posts.filter(p => p.id !== id)));
+  return json({ ok: true });
+}
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
 async function handleStats(request, env) {
