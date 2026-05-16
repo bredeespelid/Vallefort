@@ -309,10 +309,17 @@ async function handlePlayers(request, env) {
     const region = (body.region || 'euw1').toLowerCase();
     if (!riotId.includes('#')) return json({ error:'Riot ID må ha format: Navn#TAG' }, 400);
     if (!REGION_CLUSTER[region]) return json({ error:'Ugyldig region' }, 400);
-    const [gameName, tagLine] = riotId.split('#');
+    const hashIdx  = riotId.indexOf('#');
+    const gameName = riotId.slice(0, hashIdx).trim();
+    const tagLine  = riotId.slice(hashIdx + 1).trim();
+    if (!gameName || !tagLine) return json({ error:'Ugyldig Riot ID format' }, 400);
     const cluster = REGION_CLUSTER[region];
     const accRes = await fetch(`https://${cluster}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, { headers:{'X-Riot-Token':env.RIOT_API_KEY} });
-    if (!accRes.ok) return accRes.status === 404 ? json({ error:'Riot ID ikke funnet' }, 404) : json({ error:'Riot API feil, prøv igjen' }, 502);
+    if (!accRes.ok) {
+      if (accRes.status === 404) return json({ error:'Riot ID ikke funnet — sjekk at navn og tag er riktig' }, 404);
+      const errBody = await accRes.text().catch(() => '');
+      return json({ error:`Riot API feil (${accRes.status})${errBody?': '+errBody.slice(0,120):''}` }, 502);
+    }
     const acc = await accRes.json();
     const rankData = await riotFetchRank(env, region, acc.puuid, null);
     const raw = await env.KV.get(KV_PLAYERS);
