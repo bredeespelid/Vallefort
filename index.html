@@ -502,9 +502,9 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
     <div class="hero-kicker">Norsk TFT Community</div>
     <h1>Vallefort<br><em>TFT</em></h1>
     <p class="hero-body">Lobbyer, meta-diskusjoner og turneringer for norske Teamfight Tactics-spillere. Alle ranks velkomne.</p>
-    <div class="hero-btns">
+    <div class="hero-btns" id="hero-btns">
       <a href="#lobbyer" class="btn-primary">Finn en lobby</a>
-      <button class="btn-ghost" onclick="openModal()">Logg inn med Discord</button>
+      <button class="btn-ghost" id="hero-login-btn" onclick="openModal()">Logg inn med Discord</button>
     </div>
   </div>
   <div class="hero-ticker">
@@ -593,9 +593,9 @@ footer{border-top:1px solid var(--wire);padding:1.75rem clamp(1.5rem,6vw,5rem);d
     <div class="label-line"><span class="label">Bli med</span></div>
     <h2>Klar til å spille?</h2>
     <p>Alle norske TFT-spillere er velkomne, fra Iron til Challenger.</p>
-    <div class="btns">
+    <div class="btns" id="cta-btns">
       <a href="https://discord.gg/" target="_blank" class="btn-primary">Åpne Discord</a>
-      <button class="btn-ghost" onclick="openModal()">Logg inn på siden</button>
+      <button class="btn-ghost" id="cta-login-btn" onclick="openModal()">Logg inn på siden</button>
     </div>
   </div>
   <div class="cta-note reveal">
@@ -647,6 +647,10 @@ function renderLoggedOut() {
   document.getElementById('nav-user-area').innerHTML =
     `<button class="btn-discord" onclick="openModal()">${DISCORD_SVG} Logg inn</button>`;
   document.getElementById('tournament-create-area').innerHTML = '';
+  const hb = document.getElementById('hero-login-btn');
+  if (hb) hb.style.display = '';
+  const cb = document.getElementById('cta-login-btn');
+  if (cb) cb.style.display = '';
 }
 
 function renderLoggedIn(user) {
@@ -654,18 +658,34 @@ function renderLoggedIn(user) {
   const adminBtn = user.isAdmin
     ? `<button style="font-size:.7rem;padding:4px 10px;letter-spacing:.1em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;border:1px solid rgba(200,168,75,.4);background:var(--gold-lo);color:var(--gold);cursor:pointer" onclick="openAdmin()">⚙ Admin</button>`
     : '';
-  const contribPip = user.isContributor && !user.isAdmin
-    ? '<span style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5AACCC;background:rgba(90,172,204,.08);border:1px solid rgba(90,172,204,.3);padding:1px 5px">Contributor</span>'
-    : '';
+  const rolePip = user.isAdmin
+    ? '<span class="admin-pip">Admin</span>'
+    : user.isContributor
+      ? '<span style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5AACCC;background:rgba(90,172,204,.08);border:1px solid rgba(90,172,204,.3);padding:1px 5px">Contributor</span>'
+      : '';
+
   document.getElementById('nav-user-area').innerHTML = `
     <div style="display:flex;align-items:center;gap:8px">
       ${adminBtn}
-      <div class="user-chip" onclick="handleUserClick()">
-        ${user.avatar ? `<img class="user-avatar" src="${escHtml(user.avatar)}" alt="">` : `<div class="user-avatar-placeholder">${initials}</div>`}
-        <span class="user-name">${escHtml(user.username)}</span>
-        ${user.isAdmin ? '<span class="admin-pip">Admin</span>' : contribPip}
+      <div style="position:relative">
+        <div class="user-chip" onclick="toggleUserMenu()" title="Kontomeny">
+          ${user.avatar ? `<img class="user-avatar" src="${escHtml(user.avatar)}" alt="">` : `<div class="user-avatar-placeholder">${initials}</div>`}
+          <span class="user-name">${escHtml(user.username)}</span>
+          ${rolePip}
+          <span style="font-size:.65rem;color:var(--grey);margin-left:2px">▾</span>
+        </div>
+        <div id="user-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:160px;background:var(--ink3);border:1px solid var(--wire2);z-index:300;padding:4px 0">
+          <div style="padding:.5rem 1rem;font-size:.75rem;color:var(--grey);border-bottom:1px solid var(--wire)">${escHtml(user.username)}</div>
+          <button onclick="handleLogout()" style="width:100%;text-align:left;padding:.55rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:none;border:none;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,76,.08)'" onmouseout="this.style.background='none'">Logg ut</button>
+        </div>
       </div>
     </div>`;
+
+  // Skjul login-knapper overalt på siden
+  const hb = document.getElementById('hero-login-btn');
+  if (hb) hb.style.display = 'none';
+  const cb = document.getElementById('cta-login-btn');
+  if (cb) cb.style.display = 'none';
 
   if (user.isAdmin || user.isContributor) {
     document.getElementById('tournament-create-area').innerHTML =
@@ -673,11 +693,29 @@ function renderLoggedIn(user) {
   }
 }
 
-function handleUserClick() {
-  if (confirm(`Logg ut som ${currentUser.username}?`)) {
-    clearToken(); currentUser = null; renderLoggedOut(); loadLobbies(); renderTournaments([]);
-  }
+function toggleUserMenu() {
+  const menu = document.getElementById('user-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
+
+function handleLogout() {
+  clearToken(); currentUser = null;
+  document.getElementById('user-menu') && (document.getElementById('user-menu').style.display = 'none');
+  renderLoggedOut();
+  loadLobbies();
+  renderTournaments(allTournaments);
+}
+
+// Lukk usermeny ved klikk utenfor
+document.addEventListener('click', e => {
+  const menu = document.getElementById('user-menu');
+  if (menu && !menu.closest && menu.style.display === 'block') return;
+  if (menu && menu.style.display === 'block' && !e.target.closest('.user-chip') && !e.target.closest('#user-menu')) {
+    menu.style.display = 'none';
+  }
+});
+
 
 function requireLogin() { if (!currentUser) openModal(); }
 
