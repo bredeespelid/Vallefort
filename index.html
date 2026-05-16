@@ -230,26 +230,39 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 /* SPILLERE / LEADERBOARD */
 .filter-pill{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .9rem;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:rgba(200,210,225,0.8);cursor:pointer;transition:all .15s}
 .filter-pill:hover,.filter-pill.active{background:var(--gold-lo);border-color:var(--gold);color:var(--gold)}
-.player-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
-.player-list{border:1px solid var(--wire)}
-.player-row{display:grid;grid-template-columns:28px 40px 1fr 160px 90px 70px;gap:.75rem;align-items:center;padding:.8rem 1.25rem;background:var(--ink2);border-bottom:1px solid var(--wire);transition:background .15s}
-.player-row:hover{background:var(--ink3)}
-.player-row:last-child{border-bottom:none}
-.player-row-me{background:rgba(200,168,75,.06);border-left:2px solid var(--gold)}
-.player-pos{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;color:var(--grey2);text-align:right}
-.player-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--wire2)}
-.player-av-ph{width:36px;height:36px;border-radius:50%;background:var(--ink3);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--grey);border:1px solid var(--wire2);flex-shrink:0}
+/* PLAYER SECTION */
+.player-filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1.25rem}
+.player-list{display:flex;flex-direction:column;gap:5px}
+.player-list-header{display:grid;grid-template-columns:38px 44px 1fr 150px 90px 72px;gap:.75rem;align-items:center;padding:.35rem 1.25rem;margin-bottom:2px}
+.player-list-header span{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,210,225,0.3)}
+.player-row{display:grid;grid-template-columns:38px 44px 1fr 150px 90px 72px;gap:.75rem;align-items:center;padding:.75rem 1.25rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-left:3px solid transparent;transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.player-row::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.03) 0%,transparent 50%);opacity:0;transition:opacity .2s;pointer-events:none}
+.player-row:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.12);transform:translateX(2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.player-row:hover::before{opacity:1}
+.player-row-me{background:rgba(200,168,75,.05);border-left-color:var(--gold);box-shadow:-2px 0 16px rgba(200,168,75,.1)}
+.player-row-me:hover{background:rgba(200,168,75,.08);border-color:rgba(200,168,75,.25)}
+.player-row-1{border-left-color:rgba(200,168,75,.8);background:rgba(200,168,75,.04)}
+.player-row-2{border-left-color:rgba(180,180,195,.6);background:rgba(180,180,195,.02)}
+.player-row-3{border-left-color:rgba(192,125,58,.7);background:rgba(192,125,58,.03)}
+.player-pos{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:800;font-style:italic;color:rgba(200,210,225,0.3);text-align:center;line-height:1}
+.player-pos-1{color:var(--gold);text-shadow:0 0 12px rgba(200,168,75,.6);font-size:1.1rem}
+.player-pos-2{color:rgba(200,210,225,0.7);font-size:1rem}
+.player-pos-3{color:#c07d3a;font-size:.95rem}
+.player-av{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.1);transition:border-color .2s}
+.player-row:hover .player-av{border-color:rgba(255,255,255,0.25)}
+.player-row-me .player-av{border-color:rgba(200,168,75,.5)}
+.player-av-ph{width:38px;height:38px;border-radius:50%;background:var(--ink3);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--grey);border:2px solid rgba(255,255,255,0.08);flex-shrink:0}
 .player-info{display:flex;flex-direction:column;gap:2px;min-width:0}
 .player-discord{font-weight:600;font-size:.88rem;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.player-riot{font-size:.72rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-riot{font-size:.7rem;color:rgba(200,210,225,0.4);font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-tier-cell{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
-.player-lp{font-size:.72rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;font-weight:600}
-.player-wr{font-size:.73rem;color:var(--grey);font-family:'Barlow Condensed',sans-serif}
-.player-updated{font-size:.67rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;text-align:right}
-.player-empty{padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem}
-.player-register-panel{background:var(--ink2);border:1px solid var(--wire);padding:1.5rem;margin-bottom:1.25rem}
-.player-register-panel h3{font-size:1rem;margin-bottom:1rem;color:var(--white)}
-.my-player-card{background:var(--ink2);border:1px solid rgba(200,168,75,.2);border-left:3px solid var(--gold);padding:1rem 1.25rem;margin-bottom:1.25rem}
+.player-lp{font-size:.7rem;color:rgba(200,210,225,0.45);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em}
+.player-wr{font-size:.72rem;color:rgba(200,210,225,0.5);font-family:'Barlow Condensed',sans-serif}
+.player-updated{font-size:.65rem;color:rgba(200,210,225,0.3);font-family:'Barlow Condensed',sans-serif;text-align:right}
+.player-empty{padding:3rem;text-align:center;color:rgba(200,210,225,0.3);font-size:.85rem;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.01)}
+.player-register-panel{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(12px);padding:1.5rem;margin-bottom:1.25rem;box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)}
+.player-register-panel h3{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;color:var(--white)}
+.my-player-card{background:rgba(200,168,75,.04);border:1px solid rgba(200,168,75,.18);border-left:3px solid var(--gold);padding:1rem 1.25rem;margin-bottom:1.25rem;box-shadow:-2px 0 20px rgba(200,168,75,.08),inset 0 1px 0 rgba(200,168,75,.06)}
 /* Tier badge */
 .tier-badge{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 10px 2px 8px;border:1px solid;display:inline-flex;align-items:center;white-space:nowrap;box-sizing:border-box}
 .tier-challenger{color:#0ac7e4;border-color:rgba(10,199,228,.4);background:rgba(10,199,228,.08)}
@@ -1424,7 +1437,12 @@ function renderPlayerLeaderboard() {
     : playerFilter === 'UNRANKED' ? allPlayers.filter(p => !p.tier)
     : allPlayers.filter(p => p.tier === playerFilter);
   if (!players.length) { listEl.innerHTML = `<div class="player-empty">Ingen spillere i denne divisjonen ennå.</div>`; return; }
-  listEl.innerHTML = players.map((p, i) => {
+  const header = `<div class="player-list-header">
+    <span></span><span></span>
+    <span>Spiller</span><span>Rank</span><span>W/L</span><span>Oppdatert</span>
+  </div>`;
+  const rows = players.map((p, i) => {
+    const pos = i + 1;
     const av = p.discordAvatar
       ? `<img class="player-av" src="${escHtml(p.discordAvatar)}" alt="">`
       : `<div class="player-av-ph">${(p.discordUsername||'?').slice(0,2).toUpperCase()}</div>`;
@@ -1436,8 +1454,11 @@ function renderPlayerLeaderboard() {
     const total  = p.wins + p.losses;
     const wr     = total > 0 ? ` · ${Math.round(p.wins/total*100)}%` : '';
     const isMe   = currentUser?.id === p.discordId;
-    return `<div class="player-row${isMe?' player-row-me':''}" id="plr-${p.discordId}">
-      <span class="player-pos">${i+1}</span>
+    const posClass = pos <= 3 ? ` player-row-${pos}` : '';
+    const meClass  = isMe ? ' player-row-me' : '';
+    const posLabel = pos === 1 ? '1' : pos === 2 ? '2' : pos === 3 ? '3' : pos;
+    return `<div class="player-row${posClass}${meClass}" id="plr-${p.discordId}">
+      <span class="player-pos${pos<=3?' player-pos-'+pos:''}">${posLabel}</span>
       ${av}
       <div class="player-info">
         <span class="player-discord">${escHtml(p.discordUsername)}</span>
@@ -1451,6 +1472,7 @@ function renderPlayerLeaderboard() {
       <span class="player-updated">${timeAgo(p.updatedAt)}</span>
     </div>`;
   }).join('');
+  listEl.innerHTML = header + rows;
 }
 
 function renderMyPlayerCard() {
