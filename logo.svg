@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Octagon background -->
+  <polygon points="28,0 172,0 200,28 200,172 172,200 28,200 0,172 0,28" fill="#0D1117"/>
+  <!-- Gold border -->
+  <polygon points="28,0 172,0 200,28 200,172 172,200 28,200 0,172 0,28" fill="none" stroke="#C8A84B" stroke-width="6"/>
+  <!-- Castle merlons (3 teeth) -->
+  <rect x="44" y="36" width="22" height="24" fill="#C8A84B"/>
+  <rect x="89" y="36" width="22" height="24" fill="#C8A84B"/>
+  <rect x="134" y="36" width="22" height="24" fill="#C8A84B"/>
+  <!-- Battlement base -->
+  <rect x="44" y="58" width="112" height="8" fill="#C8A84B"/>
+  <!-- V shape — valley + initial -->
+  <polygon points="44,66 66,66 100,142 134,66 156,66 100,164 44,66" fill="#C8A84B"/>
+</svg>
