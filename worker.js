@@ -64,6 +64,7 @@ export default {
       if (path === '/api/lobbies')      return handleLobbies(request, env);
       if (path === '/api/tournaments')  return handleTournaments(request, env);
       if (path === '/api/posts')        return handlePosts(request, env);
+      if (path === '/api/admin/members') return handleAdminMembers(request, env);
 
       const postDelM = path.match(/^\/api\/posts\/([^/]+)$/);
       if (postDelM) return handlePostById(request, env, postDelM[1]);
@@ -145,6 +146,28 @@ async function handlePostById(request, env, id) {
 }
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
+async function handleAdminMembers(request, env) {
+  const user = await getUser(request, env);
+  if (!user) return json({ error: 'Ikke innlogget' }, 401);
+  const cfg = await getConfig(env);
+  if (!isAdminFull(user.id, env, cfg)) return json({ error: 'Ingen tilgang' }, 403);
+
+  const membersRaw = await env.KV.get(KV_MEMBERS);
+  const raw = membersRaw ? JSON.parse(membersRaw) : [];
+  const members = raw.map(m => {
+    const id = typeof m === 'string' ? m : m.id;
+    return {
+      id,
+      username: typeof m === 'object' ? m.username : null,
+      avatar:   typeof m === 'object' ? m.avatar   : null,
+      joinedAt: typeof m === 'object' ? m.joinedAt : null,
+      isAdmin:       isAdminFull(id, env, cfg),
+      isContributor: isContributor(id, cfg),
+    };
+  });
+  return json(members);
+}
+
 async function handleStats(request, env) {
   const [membersRaw, lobbiesRaw, tournamentsRaw] = await Promise.all([
     env.KV.get(KV_MEMBERS),
@@ -549,13 +572,17 @@ async function handleDiscordCallback(request, env) {
   const { access_token } = await tokenRes.json();
   const discordUser = await (await fetch('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${access_token}` } })).json();
 
-  // Spor membre
+  // Spor membre med full brukerinfo
   const membersRaw = await env.KV.get(KV_MEMBERS);
   const members    = membersRaw ? JSON.parse(membersRaw) : [];
-  if (!members.includes(discordUser.id)) {
-    members.push(discordUser.id);
-    await env.KV.put(KV_MEMBERS, JSON.stringify(members));
-  }
+  const memberAvatar = discordUser.avatar
+    ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+    : null;
+  const existingIdx = members.findIndex(m => (typeof m === 'string' ? m : m.id) === discordUser.id);
+  const memberEntry = { id: discordUser.id, username: discordUser.username, avatar: memberAvatar, joinedAt: existingIdx >= 0 ? (members[existingIdx].joinedAt || new Date().toISOString()) : new Date().toISOString() };
+  if (existingIdx >= 0) members[existingIdx] = memberEntry;
+  else members.push(memberEntry);
+  await env.KV.put(KV_MEMBERS, JSON.stringify(members));
 
   const cfg    = await getConfig(env);
   const avatar = discordUser.avatar

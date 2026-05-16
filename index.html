@@ -339,6 +339,41 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 .admin-admin-row button{background:none;border:none;color:var(--grey2);cursor:pointer;font-size:.9rem;transition:color .15s;padding:2px 6px}
 .admin-admin-row button:hover{color:var(--red)}
 
+/* ADMIN SUB-NAV */
+#admin-bar{display:none;position:fixed;top:62px;left:0;right:0;z-index:190;height:38px;background:rgba(26,20,12,0.97);border-bottom:1px solid rgba(200,168,75,0.25);backdrop-filter:blur(12px);align-items:center;padding:0 clamp(1rem,4vw,3rem);gap:4px}
+#admin-bar.visible{display:flex}
+.admin-bar-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border:1px solid transparent;background:none;color:rgba(200,168,75,0.6);cursor:pointer;transition:all .15s;height:26px;display:inline-flex;align-items:center;gap:6px}
+.admin-bar-btn:hover,.admin-bar-btn.active{color:var(--gold);border-color:rgba(200,168,75,0.3);background:rgba(200,168,75,0.08)}
+.admin-bar-label{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,168,75,0.35);margin-right:6px;padding-right:10px;border-right:1px solid rgba(200,168,75,0.15)}
+
+/* MEMBERS PANEL */
+#members-panel{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);align-items:flex-start;justify-content:center;padding:6rem 1.5rem 1.5rem;overflow-y:auto}
+#members-panel.open{display:flex}
+.members-modal{background:var(--ink3);border:1px solid rgba(200,168,75,.3);width:100%;max-width:680px}
+.members-modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--wire);background:var(--ink2);position:sticky;top:0}
+.members-modal-head h3{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.members-search{background:var(--ink);border:1px solid var(--wire2);color:var(--white);padding:.4rem .75rem;font-family:'Sora',sans-serif;font-size:.82rem;width:220px;transition:border-color .15s}
+.members-search:focus{outline:none;border-color:var(--gold)}
+.members-search::placeholder{color:var(--grey2)}
+.member-row{display:grid;grid-template-columns:32px 1fr auto auto;align-items:center;gap:.75rem;padding:.7rem 1.5rem;border-bottom:1px solid var(--wire);transition:background .12s}
+.member-row:hover{background:rgba(255,255,255,0.03)}
+.member-row:last-child{border-bottom:none}
+.member-av{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--ink4);border:1px solid var(--wire2)}
+.member-av-ph{width:32px;height:32px;border-radius:50%;background:var(--ink4);border:1px solid var(--wire2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;color:var(--gold)}
+.member-info{min-width:0}
+.member-name{font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-id{font-size:.7rem;color:var(--grey2);font-family:monospace}
+.member-role-badge{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border:1px solid;white-space:nowrap}
+.role-admin{color:var(--gold);border-color:rgba(200,168,75,.4);background:var(--gold-lo)}
+.role-contributor{color:#5AACCC;border-color:rgba(90,172,204,.35);background:rgba(90,172,204,.08)}
+.role-member{color:var(--grey2);border-color:var(--wire);background:transparent}
+.member-actions{display:flex;gap:4px;flex-shrink:0}
+.member-action-btn{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--wire2);background:transparent;color:var(--grey);cursor:pointer;transition:all .15s;white-space:nowrap}
+.member-action-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
+.member-action-btn.danger:hover{border-color:var(--red);color:var(--red);background:rgba(201,76,76,.08)}
+.members-empty{padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem}
+.members-count{font-size:.72rem;color:var(--grey2);padding:.6rem 1.5rem;border-bottom:1px solid var(--wire);background:var(--ink2)}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
@@ -604,6 +639,29 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   </div>
 </div>
 
+<!-- MEMBERS PANEL -->
+<div id="members-panel">
+  <div class="members-modal">
+    <div class="members-modal-head">
+      <h3>Brukere</h3>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="members-search" id="members-search" placeholder="Søk navn eller ID…" oninput="filterMembers(this.value)">
+        <button class="admin-close" onclick="closeMembers()">✕</button>
+      </div>
+    </div>
+    <div id="members-count" class="members-count"></div>
+    <div id="members-list"></div>
+  </div>
+</div>
+
+<!-- ADMIN SUB-BAR -->
+<div id="admin-bar">
+  <span class="admin-bar-label">Admin</span>
+  <button class="admin-bar-btn" onclick="openAdmin()">⚙ Innstillinger</button>
+  <button class="admin-bar-btn" onclick="openMembers()">Brukere</button>
+  <button class="admin-bar-btn" onclick="refreshMeta()">↻ Oppdater meta</button>
+</div>
+
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo"><img src="logo.png" alt="Vallefort"><span>Vallefort</span></a>
@@ -809,6 +867,8 @@ function renderLoggedOut() {
   document.getElementById('nav-user-area').innerHTML =
     `<button class="btn-discord" onclick="openModal()">${DISCORD_SVG} Logg inn</button>`;
   document.getElementById('tournament-create-area').innerHTML = '';
+  document.getElementById('admin-bar').classList.remove('visible');
+  document.getElementById('hero').style.paddingTop = '';
   const hb = document.getElementById('hero-login-btn');
   if (hb) hb.style.display = '';
   const cb = document.getElementById('cta-login-btn');
@@ -817,33 +877,33 @@ function renderLoggedOut() {
 
 function renderLoggedIn(user) {
   const initials = user.username.slice(0,2).toUpperCase();
-  const adminBtn = user.isAdmin
-    ? `<button style="font-size:.7rem;padding:4px 10px;letter-spacing:.1em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;border:1px solid rgba(200,168,75,.4);background:var(--gold-lo);color:var(--gold);cursor:pointer" onclick="openAdmin()">⚙ Admin</button>`
-    : '';
   const rolePip = user.isAdmin
     ? '<span class="admin-pip">Admin</span>'
     : user.isContributor
-      ? '<span style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5AACCC;background:rgba(90,172,204,.08);border:1px solid rgba(90,172,204,.3);padding:1px 5px">Contributor</span>'
+      ? '<span style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5AACCC;background:rgba(90,172,204,.08);border:1px solid rgba(90,172,204,.3);padding:1px 5px">Contrib</span>'
       : '';
 
   document.getElementById('nav-user-area').innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px">
-      ${adminBtn}
-      <div style="position:relative">
-        <div class="user-chip" onclick="toggleUserMenu()" title="Kontomeny">
-          ${user.avatar ? `<img class="user-avatar" src="${escHtml(user.avatar)}" alt="">` : `<div class="user-avatar-placeholder">${initials}</div>`}
-          <span class="user-name">${escHtml(user.username)}</span>
-          ${rolePip}
-          <span style="font-size:.65rem;color:var(--grey);margin-left:2px">▾</span>
-        </div>
-        <div id="user-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:160px;background:var(--ink3);border:1px solid var(--wire2);z-index:300;padding:4px 0">
-          <div style="padding:.5rem 1rem;font-size:.75rem;color:var(--grey);border-bottom:1px solid var(--wire)">${escHtml(user.username)}</div>
-          <button onclick="handleLogout()" style="width:100%;text-align:left;padding:.55rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:none;border:none;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,76,.08)'" onmouseout="this.style.background='none'">Logg ut</button>
-        </div>
+    <div style="position:relative">
+      <div class="user-chip" onclick="toggleUserMenu()" title="Kontomeny">
+        ${user.avatar ? `<img class="user-avatar" src="${escHtml(user.avatar)}" alt="">` : `<div class="user-avatar-placeholder">${initials}</div>`}
+        <span class="user-name">${escHtml(user.username)}</span>
+        ${rolePip}
+        <span style="font-size:.65rem;color:var(--grey);margin-left:2px">▾</span>
+      </div>
+      <div id="user-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:160px;background:var(--ink3);border:1px solid var(--wire2);z-index:300;padding:4px 0">
+        <div style="padding:.5rem 1rem;font-size:.75rem;color:var(--grey);border-bottom:1px solid var(--wire)">${escHtml(user.username)}</div>
+        <button onclick="handleLogout()" style="width:100%;text-align:left;padding:.55rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:none;border:none;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,76,.08)'" onmouseout="this.style.background='none'">Logg ut</button>
       </div>
     </div>`;
 
-  // Skjul login-knapper overalt på siden
+  // Vis admin-bar og juster padding på body
+  if (user.isAdmin) {
+    document.getElementById('admin-bar').classList.add('visible');
+    document.getElementById('hero').style.paddingTop = '100px';
+  }
+
+  // Skjul login-knapper
   const hb = document.getElementById('hero-login-btn');
   if (hb) hb.style.display = 'none';
   const cb = document.getElementById('cta-login-btn');
@@ -1307,6 +1367,90 @@ function openAdmin() {
 }
 function closeAdmin() { document.getElementById('admin-panel').classList.remove('open'); document.body.style.overflow = ''; }
 document.getElementById('admin-panel').addEventListener('click', e => { if (e.target === e.currentTarget) closeAdmin(); });
+
+/* ── MEMBERS PANEL ──────────────────────────────── */
+let allMembers = [];
+
+async function openMembers() {
+  document.getElementById('members-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('members-list').innerHTML = '<div class="members-empty">Laster brukere…</div>';
+  document.getElementById('members-search').value = '';
+  try {
+    const r = await fetch(`${API_URL}/api/admin/members`, { headers: { Authorization: `Bearer ${getToken()}` } });
+    allMembers = await r.json();
+    renderMembers(allMembers);
+  } catch { document.getElementById('members-list').innerHTML = '<div class="members-empty">Kunne ikke laste brukere.</div>'; }
+}
+
+function closeMembers() { document.getElementById('members-panel').classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('members-panel').addEventListener('click', e => { if (e.target === e.currentTarget) closeMembers(); });
+
+function filterMembers(q) {
+  const filtered = q.trim()
+    ? allMembers.filter(m => (m.username||'').toLowerCase().includes(q.toLowerCase()) || m.id.includes(q))
+    : allMembers;
+  renderMembers(filtered);
+}
+
+function renderMembers(list) {
+  const countEl = document.getElementById('members-count');
+  countEl.textContent = `${list.length} bruker${list.length === 1 ? '' : 'e'}`;
+  if (!list.length) { document.getElementById('members-list').innerHTML = '<div class="members-empty">Ingen treff.</div>'; return; }
+
+  document.getElementById('members-list').innerHTML = list.map(m => {
+    const name = m.username || m.id;
+    const initials = name.slice(0,2).toUpperCase();
+    const av = m.avatar
+      ? `<img class="member-av" src="${escHtml(m.avatar)}" alt="">`
+      : `<div class="member-av-ph">${initials}</div>`;
+    const badge = m.isAdmin
+      ? '<span class="member-role-badge role-admin">Admin</span>'
+      : m.isContributor
+        ? '<span class="member-role-badge role-contributor">Contributor</span>'
+        : '<span class="member-role-badge role-member">Medlem</span>';
+
+    const actions = [];
+    if (!m.isAdmin) actions.push(`<button class="member-action-btn" onclick="memberPromote('${m.id}','admin')">+ Admin</button>`);
+    if (!m.isContributor && !m.isAdmin) actions.push(`<button class="member-action-btn" onclick="memberPromote('${m.id}','contributor')">+ Contrib</button>`);
+    if (m.isContributor && !m.isAdmin) actions.push(`<button class="member-action-btn danger" onclick="memberDemote('${m.id}','contributor')">- Contrib</button>`);
+    if (m.isAdmin) actions.push(`<button class="member-action-btn danger" onclick="memberDemote('${m.id}','admin')">- Admin</button>`);
+
+    const joined = m.joinedAt ? new Date(m.joinedAt).toLocaleDateString('nb-NO') : '';
+    return `<div class="member-row">
+      ${av}
+      <div class="member-info">
+        <div class="member-name">${escHtml(name)}</div>
+        <div class="member-id">${m.id}${joined ? ' · ' + joined : ''}</div>
+      </div>
+      ${badge}
+      <div class="member-actions">${actions.join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function memberPromote(id, role) {
+  const cfg = JSON.parse(JSON.stringify(currentConfig));
+  if (role === 'admin') { if (!cfg.admins.includes(id)) cfg.admins.push(id); }
+  if (role === 'contributor') { if (!cfg.contributors.includes(id)) cfg.contributors.push(id); }
+  await saveConfigObj(cfg);
+  await openMembers();
+}
+
+async function memberDemote(id, role) {
+  const cfg = JSON.parse(JSON.stringify(currentConfig));
+  if (role === 'admin') cfg.admins = cfg.admins.filter(a => a !== id);
+  if (role === 'contributor') cfg.contributors = cfg.contributors.filter(c => c !== id);
+  await saveConfigObj(cfg);
+  await openMembers();
+}
+
+async function saveConfigObj(cfg) {
+  try {
+    await fetch(`${API_URL}/api/config`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${getToken()}` }, body: JSON.stringify(cfg) });
+    currentConfig = cfg;
+  } catch { alert('Kunne ikke lagre'); }
+}
 
 function renderAdminsList(admins) {
   const list = document.getElementById('admins-list');
