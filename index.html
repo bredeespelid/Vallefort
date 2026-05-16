@@ -219,7 +219,7 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .player-info{display:flex;flex-direction:column;gap:2px;min-width:0}
 .player-discord{font-weight:600;font-size:.88rem;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-riot{font-size:.72rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.player-tier-cell{display:flex;flex-direction:column;gap:3px}
+.player-tier-cell{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
 .player-lp{font-size:.72rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;font-weight:600}
 .player-wr{font-size:.73rem;color:var(--grey);font-family:'Barlow Condensed',sans-serif}
 .player-updated{font-size:.67rem;color:var(--grey2);font-family:'Barlow Condensed',sans-serif;text-align:right}
@@ -1440,15 +1440,16 @@ function renderMyPlayerCard() {
     const tierClass = me.tier ? `tier-${me.tier.toLowerCase()}` : 'tier-unranked';
     myCard.style.display = '';
     myCard.innerHTML = `<div class="my-player-card">
-      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-        <span class="tier-badge ${tierClass}" style="font-size:.82rem;padding:3px 12px">${tierLabel}</span>
-        <span style="color:var(--grey);font-size:.8rem">${escHtml(me.riotId)} · ${REGION_NO[me.region]||me.region}</span>
-        ${me.tier?`<span style="color:var(--grey2);font-size:.8rem">${me.lp} LP — ${me.wins}W ${me.losses}L</span>`:''}
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;margin-top:.6rem;flex-wrap:wrap">
-        <button class="btn-edit-t" onclick="refreshMyRank()">Oppdater rank</button>
-        <button class="btn-del-t" onclick="unregisterPlayer()">Fjern konto</button>
-        <span id="pr-refresh-status" style="font-size:.75rem;color:var(--grey)"></span>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:.35rem">
+          <span class="tier-badge ${tierClass}" style="font-size:.8rem;padding:3px 12px;align-self:flex-start">${tierLabel}</span>
+          <span style="color:rgba(200,210,225,0.75);font-size:.82rem">${escHtml(me.riotId)} · ${REGION_NO[me.region]||me.region}${me.tier?` · ${me.lp} LP · ${me.wins}W ${me.losses}L`:''}</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn-edit-t" onclick="refreshMyRank()">Oppdater rank</button>
+          <button class="btn-del-t" onclick="unregisterPlayer()">Fjern konto</button>
+          <span id="pr-refresh-status" style="font-size:.75rem;color:var(--grey)"></span>
+        </div>
       </div>
     </div>`;
   } else {
