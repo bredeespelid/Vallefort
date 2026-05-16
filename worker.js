@@ -2,313 +2,288 @@
  * VALLEFORT — Cloudflare Worker
  * ─────────────────────────────
  * Endepunkter:
- *   GET  /api/meta          → Henter/returnerer cached tier list fra tftactics.gg
- *   GET  /api/meta/refresh  → Tvinger refresh (kun admins)
- *   GET  /api/config        → Returnerer set/patch/admins (public read)
- *   POST /api/config        → Oppdaterer config (kun admins)
- *   GET  /auth/callback     → Discord OAuth callback → returnerer JWT
- *   GET  /api/me            → Returnerer innlogget bruker (fra JWT)
+ *   GET  /api/meta                        → Tier list fra tftacademy.com
+ *   GET  /api/meta/refresh                → Tving refresh (admin)
+ *   GET  /api/config                      → Set/patch/sesong
+ *   POST /api/config                      → Oppdater config (admin)
+ *   GET  /auth/callback                   → Discord OAuth
+ *   GET  /api/me                          → Innlogget bruker
+ *   GET  /api/comments/:patch/:slug       → Hent kommentarer for comp+patch
+ *   POST /api/comments/:patch/:slug       → Legg til kommentar (krever login)
+ *   DELETE /api/comments/:patch/:slug/:id → Slett kommentar (admin eller eier)
  *
- * KV-namespaces som må opprettes i Cloudflare Dashboard:
- *   VALLEFORT_KV  (bind som "KV" i worker settings)
+ * KV-nøkler for kommentarer:
+ *   comments:{patch}:{slug}  → JSON-array med kommentarer
  *
- * Miljøvariabler som må settes i Cloudflare Dashboard:
- *   DISCORD_CLIENT_ID
- *   DISCORD_CLIENT_SECRET
- *   DISCORD_REDIRECT_URI    (f.eks. https://vallefort.pages.dev/auth/callback)
- *   ADMIN_DISCORD_IDS       (kommaseparert, f.eks. "123456789,987654321")
- *   JWT_SECRET              (valgfri tilfeldig streng)
- *   SITE_ORIGIN             (f.eks. https://vallefort.pages.dev)
+ * Kommentarer nullstilles automatisk per patch — ny patch = ny nøkkel.
  */
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-// ─── KV KEYS ────────────────────────────────────────────────────────────────
-const KV_META        = 'meta:tierlist';
-const KV_META_TTL    = 'meta:ttl';
-const KV_CONFIG      = 'config';
-const META_CACHE_SEC = 3600; // 1 time mellom fetches
+const KV_META    = 'meta:tierlist';
+const KV_META_TS = 'meta:timestamp';
+const KV_CONFIG  = 'config';
+const SOURCE_URL = 'https://tftacademy.com/tierlist/comps';
+const MAX_COMMENT_LENGTH = 500;
+const MAX_COMMENTS_PER_COMP = 200;
 
-// ─── ROUTER ─────────────────────────────────────────────────────────────────
+// ─── ROUTER ───────────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const path = url.pathname;
 
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: CORS });
-    }
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
 
     try {
-      if (url.pathname === '/api/meta')            return handleMeta(request, env);
-      if (url.pathname === '/api/meta/refresh')    return handleMetaRefresh(request, env);
-      if (url.pathname === '/api/config')          return handleConfig(request, env);
-      if (url.pathname === '/auth/callback')       return handleDiscordCallback(request, env);
-      if (url.pathname === '/api/me')              return handleMe(request, env);
+      if (path === '/api/meta')                return handleMeta(request, env);
+      if (path === '/api/meta/refresh')        return handleMetaRefresh(request, env);
+      if (path === '/api/config')              return handleConfig(request, env);
+      if (path === '/auth/callback')           return handleDiscordCallback(request, env);
+      if (path === '/api/me')                  return handleMe(request, env);
+
+      // /api/comments/:patch/:slug
+      const cmMatch = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)$/);
+      if (cmMatch) return handleComments(request, env, cmMatch[1], cmMatch[2]);
+
+      // /api/comments/:patch/:slug/:id
+      const delMatch = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)\/([^/]+)$/);
+      if (delMatch) return handleDeleteComment(request, env, delMatch[1], delMatch[2], delMatch[3]);
+
       return json({ error: 'Not found' }, 404);
     } catch (e) {
       return json({ error: e.message }, 500);
     }
   },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runDailyScrape(env));
+  },
 };
 
-// ─── GET /api/meta ───────────────────────────────────────────────────────────
-async function handleMeta(request, env) {
-  const ttl    = await env.KV.get(KV_META_TTL);
-  const now    = Date.now();
-  const cached = await env.KV.get(KV_META);
+// ─── COMMENTS: GET + POST ─────────────────────────────────────────────────────
+async function handleComments(request, env, patch, slug) {
+  const key = `comments:${patch}:${slug}`;
 
-  if (cached && ttl && now < Number(ttl)) {
-    return json(JSON.parse(cached));
+  if (request.method === 'GET') {
+    const raw      = await env.KV.get(key);
+    const comments = raw ? JSON.parse(raw) : [];
+    return json({ patch, slug, comments, count: comments.length });
   }
 
-  // Hent fersk data
-  const fresh = await fetchTftacticsMeta();
-  await env.KV.put(KV_META,     JSON.stringify(fresh));
-  await env.KV.put(KV_META_TTL, String(now + META_CACHE_SEC * 1000));
+  if (request.method === 'POST') {
+    const user = await getUser(request, env);
+    if (!user) return json({ error: 'Logg inn med Discord for å kommentere' }, 401);
 
-  return json(fresh);
+    const body = await request.json().catch(() => ({}));
+    const text = (body.text || '').trim();
+
+    if (!text)                              return json({ error: 'Kommentar kan ikke være tom' }, 400);
+    if (text.length > MAX_COMMENT_LENGTH)   return json({ error: `Maks ${MAX_COMMENT_LENGTH} tegn` }, 400);
+
+    const raw      = await env.KV.get(key);
+    const comments = raw ? JSON.parse(raw) : [];
+
+    if (comments.length >= MAX_COMMENTS_PER_COMP) {
+      return json({ error: 'Maks antall kommentarer nådd for denne compen' }, 400);
+    }
+
+    const newComment = {
+      id:        crypto.randomUUID(),
+      userId:    user.id,
+      username:  user.username,
+      avatar:    user.avatar || null,
+      text,
+      patch,
+      slug,
+      createdAt: new Date().toISOString(),
+    };
+
+    comments.push(newComment);
+    await env.KV.put(key, JSON.stringify(comments));
+    return json(newComment, 201);
+  }
+
+  return json({ error: 'Method not allowed' }, 405);
 }
 
-// ─── GET /api/meta/refresh ───────────────────────────────────────────────────
+// ─── COMMENTS: DELETE ─────────────────────────────────────────────────────────
+async function handleDeleteComment(request, env, patch, slug, commentId) {
+  if (request.method !== 'DELETE') return json({ error: 'Method not allowed' }, 405);
+
+  const user = await getUser(request, env);
+  if (!user) return json({ error: 'Ikke innlogget' }, 401);
+
+  const key      = `comments:${patch}:${slug}`;
+  const raw      = await env.KV.get(key);
+  const comments = raw ? JSON.parse(raw) : [];
+
+  const comment = comments.find(c => c.id === commentId);
+  if (!comment) return json({ error: 'Kommentar ikke funnet' }, 404);
+
+  // Kun eier eller admin kan slette
+  if (comment.userId !== user.id && !isAdmin(user.id, env)) {
+    return json({ error: 'Ingen tilgang' }, 403);
+  }
+
+  const updated = comments.filter(c => c.id !== commentId);
+  await env.KV.put(key, JSON.stringify(updated));
+  return json({ ok: true, deleted: commentId });
+}
+
+// ─── DAGLIG SCRAPE ────────────────────────────────────────────────────────────
+async function runDailyScrape(env) {
+  try {
+    const data = await scrapeTftAcademy();
+    await env.KV.put(KV_META,    JSON.stringify(data));
+    await env.KV.put(KV_META_TS, new Date().toISOString());
+  } catch (e) {
+    console.error('Scrape feilet:', e.message);
+  }
+}
+
+// ─── SCRAPER ──────────────────────────────────────────────────────────────────
+async function scrapeTftAcademy() {
+  const res = await fetch(SOURCE_URL, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Vallefort/1.0)', 'Accept': 'text/html' },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return parseTierList(await res.text());
+}
+
+function parseTierList(html) {
+  const tiers   = { S: [], A: [], B: [], C: [] };
+  const patchM  = html.match(/[Pp]atch\s+([\d.]+[a-z]?)/);
+  const setM    = html.match(/set-(\d+)-/);
+  const patch   = patchM ? patchM[1] : null;
+  const setNum  = setM   ? parseInt(setM[1]) : null;
+
+  for (const tier of ['S','A','B','C']) {
+    const pattern = new RegExp(`${tier}\\s+tier[\\s\\S]*?(?=(?:S|A|B|C)\\s+tier|X\\s+tier|$)`, 'i');
+    const section = html.match(pattern);
+    if (!section) continue;
+
+    const linkRe = /href="(\/tierlist\/comps\/([^"]+))"/g;
+    let m;
+    while ((m = linkRe.exec(section[0])) !== null) {
+      const slug = m[2];
+      const url  = `https://tftacademy.com${m[1]}`;
+      const name = slug
+        .replace(/^set-\d+-/, '')
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+      if (!tiers[tier].find(c => c.slug === slug)) {
+        tiers[tier].push({ name, url, slug });
+      }
+    }
+  }
+
+  return { source: 'tftacademy.com', sourceUrl: SOURCE_URL, set: setNum, patch, fetchedAt: new Date().toISOString(), fallback: false, tiers };
+}
+
+// ─── META ─────────────────────────────────────────────────────────────────────
+async function handleMeta(request, env) {
+  const cached = await env.KV.get(KV_META);
+  const ts     = await env.KV.get(KV_META_TS);
+  if (cached) { const d = JSON.parse(cached); d.cachedAt = ts; return json(d); }
+  try {
+    const data = await scrapeTftAcademy();
+    await env.KV.put(KV_META, JSON.stringify(data));
+    await env.KV.put(KV_META_TS, new Date().toISOString());
+    return json(data);
+  } catch (e) { return json(getFallback(e.message)); }
+}
+
 async function handleMetaRefresh(request, env) {
   const user = await getUser(request, env);
-  if (!user || !isAdmin(user.id, env)) {
-    return json({ error: 'Unauthorized' }, 401);
-  }
-  const fresh = await fetchTftacticsMeta();
-  await env.KV.put(KV_META,     JSON.stringify(fresh));
-  await env.KV.put(KV_META_TTL, String(Date.now() + META_CACHE_SEC * 1000));
-  return json({ ok: true, refreshed: new Date().toISOString(), data: fresh });
+  if (!user || !isAdmin(user.id, env)) return json({ error: 'Unauthorized' }, 401);
+  try {
+    const data = await scrapeTftAcademy();
+    await env.KV.put(KV_META, JSON.stringify(data));
+    await env.KV.put(KV_META_TS, new Date().toISOString());
+    return json({ ok: true, refreshed: new Date().toISOString(), data });
+  } catch (e) { return json({ ok: false, error: e.message }, 500); }
 }
 
-// ─── GET/POST /api/config ────────────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
 async function handleConfig(request, env) {
   if (request.method === 'GET') {
     const raw = await env.KV.get(KV_CONFIG);
-    const cfg = raw ? JSON.parse(raw) : defaultConfig();
-    return json(cfg);
+    return json(raw ? JSON.parse(raw) : defaultConfig());
   }
-
-  // POST — kun admins
   const user = await getUser(request, env);
-  if (!user || !isAdmin(user.id, env)) {
-    return json({ error: 'Unauthorized' }, 401);
-  }
-
-  const body   = await request.json();
-  const raw    = await env.KV.get(KV_CONFIG);
+  if (!user || !isAdmin(user.id, env)) return json({ error: 'Unauthorized' }, 401);
+  const body    = await request.json();
+  const raw     = await env.KV.get(KV_CONFIG);
   const current = raw ? JSON.parse(raw) : defaultConfig();
-
-  const updated = {
-    ...current,
-    ...(body.set      !== undefined && { set: body.set }),
-    ...(body.patch    !== undefined && { patch: body.patch }),
-    ...(body.season   !== undefined && { season: body.season }),
-    ...(body.admins   !== undefined && { admins: body.admins }),
-    updatedAt: new Date().toISOString(),
-    updatedBy: user.username,
-  };
-
+  const updated = { ...current, ...(body.set !== undefined && { set: body.set }), ...(body.patch !== undefined && { patch: body.patch }), ...(body.season !== undefined && { season: body.season }), ...(body.admins !== undefined && { admins: body.admins }), updatedAt: new Date().toISOString(), updatedBy: user.username };
   await env.KV.put(KV_CONFIG, JSON.stringify(updated));
   return json(updated);
 }
 
-// ─── GET /auth/callback ──────────────────────────────────────────────────────
+// ─── DISCORD OAUTH ────────────────────────────────────────────────────────────
 async function handleDiscordCallback(request, env) {
-  const url    = new URL(request.url);
-  const code   = url.searchParams.get('code');
-  const state  = url.searchParams.get('state');
-
+  const url  = new URL(request.url);
+  const code = url.searchParams.get('code');
   if (!code) return new Response('Mangler code', { status: 400 });
 
-  // Bytt code mot token
   const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id:     env.DISCORD_CLIENT_ID,
-      client_secret: env.DISCORD_CLIENT_SECRET,
-      grant_type:    'authorization_code',
-      code,
-      redirect_uri:  env.DISCORD_REDIRECT_URI,
-    }),
+    body: new URLSearchParams({ client_id: env.DISCORD_CLIENT_ID, client_secret: env.DISCORD_CLIENT_SECRET, grant_type: 'authorization_code', code, redirect_uri: env.DISCORD_REDIRECT_URI }),
   });
+  if (!tokenRes.ok) return new Response(`Token-feil: ${await tokenRes.text()}`, { status: 400 });
 
-  if (!tokenRes.ok) {
-    const err = await tokenRes.text();
-    return new Response(`Token-feil: ${err}`, { status: 400 });
-  }
+  const { access_token } = await tokenRes.json();
+  const discordUser = await (await fetch('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${access_token}` } })).json();
 
-  const tokenData = await tokenRes.json();
-
-  // Hent brukerinfo
-  const userRes = await fetch('https://discord.com/api/users/@me', {
-    headers: { Authorization: `Bearer ${tokenData.access_token}` },
-  });
-  const discordUser = await userRes.json();
-
-  const payload = {
-    id:            discordUser.id,
-    username:      discordUser.username,
-    discriminator: discordUser.discriminator,
-    avatar:        discordUser.avatar
-      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-      : null,
-    isAdmin:       isAdmin(discordUser.id, env),
-    exp:           Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 dager
-  };
-
-  const token = await signJWT(payload, env.JWT_SECRET || 'vallefort-secret');
-  const origin = env.SITE_ORIGIN || 'https://vallefort.pages.dev';
-
-  // Redirect tilbake til siden med token i URL-hash
-  return Response.redirect(`${origin}/?token=${token}`, 302);
+  const payload = { id: discordUser.id, username: discordUser.username, avatar: discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png` : null, isAdmin: isAdmin(discordUser.id, env), exp: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+  const token   = await signJWT(payload, env.JWT_SECRET || 'vallefort-secret');
+  const origin  = env.SITE_ORIGIN || 'https://bredeespelid.github.io';
+  return Response.redirect(`${origin}/Vallefort/?token=${token}`, 302);
 }
 
-// ─── GET /api/me ─────────────────────────────────────────────────────────────
 async function handleMe(request, env) {
   const user = await getUser(request, env);
   if (!user) return json({ error: 'Ikke innlogget' }, 401);
   return json(user);
 }
 
-// ─── SCRAPER ─────────────────────────────────────────────────────────────────
-// tftactics.gg er JS-rendret, men data-kilden er sunderarmor.com CDN.
-// Vi forsøker å hente det statiske data-endepunktet direkte.
-// Fallback: returnerer hardkodet struktur med lenke til siden.
-async function fetchTftacticsMeta() {
-  // Forsøk 1: kjent CDN-path for tier list data
-  const candidates = [
-    'https://sunderarmor.com/tierlist/comps.json',
-    'https://sunderarmor.com/data/comps.json',
-    'https://sunderarmor.com/api/comps',
-  ];
-
-  for (const url of candidates) {
-    try {
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-          'Referer':    'https://tftactics.gg/',
-        },
-        cf: { cacheTtl: 0 },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return normaliseComps(data, url);
-      }
-    } catch (_) { /* prøv neste */ }
-  }
-
-  // Fallback: returner metadata med link — frontend viser link til tftactics.gg
-  return {
-    source:    'tftactics.gg',
-    sourceUrl: 'https://tftactics.gg/tierlist/team-comps/',
-    set:       17,
-    patch:     '17.3',
-    fetchedAt: new Date().toISOString(),
-    fallback:  true,
-    tiers: {
-      S: [],
-      A: [],
-      B: [],
-      C: [],
-    },
-    note: 'Live data utilgjengelig — tftactics.gg er JS-rendret. Se lenke.',
-  };
-}
-
-function normaliseComps(raw, source) {
-  // Normaliserer ulike JSON-strukturer til et felles format
-  const tiers = { S: [], A: [], B: [], C: [] };
-
-  // Prøv vanlige strukturer
-  const list = raw.comps || raw.tierlist || raw.data || raw;
-  if (Array.isArray(list)) {
-    for (const comp of list) {
-      const tier  = (comp.tier || comp.rating || 'B').toUpperCase();
-      const name  = comp.name || comp.title || comp.comp_name || 'Ukjent';
-      const slug  = comp.slug || comp.url_slug || '';
-      const url   = slug ? `https://tftactics.gg/tierlist/team-comps/${slug}` : source;
-      if (tiers[tier] !== undefined) {
-        tiers[tier].push({ name, url, playstyle: comp.playstyle || '', difficulty: comp.difficulty || '' });
-      }
-    }
-  }
-
-  return {
-    source:    'tftactics.gg',
-    sourceUrl: 'https://tftactics.gg/tierlist/team-comps/',
-    set:       raw.set       || 17,
-    patch:     raw.patch     || raw.version || 'ukjent',
-    fetchedAt: new Date().toISOString(),
-    fallback:  false,
-    tiers,
-  };
-}
-
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
-function defaultConfig() {
-  return {
-    set:      17,
-    patch:    '17.3',
-    season:   'Sesong 14',
-    admins:   [],
-    updatedAt: new Date().toISOString(),
-    updatedBy: 'system',
-  };
-}
+function getFallback(e) { return { source: 'tftacademy.com', sourceUrl: SOURCE_URL, set: null, patch: null, fetchedAt: new Date().toISOString(), fallback: true, error: e, tiers: { S: [], A: [], B: [], C: [] } }; }
+function defaultConfig() { return { set: 17, patch: '17.3', season: 'Sesong 14', admins: [], updatedAt: new Date().toISOString() }; }
+function isAdmin(id, env) { return (env.ADMIN_DISCORD_IDS || '').split(',').map(s => s.trim()).includes(String(id)); }
+function json(data, status = 200) { return new Response(JSON.stringify(data), { status, headers: { ...CORS, 'Content-Type': 'application/json' } }); }
 
-function isAdmin(discordId, env) {
-  const ids = (env.ADMIN_DISCORD_IDS || '').split(',').map(s => s.trim());
-  return ids.includes(String(discordId));
-}
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...CORS, 'Content-Type': 'application/json' },
-  });
-}
-
-// ─── MINIMAL JWT (HMAC-SHA256) ────────────────────────────────────────────────
 async function signJWT(payload, secret) {
-  const header  = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const body    = btoa(JSON.stringify(payload));
-  const msg     = `${header}.${body}`;
-  const key     = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
-  );
-  const sig     = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(msg));
-  const sigB64  = btoa(String.fromCharCode(...new Uint8Array(sig)));
-  return `${msg}.${sigB64}`;
+  const h = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const b = btoa(JSON.stringify(payload));
+  const m = `${h}.${b}`;
+  const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const s = await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(m));
+  return `${m}.${btoa(String.fromCharCode(...new Uint8Array(s)))}`;
 }
 
 async function verifyJWT(token, secret) {
   try {
-    const [header, body, sig] = token.split('.');
-    const msg = `${header}.${body}`;
-    const key = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']
-    );
-    const sigBytes = Uint8Array.from(atob(sig), c => c.charCodeAt(0));
-    const valid    = await crypto.subtle.verify('HMAC', key, sigBytes, new TextEncoder().encode(msg));
-    if (!valid) return null;
-    const payload  = JSON.parse(atob(body));
-    if (payload.exp && Date.now() > payload.exp) return null;
-    return payload;
+    const [h, b, s] = token.split('.');
+    const m = `${h}.${b}`;
+    const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
+    const ok = await crypto.subtle.verify('HMAC', k, Uint8Array.from(atob(s), c => c.charCodeAt(0)), new TextEncoder().encode(m));
+    if (!ok) return null;
+    const p = JSON.parse(atob(b));
+    if (p.exp && Date.now() > p.exp) return null;
+    return p;
   } catch { return null; }
 }
 
 async function getUser(request, env) {
-  const auth  = request.headers.get('Authorization') || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-  if (!token) return null;
-  return verifyJWT(token, env.JWT_SECRET || 'vallefort-secret');
+  const auth = request.headers.get('Authorization') || '';
+  const t    = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!t) return null;
+  return verifyJWT(t, env.JWT_SECRET || 'vallefort-secret');
 }
