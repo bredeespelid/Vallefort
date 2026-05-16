@@ -292,6 +292,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 @media(max-width:640px){
   .carousel-slide{grid-template-columns:1fr}
   .carousel-slide-img{display:none}
+  .carousel-slide-body{padding:1.75rem 1.25rem}
 }
 
 /* MODAL */
@@ -336,20 +337,75 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 @media(max-width:768px){
+  /* Nav */
   .nav-links{display:none}
   .nav-links.open{display:flex;flex-direction:column;position:fixed;top:58px;left:0;right:0;background:rgba(11,13,15,.97);border-bottom:1px solid var(--wire);padding:1rem 0;z-index:199}
   .nav-links.open a{height:auto;line-height:1;padding:.85rem 1.5rem;border-bottom:none}
   .nav-toggle{display:block}
-  .tournament-layout{grid-template-columns:1fr}
-  .t-side{border-left:none;border-top:1px solid var(--wire)}
+
+  /* Hero */
   .hero-ticker{grid-template-columns:1fr}
   .ticker-item{border-right:none;border-bottom:1px solid var(--wire)}
   .ticker-item:last-child{border-bottom:none}
-  .comment-input-area{flex-direction:column}
+
+  /* Section padding */
+  .section{padding:3rem 1.25rem}
+
+  /* Lobby */
+  .lobby-grid{grid-template-columns:1fr}
+  .lobby-card{grid-template-columns:auto 1fr auto;gap:.75rem;padding:1rem 1.25rem}
+
+  /* Tournament cards */
+  .tournament-card-head{padding:1rem 1.25rem}
+  .tournament-card-body{grid-template-columns:1fr}
+  .t-card-main{padding:1rem 1.25rem}
+  .t-card-side{padding:1rem 1.25rem;border-left:none;border-top:1px solid var(--wire)}
+  .tournament-layout{grid-template-columns:1fr}
+  .t-side{border-left:none;border-top:1px solid var(--wire)}
+
+  /* Forms */
+  .form-row{grid-template-columns:1fr}
   .admin-row{grid-template-columns:1fr}
+
+  /* Comments */
+  .comment-input-area{flex-direction:column}
+
+  /* CTA */
+  .cta-band{padding:2.5rem 1.25rem}
   .cta-note{max-width:100%;width:100%}
+
+  /* Modal */
+  .modal{padding:1.75rem 1.25rem}
+  .modal-wrap{padding:.75rem}
+
+  /* Admin modal */
+  .admin-modal{max-height:92vh}
 }
-@media(max-width:500px){h1{font-size:3.4rem}}
+
+@media(max-width:480px){
+  h1{font-size:3.2rem}
+
+  /* Nav: hide text label on login button, keep icon */
+  .btn-discord span{display:none}
+
+  /* Lobby card: simplify on very small screens */
+  .lobby-card{grid-template-columns:1fr auto;gap:.6rem}
+  .rank-tag{font-size:.62rem;padding:2px 6px}
+
+  /* Tournament head actions wrap nicely */
+  .tournament-card-head{grid-template-columns:1fr}
+  .tournament-card-head > div:last-child{display:flex;flex-wrap:wrap;gap:6px}
+
+  /* Rules grid single column */
+  .rules-grid{grid-template-columns:1fr}
+
+  /* Ticker numbers smaller */
+  .ticker-num{font-size:2rem}
+
+  /* Hero buttons stack */
+  .hero-btns{flex-direction:column;align-items:flex-start}
+  .hero-btns .btn-primary,.hero-btns .btn-ghost{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
