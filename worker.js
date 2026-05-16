@@ -72,6 +72,9 @@ export default {
       const cmMatch = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)$/);
       if (cmMatch) return handleComments(request, env, cmMatch[1], cmMatch[2]);
 
+      const cmVoteM = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)\/([^/]+)\/vote$/);
+      if (cmVoteM) return handleCommentVote(request, env, cmVoteM[1], cmVoteM[2], cmVoteM[3]);
+
       const cmDelMatch = path.match(/^\/api\/comments\/([^/]+)\/([^/]+)\/([^/]+)$/);
       if (cmDelMatch) return handleDeleteComment(request, env, cmDelMatch[1], cmDelMatch[2], cmDelMatch[3]);
 
@@ -417,6 +420,31 @@ async function handleComments(request, env, patch, slug) {
   }
 
   return json({ error: 'Method not allowed' }, 405);
+}
+
+async function handleCommentVote(request, env, patch, slug, commentId) {
+  if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+  const user = await getUser(request, env);
+  if (!user) return json({ error: 'Ikke innlogget' }, 401);
+  const body = await request.json().catch(() => ({}));
+  const type = body.type;
+  if (type !== 'like' && type !== 'dislike') return json({ error: 'Ugyldig stemme' }, 400);
+  const key      = `comments:${patch}:${slug}`;
+  const raw      = await env.KV.get(key);
+  const comments = raw ? JSON.parse(raw) : [];
+  const comment  = comments.find(c => c.id === commentId);
+  if (!comment) return json({ error: 'Kommentar ikke funnet' }, 404);
+  if (!comment.likes)    comment.likes    = [];
+  if (!comment.dislikes) comment.dislikes = [];
+  // Remove from opposite
+  if (type === 'like')    comment.dislikes = comment.dislikes.filter(id => id !== user.id);
+  if (type === 'dislike') comment.likes    = comment.likes.filter(id => id !== user.id);
+  // Toggle
+  const arr = type === 'like' ? comment.likes : comment.dislikes;
+  const idx = arr.indexOf(user.id);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(user.id);
+  await env.KV.put(key, JSON.stringify(comments));
+  return json({ likes: comment.likes.length, dislikes: comment.dislikes.length });
 }
 
 async function handleDeleteComment(request, env, patch, slug, commentId) {

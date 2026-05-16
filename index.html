@@ -142,14 +142,30 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .fc-reply-preview{background:rgba(200,168,75,0.07);border:1px solid rgba(200,168,75,0.2);padding:.4rem .75rem;margin-bottom:.5rem;font-size:.78rem;color:var(--grey);display:flex;align-items:center;justify-content:space-between;gap:.5rem}
 .fc-reply-preview b{color:var(--gold)}
 .fc-reply-preview button{background:none;border:none;color:var(--grey2);cursor:pointer;font-size:.8rem}
-.fc-input-row{display:flex;gap:8px;align-items:flex-end}
-.fc-textarea{flex:1;background:var(--ink2);border:1px solid var(--wire2);color:var(--white);padding:.55rem .75rem;font-family:'Sora',sans-serif;font-size:.85rem;font-weight:300;resize:none;height:70px;transition:border-color .15s}
-.fc-textarea:focus{outline:none;border-color:var(--gold)}
-.fc-textarea::placeholder{color:var(--grey2)}
-.fc-send-btn{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.1rem;border:1px solid var(--gold);background:var(--gold-lo);color:var(--gold);cursor:pointer;transition:all .15s;white-space:nowrap;align-self:flex-end}
-.fc-send-btn:hover{background:var(--gold);color:var(--ink)}
-.fc-send-btn:disabled{opacity:.4;cursor:not-allowed}
-.fc-char{font-size:.68rem;color:var(--grey2);text-align:right;margin-top:3px}
+/* Vote + thread */
+.fc-vote-row{display:flex;align-items:center;gap:5px;margin-top:5px}
+.fc-vote-btn{display:inline-flex;align-items:center;gap:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.04em;padding:2px 8px;border:1px solid var(--wire2);background:transparent;color:var(--grey2);cursor:pointer;transition:all .15s}
+.fc-vote-btn:hover{border-color:rgba(255,255,255,.3);color:var(--white)}
+.fc-vote-btn.active-like{border-color:var(--green);color:#6ddfaa;background:rgba(61,171,110,.1)}
+.fc-vote-btn.active-dislike{border-color:var(--red);color:#e87a7a;background:rgba(201,76,76,.08)}
+.fc-sep{color:var(--wire2);font-size:.8rem;user-select:none}
+.fc-reply-toggle{background:none;border:none;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grey2);cursor:pointer;padding:4px 0 0;transition:color .12s;display:inline-flex;align-items:center;gap:4px}
+.fc-reply-toggle:hover{color:var(--gold)}
+.fc-replies{margin-top:.6rem;padding-left:1rem;border-left:2px solid var(--wire2);display:flex;flex-direction:column;gap:.5rem;overflow:hidden;transition:max-height .3s ease}
+/* Redesigned composer */
+.fc-composer{display:flex;gap:.75rem;align-items:flex-start}
+.fc-composer-av,.fc-composer-av-ph{width:36px;height:36px;border-radius:50%;flex-shrink:0;margin-top:2px;object-fit:cover}
+.fc-composer-av-ph{background:var(--gold-lo);border:1px solid rgba(200,168,75,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;color:var(--gold)}
+.fc-composer-box{flex:1;background:var(--ink);border:1px solid var(--wire2);transition:border-color .2s,box-shadow .2s}
+.fc-composer-box:focus-within{border-color:rgba(200,168,75,.45);box-shadow:0 0 0 3px rgba(200,168,75,.06)}
+.fc-composer-textarea{width:100%;background:transparent;border:none;color:var(--white);padding:.7rem .9rem;font-family:'Sora',sans-serif;font-size:.875rem;font-weight:300;resize:none;height:76px;outline:none;line-height:1.6}
+.fc-composer-textarea::placeholder{color:var(--grey2)}
+.fc-composer-footer{display:flex;align-items:center;justify-content:space-between;padding:.45rem .75rem;border-top:1px solid var(--wire)}
+.fc-composer-hint{font-size:.68rem;color:var(--grey2)}
+.fc-composer-char{font-size:.7rem;color:var(--grey2);font-variant-numeric:tabular-nums}
+.fc-composer-send{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.35rem 1.1rem;border:1px solid var(--gold);background:var(--gold-lo);color:var(--gold);cursor:pointer;transition:all .15s}
+.fc-composer-send:hover{background:var(--gold);color:var(--ink)}
+.fc-composer-send:disabled{opacity:.35;cursor:not-allowed}
 .fc-login-prompt{font-size:.85rem;color:var(--grey);text-align:center;padding:.5rem 0}
 .fc-login-prompt button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;text-decoration:underline}
 .fc-empty{font-size:.85rem;color:var(--grey2);text-align:center;padding:2rem 0;font-style:italic}
@@ -1103,43 +1119,121 @@ function closeForumModal() {
 }
 document.getElementById('forum-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeForumModal(); });
 
+let _fc = {}; // comment cache keyed by id for safe onclick refs
+
 async function loadForumComments() {
   if (!forumComp) return;
-  const listEl = document.getElementById('fm-list');
   try {
     const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(forumPatch)}/${encodeURIComponent(forumComp.slug)}`);
     const d = await r.json();
     renderForumList(d.comments);
     const cc = document.getElementById(`cc-${forumComp.slug}`);
     if (cc) cc.textContent = d.count;
-  } catch { listEl.innerHTML = '<div class="fc-empty">Kunne ikke laste kommentarer.</div>'; }
+  } catch { document.getElementById('fm-list').innerHTML = '<div class="fc-empty">Kunne ikke laste kommentarer.</div>'; }
 }
 
 function renderForumList(comments) {
+  _fc = {};
   const listEl = document.getElementById('fm-list');
   if (!comments || !comments.length) { listEl.innerHTML = '<div class="fc-empty">Ingen kommentarer ennå — vær den første!</div>'; return; }
-  listEl.innerHTML = comments.map(c => {
-    const time   = new Date(c.createdAt).toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-    const canDel = currentUser && (currentUser.id === c.userId || currentUser.isAdmin);
-    const av     = c.avatar
-      ? `<img class="fc-av" src="${escHtml(c.avatar)}" alt="">`
-      : `<div class="fc-av-ph">${(c.username||'?').slice(0,2).toUpperCase()}</div>`;
-    const quote  = c.replyTo
-      ? `<div class="fc-reply-quote"><b>${escHtml(c.replyTo.username)}</b>: ${escHtml(c.replyTo.text)}</div>`
-      : '';
-    const delBtn = canDel ? `<button class="fc-del-btn" onclick="deleteForumComment('${c.id}')">Slett</button>` : '';
-    const replyBtn = currentUser ? `<button class="fc-reply-btn" onclick="setReply('${c.id}','${escHtml(c.username).replace(/'/g,"\\'")}','${escHtml(c.text).replace(/'/g,"\\'").slice(0,80)}')">Svar</button>` : '';
-    return `<div class="fc-item" id="fci-${c.id}">
-      ${av}
-      <div class="fc-bubble">
-        <div class="fc-meta"><b>${escHtml(c.username)}</b><span>${time}</span></div>
-        ${quote}
-        <div class="fc-text">${escHtml(c.text)}</div>
-        <div class="fc-actions">${replyBtn}${delBtn}</div>
-      </div>
-    </div>`;
-  }).join('');
+
+  // Index all comments and group replies under their parent
+  comments.forEach(c => { _fc[c.id] = c; });
+  const topLevel = comments.filter(c => !c.replyTo);
+  const byParent = {};
+  comments.filter(c => c.replyTo).forEach(c => {
+    (byParent[c.replyTo.id] = byParent[c.replyTo.id] || []).push(c);
+  });
+
+  listEl.innerHTML = topLevel.map(c => renderFcItem(c, byParent, false)).join('');
   listEl.scrollTop = listEl.scrollHeight;
+}
+
+function renderFcItem(c, byParent, isReply) {
+  const time    = new Date(c.createdAt).toLocaleString('nb-NO', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  const canDel  = currentUser && (currentUser.id === c.userId || currentUser.isAdmin);
+  const likes   = (c.likes || []).length;
+  const dislikes= (c.dislikes || []).length;
+  const userLiked    = currentUser && (c.likes    || []).includes(currentUser.id);
+  const userDisliked = currentUser && (c.dislikes || []).includes(currentUser.id);
+  const av = c.avatar
+    ? `<img class="fc-av" src="${escHtml(c.avatar)}" alt="">`
+    : `<div class="fc-av-ph">${(c.username||'?').slice(0,2).toUpperCase()}</div>`;
+  const quote = c.replyTo
+    ? `<div class="fc-reply-quote"><b>${escHtml(c.replyTo.username)}</b>: ${escHtml(c.replyTo.text)}</div>`
+    : '';
+  const voteRow = `
+    <div class="fc-vote-row">
+      <button class="fc-vote-btn${userLiked?' active-like':''}" onclick="voteComment('${c.id}','like')" title="Liker">▲ <span id="fl-${c.id}">${likes}</span></button>
+      <button class="fc-vote-btn${userDisliked?' active-dislike':''}" onclick="voteComment('${c.id}','dislike')" title="Liker ikke">▼ <span id="fd-${c.id}">${dislikes}</span></button>
+      <span class="fc-sep">·</span>
+      ${currentUser ? `<button class="fc-reply-btn" onclick="setReplyById('${c.id}')">Svar</button>` : ''}
+      ${canDel ? `<button class="fc-del-btn" onclick="deleteForumComment('${c.id}')">Slett</button>` : ''}
+    </div>`;
+
+  const replies = byParent[c.id] || [];
+  const repliesHtml = replies.length ? `
+    <button class="fc-reply-toggle" id="frt-${c.id}" onclick="toggleReplies('${c.id}')">▾ ${replies.length} svar</button>
+    <div class="fc-replies" id="fc-replies-${c.id}">
+      ${replies.map(r => renderFcItem(r, byParent, true)).join('')}
+    </div>` : '';
+
+  return `<div class="fc-item${isReply?' fc-item-reply':''}" id="fci-${c.id}">
+    ${av}
+    <div class="fc-bubble">
+      <div class="fc-meta"><b>${escHtml(c.username)}</b><span>${time}</span></div>
+      ${quote}
+      <div class="fc-text">${escHtml(c.text)}</div>
+      ${voteRow}
+    </div>
+  </div>${repliesHtml}`;
+}
+
+function toggleReplies(parentId) {
+  const el   = document.getElementById(`fc-replies-${parentId}`);
+  const btn  = document.getElementById(`frt-${parentId}`);
+  const open = el.style.display !== 'none';
+  el.style.display  = open ? 'none' : 'flex';
+  btn.textContent   = open ? `▸ ${(el.children.length)} svar` : `▾ ${(el.children.length)} svar`;
+}
+
+async function voteComment(id, type) {
+  if (!currentUser) { openModal(); return; }
+  try {
+    const r = await fetch(`${API_URL}/api/comments/${encodeURIComponent(forumPatch)}/${encodeURIComponent(forumComp.slug)}/${id}/vote`, {
+      method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${getToken()}`}, body: JSON.stringify({type})
+    });
+    if (!r.ok) return;
+    const d = await r.json();
+    const likeBtn = document.querySelector(`#fci-${id} .fc-vote-btn:first-child`);
+    const disBtn  = document.querySelector(`#fci-${id} .fc-vote-btn:nth-child(2)`);
+    document.getElementById(`fl-${id}`).textContent = d.likes;
+    document.getElementById(`fd-${id}`).textContent = d.dislikes;
+    // Update _fc cache and re-check active state
+    if (_fc[id]) {
+      if (type === 'like') {
+        const already = (_fc[id].likes||[]).includes(currentUser.id);
+        _fc[id].likes    = already ? (_fc[id].likes||[]).filter(x=>x!==currentUser.id) : [...(_fc[id].likes||[]), currentUser.id];
+        _fc[id].dislikes = (_fc[id].dislikes||[]).filter(x=>x!==currentUser.id);
+      } else {
+        const already = (_fc[id].dislikes||[]).includes(currentUser.id);
+        _fc[id].dislikes = already ? (_fc[id].dislikes||[]).filter(x=>x!==currentUser.id) : [...(_fc[id].dislikes||[]), currentUser.id];
+        _fc[id].likes    = (_fc[id].likes||[]).filter(x=>x!==currentUser.id);
+      }
+      if (likeBtn)  likeBtn.className  = 'fc-vote-btn' + ((_fc[id].likes||[]).includes(currentUser.id) ? ' active-like' : '');
+      if (disBtn)   disBtn.className   = 'fc-vote-btn' + ((_fc[id].dislikes||[]).includes(currentUser.id) ? ' active-dislike' : '');
+    }
+  } catch {}
+}
+
+function setReplyById(id) {
+  const c = _fc[id]; if (!c) return;
+  forumReplyTo = { id, username: c.username, text: c.text.slice(0, 80) };
+  document.getElementById('fm-reply-preview').style.display = 'flex';
+  document.getElementById('fm-reply-name').textContent = c.username;
+  document.getElementById('fm-reply-text').textContent = c.text.slice(0, 80);
+  document.getElementById('fc-txt')?.focus();
+  document.getElementById(`fci-${id}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function renderForumInput() {
@@ -1148,23 +1242,25 @@ function renderForumInput() {
     el.innerHTML = `<div class="fc-login-prompt"><button onclick="closeForumModal();openModal()">Logg inn med Discord</button> for å kommentere</div>`;
     return;
   }
+  const av = currentUser.avatar
+    ? `<img class="fc-composer-av" src="${escHtml(currentUser.avatar)}" alt="">`
+    : `<div class="fc-composer-av-ph">${currentUser.username.slice(0,2).toUpperCase()}</div>`;
   el.innerHTML = `
-    <div class="fc-input-row">
-      <div style="flex:1">
-        <textarea class="fc-textarea" id="fc-txt" placeholder="Skriv en kommentar… (maks 500 tegn)" maxlength="500" oninput="document.getElementById('fc-char').textContent=this.value.length+'/500'"></textarea>
-        <div class="fc-char" id="fc-char">0/500</div>
+    <div class="fc-composer">
+      ${av}
+      <div class="fc-composer-box">
+        <textarea class="fc-composer-textarea" id="fc-txt" placeholder="Skriv en kommentar…" maxlength="500"
+          oninput="document.getElementById('fc-char').textContent=this.value.length+'/500'"
+          onkeydown="if((e=event).ctrlKey&&e.key==='Enter')submitForumComment()"></textarea>
+        <div class="fc-composer-footer">
+          <span class="fc-composer-hint">Ctrl+Enter for å sende</span>
+          <div class="fc-composer-right">
+            <span class="fc-composer-char" id="fc-char">0/500</span>
+            <button class="fc-composer-send" id="fc-send" onclick="submitForumComment()">Send</button>
+          </div>
+        </div>
       </div>
-      <button class="fc-send-btn" id="fc-send" onclick="submitForumComment()">Send</button>
     </div>`;
-}
-
-function setReply(id, username, text) {
-  forumReplyTo = { id, username, text };
-  document.getElementById('fm-reply-preview').style.display = 'flex';
-  document.getElementById('fm-reply-name').textContent  = username;
-  document.getElementById('fm-reply-text').textContent  = text;
-  document.getElementById('fc-txt')?.focus();
-  document.getElementById(`fci-${id}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function clearReply() {
@@ -1198,11 +1294,10 @@ async function deleteForumComment(id) {
   if (!confirm('Slett kommentar?')) return;
   try {
     await fetch(`${API_URL}/api/comments/${encodeURIComponent(forumPatch)}/${encodeURIComponent(forumComp.slug)}/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${getToken()}`} });
-    document.getElementById(`fci-${id}`)?.remove();
-    const count = document.getElementById('fm-list').querySelectorAll('.fc-item').length;
+    await loadForumComments();
+    const count = Object.keys(_fc).length;
     const cc = document.getElementById(`cc-${forumComp.slug}`);
     if (cc) cc.textContent = count;
-    if (!count) document.getElementById('fm-list').innerHTML = '<div class="fc-empty">Ingen kommentarer ennå — vær den første!</div>';
   } catch { alert('Kunne ikke slette'); }
 }
 
