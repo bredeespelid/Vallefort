@@ -256,6 +256,16 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .btn-del-t:hover{background:rgba(201,76,76,.2);border-color:var(--red)}
 .t-empty{padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem;border:1px solid var(--wire)}
 .status-open{color:var(--green)}.status-closed{color:var(--grey)}.status-ongoing{color:var(--gold)}.status-finished{color:var(--grey2)}
+.t-countdown{display:inline-flex;align-items:center;gap:.5rem;margin-top:.35rem;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(200,210,225,.55)}
+.t-countdown-val{color:var(--gold);font-size:.95rem;letter-spacing:.04em}
+.t-winners{margin-top:.75rem;display:flex;flex-direction:column;gap:.4rem}
+.t-winner{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--white);font-weight:500}
+.t-w-rank{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;flex-shrink:0}
+.t-w-1{background:rgba(200,168,75,.2);color:var(--gold);border:1px solid rgba(200,168,75,.5)}
+.t-w-2{background:rgba(160,168,185,.15);color:#c0c8d8;border:1px solid rgba(160,168,185,.3)}
+.t-w-3{background:rgba(160,110,70,.15);color:#c8905a;border:1px solid rgba(160,110,70,.35)}
+.btn-finish-t{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid rgba(200,168,75,.35);background:rgba(200,168,75,.08);color:var(--gold);cursor:pointer;transition:all .15s}
+.btn-finish-t:hover{background:rgba(200,168,75,.18);border-color:var(--gold)}
 
 /* FORM MODALS */
 .form-group{margin-bottom:1rem}
@@ -570,9 +580,21 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
         <input class="form-input" id="tm-date" type="date">
       </div>
       <div class="form-group">
+        <label>Starttidspunkt (norsk tid)</label>
+        <input class="form-input" id="tm-starttime" type="datetime-local">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
         <label>Format</label>
         <select class="form-input" id="tm-format">
           <option>Enkelt utslagsspill</option><option>Dobbel utslagsspill</option><option>Roundrobin</option><option>Sveitsisk</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-input" id="tm-status">
+          <option value="open">Påmelding åpen</option><option value="closed">Påmelding stengt</option><option value="ongoing">Pågår</option><option value="finished">Ferdig</option>
         </select>
       </div>
     </div>
@@ -590,17 +612,9 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
         </select>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Server</label>
-        <input class="form-input" id="tm-server" value="EUW" maxlength="10">
-      </div>
-      <div class="form-group">
-        <label>Status</label>
-        <select class="form-input" id="tm-status">
-          <option value="open">Påmelding åpen</option><option value="closed">Påmelding stengt</option><option value="ongoing">Pågår</option><option value="finished">Ferdig</option>
-        </select>
-      </div>
+    <div class="form-group">
+      <label>Server</label>
+      <input class="form-input" id="tm-server" value="EUW" maxlength="10">
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -621,6 +635,31 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
       <button class="btn-submit" id="tm-submit" onclick="submitTournament()">Lagre</button>
     </div>
     <div class="admin-status" id="tm-status-msg"></div>
+  </div>
+</div>
+
+<!-- FINISH TOURNAMENT MODAL -->
+<div class="modal-wrap" id="finish-modal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeFinishModal()">✕</button>
+    <h3 id="finish-modal-title" style="margin-bottom:1.5rem">Avslutt turnering</h3>
+    <div class="form-group">
+      <label>1. plass</label>
+      <select class="form-input" id="fm-place1"></select>
+    </div>
+    <div class="form-group">
+      <label>2. plass</label>
+      <select class="form-input" id="fm-place2"></select>
+    </div>
+    <div class="form-group">
+      <label>3. plass</label>
+      <select class="form-input" id="fm-place3"></select>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeFinishModal()">Avbryt</button>
+      <button class="btn-submit" id="fm-submit" onclick="submitFinishTournament()">Avslutt & lagre</button>
+    </div>
+    <div class="admin-status" id="fm-status-msg"></div>
   </div>
 </div>
 
@@ -1414,6 +1453,17 @@ function renderTournaments(list) {
     const canReg     = t.status === 'open' && regCount < t.maxPlayers;
     const dateStr    = t.date ? new Date(t.date).toLocaleDateString('nb-NO', {day:'2-digit',month:'long',year:'numeric'}) : 'Dato annonseres';
 
+    const countdownHtml = t.startTime && t.status !== 'finished'
+      ? `<div class="t-countdown">Starter om <span class="t-countdown-val" id="tcv-${t.id}">…</span></div>`
+      : '';
+
+    const winnersHtml = t.winners
+      ? `<div class="t-winners">
+          ${t.winners.place1 ? `<div class="t-winner"><span class="t-w-rank t-w-1">1</span>${escHtml(t.winners.place1.username)}</div>` : ''}
+          ${t.winners.place2 ? `<div class="t-winner"><span class="t-w-rank t-w-2">2</span>${escHtml(t.winners.place2.username)}</div>` : ''}
+          ${t.winners.place3 ? `<div class="t-winner"><span class="t-w-rank t-w-3">3</span>${escHtml(t.winners.place3.username)}</div>` : ''}
+        </div>` : '';
+
     const regBtn = currentUser
       ? (isReg
           ? `<button class="btn-reg registered" onclick="unregisterTournament('${t.id}')">✓ Påmeldt — Meld av</button>`
@@ -1421,6 +1471,7 @@ function renderTournaments(list) {
       : `<button class="btn-reg" onclick="openModal()">Logg inn for å melde på</button>`;
 
     const editBtns = canEdit ? `<button class="btn-edit-t" onclick="openTournamentModal('${t.id}')">Rediger</button><button class="btn-del-t" onclick="deleteTournament('${t.id}')">Slett</button>` : '';
+    const finishBtn = currentUser?.isAdmin ? `<button class="btn-finish-t" onclick="openFinishModal('${t.id}')">Kår vinnere</button>` : '';
     const fbUrl  = encodeURIComponent(`https://bredeespelid.github.io/Vallefort/#tc-${t.id}`);
     const fbShare = `<a class="btn-fb" href="https://www.facebook.com/sharer/sharer.php?u=${fbUrl}" target="_blank" rel="noopener">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
@@ -1432,8 +1483,9 @@ function renderTournaments(list) {
           <div class="t-status ${STATUS_CLASS[t.status]}"><span class="live-dot" style="background:currentColor"></span> ${STATUS_LABEL[t.status]||t.status}</div>
           <div class="t-name">${escHtml(t.name)}</div>
           <div class="t-date">${dateStr}${t.description ? ' · ' + escHtml(t.description) : ''}</div>
+          ${countdownHtml}
         </div>
-        <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap">${editBtns}${fbShare}</div>
+        <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap">${finishBtn}${editBtns}${fbShare}</div>
       </div>
       <div class="tournament-card-body">
         <div class="t-card-main">
@@ -1444,14 +1496,14 @@ function renderTournaments(list) {
           <div class="t-card-actions">${regBtn}</div>
         </div>
         <div class="t-card-side">
-          <h3>Påmelding</h3>
+          ${t.status === 'finished' && t.winners ? `<h3>Resultater</h3>${winnersHtml}` : `<h3>Påmelding</h3>
           <div class="slots-track"><div class="slots-fill" style="width:${fillPct}%"></div></div>
           <div class="slots-txt"><b>${regCount}</b> / ${t.maxPlayers} påmeldt</div>
           <div class="prize-grid">
             <div class="prize-item"><div class="prize-place">1. plass</div><div class="prize-val">${escHtml(t.prize1||'TBA')}</div></div>
             <div class="prize-item"><div class="prize-place">2. plass</div><div class="prize-val">${escHtml(t.prize2||'TBA')}</div></div>
-          </div>
-          <p style="font-size:.72rem;color:var(--grey2)">Opprettet av ${escHtml(t.createdByUsername)}</p>
+          </div>`}
+          <p style="font-size:.72rem;color:var(--grey2);margin-top:.75rem">Opprettet av ${escHtml(t.createdByUsername)}</p>
         </div>
       </div>
     </div>`;
@@ -1483,20 +1535,97 @@ async function deleteTournament(id) {
   } catch { alert('Noe gikk galt'); }
 }
 
+/* ── COUNTDOWN ─────────────────────────────────────── */
+function updateCountdowns() {
+  allTournaments.forEach(t => {
+    if (!t.startTime || t.status === 'finished') return;
+    const el = document.getElementById(`tcv-${t.id}`);
+    if (!el) return;
+    const diff = new Date(t.startTime).getTime() - Date.now();
+    if (diff <= 0) { el.textContent = 'Starter snart!'; return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const hms = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.textContent = d > 0 ? `${d}d ${hms}` : hms;
+  });
+}
+setInterval(updateCountdowns, 1000);
+
+/* ── FINISH / WINNERS MODAL ────────────────────────── */
+let finishingTournamentId = null;
+
+function openFinishModal(id) {
+  const t = allTournaments.find(x => x.id === id);
+  if (!t) return;
+  finishingTournamentId = id;
+  document.getElementById('finish-modal-title').textContent = `Avslutt: ${t.name}`;
+  const none = `<option value="">— Ingen —</option>`;
+  const opts = none + t.registrations.map(r =>
+    `<option value="${r.userId}" data-uname="${escHtml(r.username)}">${escHtml(r.username)}</option>`
+  ).join('');
+  ['fm-place1','fm-place2','fm-place3'].forEach(sid => {
+    document.getElementById(sid).innerHTML = opts;
+  });
+  if (t.winners) {
+    if (t.winners.place1) document.getElementById('fm-place1').value = t.winners.place1.userId;
+    if (t.winners.place2) document.getElementById('fm-place2').value = t.winners.place2.userId;
+    if (t.winners.place3) document.getElementById('fm-place3').value = t.winners.place3.userId;
+  }
+  document.getElementById('fm-status-msg').textContent = '';
+  document.getElementById('finish-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFinishModal() {
+  document.getElementById('finish-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitFinishTournament() {
+  function getWinner(sid) {
+    const sel = document.getElementById(sid);
+    if (!sel.value) return null;
+    return { userId: sel.value, username: sel.options[sel.selectedIndex].dataset.uname };
+  }
+  const winners = { place1: getWinner('fm-place1'), place2: getWinner('fm-place2'), place3: getWinner('fm-place3') };
+  const btn = document.getElementById('fm-submit');
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(`${API_URL}/api/tournaments/${finishingTournamentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ status: 'finished', winners }),
+    });
+    if (!r.ok) { const e = await r.json(); showStatus('fm-status-msg', e.error, 'var(--red)'); return; }
+    closeFinishModal();
+    await loadTournaments();
+  } catch { showStatus('fm-status-msg', 'Noe gikk galt', 'var(--red)'); }
+  finally { btn.disabled = false; btn.textContent = 'Avslutt & lagre'; }
+}
+
+function toLocalInput(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
 function openTournamentModal(id) {
   editingTournamentId = id || null;
   const tm = id ? allTournaments.find(t => t.id === id) : null;
-  document.getElementById('tm-title').textContent = tm ? 'Rediger turnering' : 'Opprett turnering';
-  document.getElementById('tm-name').value        = tm?.name        || '';
-  document.getElementById('tm-date').value        = tm?.date        || '';
-  document.getElementById('tm-format').value      = tm?.format      || 'Enkelt utslagsspill';
-  document.getElementById('tm-maxplayers').value  = tm?.maxPlayers  || 16;
-  document.getElementById('tm-rank').value        = tm?.rankReq     || 'Alle';
-  document.getElementById('tm-server').value      = tm?.server      || 'EUW';
-  document.getElementById('tm-prize1').value      = tm?.prize1      || '';
-  document.getElementById('tm-prize2').value      = tm?.prize2      || '';
-  document.getElementById('tm-desc').value        = tm?.description || '';
-  document.getElementById('tm-status').value      = tm?.status      || 'open';
+  document.getElementById('tm-title').textContent     = tm ? 'Rediger turnering' : 'Opprett turnering';
+  document.getElementById('tm-name').value            = tm?.name        || '';
+  document.getElementById('tm-date').value            = tm?.date        || '';
+  document.getElementById('tm-starttime').value       = toLocalInput(tm?.startTime);
+  document.getElementById('tm-format').value          = tm?.format      || 'Enkelt utslagsspill';
+  document.getElementById('tm-maxplayers').value      = tm?.maxPlayers  || 16;
+  document.getElementById('tm-rank').value            = tm?.rankReq     || 'Alle';
+  document.getElementById('tm-server').value          = tm?.server      || 'EUW';
+  document.getElementById('tm-prize1').value          = tm?.prize1      || '';
+  document.getElementById('tm-prize2').value          = tm?.prize2      || '';
+  document.getElementById('tm-desc').value            = tm?.description || '';
+  document.getElementById('tm-status').value          = tm?.status      || 'open';
   document.getElementById('tm-status-msg').textContent = '';
   document.getElementById('tournament-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1504,9 +1633,11 @@ function openTournamentModal(id) {
 function closeTournamentModal() { document.getElementById('tournament-modal').classList.remove('open'); document.body.style.overflow = ''; }
 
 async function submitTournament() {
+  const stRaw = document.getElementById('tm-starttime').value;
   const body = {
     name:        document.getElementById('tm-name').value.trim(),
     date:        document.getElementById('tm-date').value || null,
+    startTime:   stRaw ? new Date(stRaw).toISOString() : null,
     format:      document.getElementById('tm-format').value,
     maxPlayers:  parseInt(document.getElementById('tm-maxplayers').value),
     rankReq:     document.getElementById('tm-rank').value,
@@ -1724,6 +1855,7 @@ function closeModal() { document.getElementById('discord-modal').classList.remov
 document.getElementById('discord-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 document.getElementById('lobby-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeLobbyModal(); });
 document.getElementById('tournament-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeTournamentModal(); });
+document.getElementById('finish-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeFinishModal(); });
 
 /* ── HELPERS ────────────────────────────────────── */
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }

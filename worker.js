@@ -293,7 +293,8 @@ async function handleTournaments(request, env) {
     const tournament = {
       id:                  crypto.randomUUID(),
       name,
-      date:                body.date   || null,
+      date:                body.date      || null,
+      startTime:           body.startTime || null,
       format:              VALID_FORMATS.includes(body.format) ? body.format : 'Enkelt utslagsspill',
       maxPlayers:          Math.min(Math.max(parseInt(body.maxPlayers) || 16, 4), 64),
       rankReq:             VALID_RANKS.includes(body.rankReq) ? body.rankReq : 'Alle',
@@ -303,6 +304,7 @@ async function handleTournaments(request, env) {
       description:         (body.description || '').trim().slice(0, 300),
       registrations:       [],
       status:              'open',
+      winners:             null,
       createdBy:           user.id,
       createdByUsername:   user.username,
       createdAt:           new Date().toISOString(),
@@ -335,6 +337,7 @@ async function handleTournamentById(request, env, id) {
     const body = await request.json().catch(() => ({}));
     if (body.name        !== undefined) t.name       = (body.name || '').trim().slice(0, 80);
     if (body.date        !== undefined) t.date       = body.date || null;
+    if (body.startTime   !== undefined) t.startTime  = body.startTime || null;
     if (body.format      !== undefined && VALID_FORMATS.includes(body.format))   t.format    = body.format;
     if (body.maxPlayers  !== undefined) t.maxPlayers = Math.min(Math.max(parseInt(body.maxPlayers) || 16, 4), 64);
     if (body.rankReq     !== undefined && VALID_RANKS.includes(body.rankReq))    t.rankReq   = body.rankReq;
@@ -343,6 +346,7 @@ async function handleTournamentById(request, env, id) {
     if (body.prize2      !== undefined) t.prize2     = (body.prize2 || 'TBA').trim().slice(0, 60);
     if (body.description !== undefined) t.description = (body.description || '').trim().slice(0, 300);
     if (body.status      !== undefined && VALID_STATUSES.includes(body.status))  t.status    = body.status;
+    if (body.winners     !== undefined) t.winners    = body.winners || null;
     all[idx] = t;
     await env.KV.put(KV_TOURNAMENTS, JSON.stringify(all));
     return json(t);
