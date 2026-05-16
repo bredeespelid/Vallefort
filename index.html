@@ -1030,17 +1030,13 @@ function renderLoggedIn(user) {
       : '';
 
   document.getElementById('nav-user-area').innerHTML = `
-    <div style="position:relative">
-      <div class="user-chip" onclick="toggleUserMenu()" title="Kontomeny">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="user-chip">
         ${user.avatar ? `<img class="user-avatar" src="${escHtml(user.avatar)}" alt="">` : `<div class="user-avatar-placeholder">${initials}</div>`}
         <span class="user-name">${escHtml(user.username)}</span>
         ${rolePip}
-        <span style="font-size:.65rem;color:var(--grey);margin-left:2px">▾</span>
       </div>
-      <div id="user-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:160px;background:var(--ink3);border:1px solid var(--wire2);z-index:300;padding:4px 0">
-        <div style="padding:.5rem 1rem;font-size:.75rem;color:var(--grey);border-bottom:1px solid var(--wire)">${escHtml(user.username)}</div>
-        <button onclick="handleLogout()" style="width:100%;text-align:left;padding:.55rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:none;border:none;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(201,76,76,.08)'" onmouseout="this.style.background='none'">Logg ut</button>
-      </div>
+      <button onclick="handleLogout()" style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);background:rgba(201,76,76,.08);border:1px solid rgba(201,76,76,.25);padding:5px 12px;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(201,76,76,.18)'" onmouseout="this.style.background='rgba(201,76,76,.08)'">Logg ut</button>
     </div>`;
 
   // Vis admin-bar og juster padding på body
