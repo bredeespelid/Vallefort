@@ -1615,13 +1615,22 @@ async function deleteTournament(id) {
 /* ── REFRESH COUNTDOWN ─────────────────────────────── */
 function nextNoonNorway() {
   const now = new Date();
-  const utcStr  = now.toLocaleString('en-US', { timeZone:'UTC',         year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false });
-  const osloStr = now.toLocaleString('en-US', { timeZone:'Europe/Oslo', year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false });
-  const offsetMs = new Date(osloStr) - new Date(utcStr);
-  const osloNow  = new Date(now.getTime() + offsetMs);
-  const noonOslo = new Date(osloNow); noonOslo.setHours(12, 0, 0, 0);
-  if (osloNow >= noonOslo) noonOslo.setDate(noonOslo.getDate() + 1);
-  return new Date(noonOslo.getTime() - offsetMs);
+  // Get current date string in Oslo (en-CA = YYYY-MM-DD format)
+  const osloDate = new Intl.DateTimeFormat('en-CA', { timeZone:'Europe/Oslo', year:'numeric', month:'2-digit', day:'2-digit' }).format(now);
+  const osloHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone:'Europe/Oslo', hour:'numeric', hour12:false }).format(now));
+  // If noon has already passed in Oslo today, target tomorrow
+  let date = osloDate;
+  if (osloHour >= 12) {
+    const d = new Date(date + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    date = d.toISOString().slice(0, 10);
+  }
+  // Try 10:00 UTC = noon CEST (UTC+2, summer)
+  const c1 = new Date(date + 'T10:00:00Z');
+  const h1 = parseInt(new Intl.DateTimeFormat('en-US', { timeZone:'Europe/Oslo', hour:'numeric', hour12:false }).format(c1));
+  if (h1 === 12) return c1;
+  // Fall back to 11:00 UTC = noon CET (UTC+1, winter)
+  return new Date(date + 'T11:00:00Z');
 }
 
 function updateRefreshCountdown() {
