@@ -102,7 +102,12 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runDailyScrape(env));
+    ctx.waitUntil((async () => {
+      // Only run player refresh when it's actually noon in Norway (handles both UTC+1 and UTC+2)
+      const osloHour = parseInt(new Date().toLocaleString('en-US', { timeZone:'Europe/Oslo', hour:'numeric', hour12:false }));
+      if (osloHour === 12) await runDailyPlayerRefresh(env);
+      await runDailyScrape(env);
+    })());
   },
 };
 
@@ -383,6 +388,17 @@ async function handleAdminRefreshAllPlayers(request, env) {
   }
   await env.KV.put(KV_PLAYERS, JSON.stringify(players));
   return json({ ok:true, count:players.length });
+}
+
+async function runDailyPlayerRefresh(env) {
+  const raw = await env.KV.get(KV_PLAYERS);
+  const players = raw ? JSON.parse(raw) : [];
+  for (let i = 0; i < players.length; i++) {
+    const p = players[i];
+    const rankData = await riotFetchRank(env, p.region, p.puuid, p.summonerId);
+    if (rankData) Object.assign(players[i], { summonerId:rankData.summonerId, tier:rankData.tier, rank:rankData.rank, lp:rankData.lp, wins:rankData.wins, losses:rankData.losses, updatedAt:new Date().toISOString() });
+  }
+  if (players.length) await env.KV.put(KV_PLAYERS, JSON.stringify(players));
 }
 
 // ─── TOURNAMENTS ──────────────────────────────────────────────────────────────

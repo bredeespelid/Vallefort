@@ -6,6 +6,9 @@ compatibility_date = "2024-01-01"
 binding = "KV"
 id      = "d2cf4c59c6014806aa2363a9ab0c907e"
 
+[triggers]
+crons = ["0 10 * * *", "0 11 * * *"]
+
 [vars]
 DISCORD_REDIRECT_URI = "https://vallefort.brede-espelid.workers.dev/auth/callback"
 SITE_ORIGIN          = "https://bredeespelid.github.io"
