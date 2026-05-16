@@ -193,6 +193,12 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .btn-reg:disabled{opacity:.35;cursor:not-allowed}
 .btn-edit-t{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(200,210,225,0.85);cursor:pointer;transition:all .15s}
 .btn-edit-t:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-lo)}
+.btn-fb{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid rgba(24,119,242,.4);background:rgba(24,119,242,.1);color:#7aaef8;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.btn-fb:hover{background:rgba(24,119,242,.25);border-color:#1877F2;color:#fff}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire)}
+.rule-item{display:flex;align-items:flex-start;gap:.75rem;padding:1rem 1.25rem;background:var(--ink2);font-size:.88rem;color:rgba(200,210,225,0.85);line-height:1.5}
+.rule-item.rule-highlight{background:var(--ink3);color:var(--white);font-weight:500}
+.rule-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
 .btn-del-t{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid rgba(201,76,76,.4);background:rgba(201,76,76,.08);color:#e87a7a;cursor:pointer;transition:all .15s}
 .btn-del-t:hover{background:rgba(201,76,76,.2);border-color:var(--red)}
 .t-empty{padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem;border:1px solid var(--wire)}
@@ -664,6 +670,25 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
   </div>
 </section>
 
+<!-- REGLER -->
+<section id="regler" style="background:var(--ink2)">
+  <div class="section">
+    <div class="label-line reveal"><span class="label">Community</span></div>
+    <h2 class="reveal">Regler</h2>
+    <p class="section-lead reveal">Vi holder det chill og competitive. Alle er velkomne så lenge du følger disse.</p>
+    <div class="rules-grid reveal">
+      <div class="rule-item"><span class="rule-icon">👊</span><span>Vær respektfull mot alle</span></div>
+      <div class="rule-item"><span class="rule-icon">🚫</span><span>Ingen toxic oppførsel eller flaming</span></div>
+      <div class="rule-item"><span class="rule-icon">🔇</span><span>Ikke spam</span></div>
+      <div class="rule-item"><span class="rule-icon">📢</span><span>Ingen reklame uten tillatelse</span></div>
+      <div class="rule-item"><span class="rule-icon">📌</span><span>Bruk riktige kanaler</span></div>
+      <div class="rule-item"><span class="rule-icon">📋</span><span>Følg Discord sine TOS</span></div>
+      <div class="rule-item"><span class="rule-icon">🙊</span><span>Unngå politikk og kontroversielle tema</span></div>
+      <div class="rule-item rule-highlight"><span class="rule-icon">🎮</span><span>Dette er et norsk TFT community – hold det chill + competitive</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <div class="cta-band">
   <div class="cta-text reveal">
@@ -671,7 +696,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
     <h2>Klar til å spille?</h2>
     <p>Alle norske TFT-spillere er velkomne, fra Iron til Challenger.</p>
     <div class="btns" id="cta-btns">
-      <a href="https://discord.gg/" target="_blank" class="btn-primary">Åpne Discord</a>
+      <a href="https://discord.gg/ADMaFnt7Dh" target="_blank" class="btn-primary">Åpne Discord</a>
       <button class="btn-ghost" id="cta-login-btn" onclick="openModal()">Logg inn på siden</button>
     </div>
   </div>
@@ -689,7 +714,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 
 <footer>
   <div class="footer-brand">Vallefort</div>
-  <nav class="footer-links"><a href="#">Om</a><a href="#">Regler</a><a href="https://discord.gg/" target="_blank">Discord</a><a href="#">Kontakt</a></nav>
+  <nav class="footer-links"><a href="#regler">Regler</a><a href="https://discord.gg/ADMaFnt7Dh" target="_blank">Discord</a></nav>
   <div class="footer-copy">© 2026 Vallefort</div>
 </footer>
 
@@ -1088,6 +1113,11 @@ function renderTournaments(list) {
       : `<button class="btn-reg" onclick="openModal()">Logg inn for å melde på</button>`;
 
     const editBtns = canEdit ? `<button class="btn-edit-t" onclick="openTournamentModal('${t.id}')">Rediger</button><button class="btn-del-t" onclick="deleteTournament('${t.id}')">Slett</button>` : '';
+    const fbText = encodeURIComponent(`🎮 ${t.name} — Norsk TFT-turnering på Vallefort! Meld deg på: `);
+    const fbUrl  = encodeURIComponent('https://bredeespelid.github.io/Vallefort/#turneringer');
+    const fbShare = `<a class="btn-fb" href="https://www.facebook.com/sharer/sharer.php?u=${fbUrl}&quote=${fbText}" target="_blank" rel="noopener">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+      Del på Facebook</a>`;
 
     return `<div class="tournament-card" id="tc-${t.id}">
       <div class="tournament-card-head">
@@ -1096,7 +1126,7 @@ function renderTournaments(list) {
           <div class="t-name">${escHtml(t.name)}</div>
           <div class="t-date">${dateStr}${t.description ? ' · ' + escHtml(t.description) : ''}</div>
         </div>
-        <div style="display:flex;gap:6px;align-items:flex-start">${editBtns}</div>
+        <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap">${editBtns}${fbShare}</div>
       </div>
       <div class="tournament-card-body">
         <div class="t-card-main">
