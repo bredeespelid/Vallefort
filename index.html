@@ -289,6 +289,15 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .t-card-main{background:var(--ink2);padding:1.25rem 2rem}
 .t-card-side{background:var(--ink3);padding:1.25rem 1.5rem}
 .t-card-actions{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.t-participants{margin-top:1rem;border-top:1px solid rgba(255,255,255,0.07);padding-top:.75rem}
+.t-participants-label{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,210,225,0.35);margin-bottom:.5rem}
+.t-participant{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.t-participant:last-child{border-bottom:none}
+.t-par-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.t-par-av-ph{width:22px;height:22px;border-radius:50%;background:var(--ink4);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:var(--grey);border:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+.t-par-name{font-size:.78rem;color:rgba(200,210,225,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.t-par-name.is-me{color:var(--gold)}
+.t-par-more{font-size:.72rem;color:rgba(200,210,225,0.35);font-family:'Barlow Condensed',sans-serif;padding-top:4px;letter-spacing:.04em}
 .btn-reg{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.25rem;border:1px solid var(--discord);background:rgba(88,101,242,.15);color:#a5aef8;cursor:pointer;transition:all .15s}
 .btn-reg:hover{background:var(--discord);color:#fff;box-shadow:0 2px 12px rgba(88,101,242,.4)}
 .btn-reg.registered{border-color:var(--green);color:#6ddfaa;background:rgba(61,171,110,.12)}
@@ -990,15 +999,19 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
       <button class="btn-ghost" id="cta-login-btn" onclick="openModal()">Logg inn på siden</button>
     </div>
   </div>
-  <div class="cta-note reveal">
-    <h4>Discord-login gir deg</h4>
-    <ul>
-      <li>Opprett og administrer lobbyer</li>
-      <li>Kommenter på comps per patch</li>
-      <li>Meld deg på turneringer</li>
-      <li>Profil med rank og stats</li>
-      <li>Norsk TFT-rolle automatisk</li>
-    </ul>
+  <div class="cta-note reveal" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.09);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)">
+    <h4 style="margin-bottom:.5rem">Visste du?</h4>
+    <p style="font-size:.82rem;font-weight:300;color:var(--grey);line-height:1.65;margin-bottom:1rem">Åpner du siden på telefonen og legger den til på hjemskjermen — fungerer den som en ekte app, uten app-butikk.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
+        <span style="font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(200,210,225,0.4);flex-shrink:0">iOS</span>
+        <span style="font-size:.78rem;color:rgba(200,210,225,0.7);font-weight:300">Trykk <strong style="color:var(--white);font-weight:600">Del</strong> □↑ → <strong style="color:var(--white);font-weight:600">Legg til på hjemskjerm</strong></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
+        <span style="font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(200,210,225,0.4);flex-shrink:0">Android</span>
+        <span style="font-size:.78rem;color:rgba(200,210,225,0.7);font-weight:300">Trykk <strong style="color:var(--white);font-weight:600">⋮ meny</strong> → <strong style="color:var(--white);font-weight:600">Installer app</strong></span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1624,6 +1637,29 @@ function renderTournaments(list) {
             <div class="prize-item"><div class="prize-place">1. plass</div><div class="prize-val">${escHtml(t.prize1||'TBA')}</div></div>
             <div class="prize-item"><div class="prize-place">2. plass</div><div class="prize-val">${escHtml(t.prize2||'TBA')}</div></div>
           </div>`}
+          ${t.registrations.length > 0 ? (() => {
+            const show = t.registrations.slice(0, 8);
+            const rest = t.registrations.length - show.length;
+            const items = show.map(r => {
+              const pl = allPlayers.find(p => p.discordId === r.userId);
+              const tierClass = pl?.tier ? `tier-${pl.tier.toLowerCase()}` : 'tier-unranked';
+              const tierLabel = pl?.tier ? `${TIER_NO[pl.tier]||pl.tier}${!NO_RANK_TIER.has(pl.tier)&&pl.rank?' '+pl.rank:''}` : '';
+              const av = r.avatar
+                ? `<img class="t-par-av" src="${escHtml(r.avatar)}" alt="">`
+                : `<div class="t-par-av-ph">${(r.username||'?').slice(0,2).toUpperCase()}</div>`;
+              const isMe = currentUser?.id === r.userId;
+              return `<div class="t-participant">
+                ${av}
+                <span class="t-par-name${isMe?' is-me':''}">${escHtml(r.username)}</span>
+                ${tierLabel ? `<span class="tier-badge ${tierClass}" style="font-size:.58rem;padding:1px 6px">${tierLabel}</span>` : ''}
+              </div>`;
+            }).join('');
+            return `<div class="t-participants">
+              <div class="t-participants-label">Deltakere · ${t.registrations.length}</div>
+              ${items}
+              ${rest > 0 ? `<div class="t-par-more">+ ${rest} til</div>` : ''}
+            </div>`;
+          })() : ''}
           <p style="font-size:.72rem;color:var(--grey2);margin-top:.75rem">Opprettet av ${escHtml(t.createdByUsername)}</p>
         </div>
       </div>
