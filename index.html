@@ -541,6 +541,58 @@ body.c-hover .c-ring{width:54px;height:54px;border-color:rgba(200,168,75,.85);ba
 @keyframes orbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-32px) scale(.94)}}
 @keyframes orbFloat3{0%,100%{transform:translate(0,0)}33%{transform:translate(22px,-16px)}66%{transform:translate(-14px,12px)}}
 
+/* ══ FULL ESPORTS MODE ════════════════════════════ */
+/* Canvas particles */
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+/* CRT scan-line overlay */
+.hero-scanline{position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,0.13) 3px,rgba(0,0,0,0.13) 4px);opacity:.5}
+/* Lift hero text above canvas/scanlines */
+.hero-content{position:relative;z-index:3}
+.hero-ticker{position:relative;z-index:3}
+
+/* Glitch on hero h1 */
+@keyframes heroGlitch{
+  0%{transform:skewX(-6deg) translateX(-5px);filter:hue-rotate(90deg) brightness(2.2);color:#ff3cff;text-shadow:6px 0 #00ffff,-6px 0 #ff3cff}
+  30%{transform:skewX(5deg) translateX(5px);filter:hue-rotate(-90deg) brightness(1.7);color:#00e5ff;text-shadow:-4px 0 #ff00ff}
+  60%{transform:skewX(-2deg) translateX(-2px);filter:hue-rotate(45deg) brightness(2.5);color:var(--white);text-shadow:3px 0 rgba(255,0,200,.6),-3px 0 rgba(0,200,255,.6)}
+  80%{transform:skewX(1deg);filter:none;color:var(--white);text-shadow:none}
+  100%{transform:none;filter:none;color:var(--white);text-shadow:none}
+}
+#hero h1.hero-glitch{animation:heroGlitch .45s steps(3) forwards}
+
+/* Neon pulse — #1 leaderboard row */
+@keyframes neonPulse{
+  0%,100%{box-shadow:-3px 0 0 rgba(200,168,75,.9),0 0 10px rgba(200,168,75,.06),inset 0 0 20px rgba(200,168,75,.02)}
+  50%{box-shadow:-3px 0 0 rgba(200,168,75,1),0 0 50px rgba(200,168,75,.3),0 0 90px rgba(200,168,75,.12),inset 0 0 30px rgba(200,168,75,.06)}
+}
+.player-row-1{animation:neonPulse 2.8s ease-in-out infinite!important}
+
+/* Logo glitch on hover */
+@keyframes logoGlitch{0%,100%{filter:none}50%{filter:drop-shadow(3px 0 #ff3cff) drop-shadow(-3px 0 #00e5ff)}}
+.nav-logo:hover img{animation:logoGlitch .35s steps(2)}
+
+/* Animated nav bottom stripe */
+@keyframes navStripe{from{background-position:0 0}to{background-position:40px 0}}
+nav{position:relative}
+nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,var(--gold) 0,var(--gold) 10px,transparent 10px,transparent 20px,rgba(88,101,242,.7) 20px,rgba(88,101,242,.7) 28px,transparent 28px,transparent 40px);background-size:40px 2px;animation:navStripe 1.8s linear infinite;pointer-events:none;z-index:1}
+
+/* Section h2 esports prefix */
+.section h2::before{content:'// ';color:var(--gold);font-size:.5em;opacity:.7;font-style:normal;letter-spacing:.05em;font-weight:800;vertical-align:middle}
+
+/* Hero kicker blinking cursor */
+.hero-kicker::after{content:'_';animation:blink .85s step-end infinite;color:var(--gold);margin-left:3px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Countdown glow pulse */
+@keyframes countdownGlow{0%,100%{text-shadow:0 0 6px rgba(200,168,75,.3)}50%{text-shadow:0 0 24px rgba(200,168,75,.95),0 0 50px rgba(200,168,75,.45)}}
+.t-countdown-val{color:var(--gold-hi)!important;animation:countdownGlow 2s ease-in-out infinite}
+
+/* Tournament card esports hover */
+.tournament-card:hover{transform:translateY(-3px)!important;box-shadow:0 24px 64px rgba(0,0,0,.55),0 0 50px rgba(200,168,75,.1),inset 0 1px 0 rgba(200,168,75,.2)!important}
+
+/* Hex pattern overlay on meta section */
+#meta{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V17L28 1l28 16v33L28 66zm0 34L0 84V51l28-17 28 17v33L28 100z' fill='none' stroke='%23C8A84B' stroke-width='1'/%3E%3C/svg%3E"),linear-gradient(var(--ink2),var(--ink2));background-blend-mode:overlay;background-size:56px 100px,auto}
+
 @media(max-width:768px){
   /* Nav */
   .nav-links{display:none}
@@ -874,6 +926,8 @@ body.c-hover .c-ring{width:54px;height:54px;border-color:rgba(200,168,75,.85);ba
 
 <!-- HERO -->
 <section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-scanline"></div>
   <div class="hero-orb hero-orb-1"></div>
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-orb hero-orb-3"></div>
@@ -2275,6 +2329,113 @@ const sectionObs = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.25 });
 navSections.forEach(id => { const el = document.getElementById(id); if (el) sectionObs.observe(el); });
+
+/* ── HERO CANVAS PARTICLES ─────────────────────── */
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const GOLD = 'rgba(200,168,75,', BLUE = 'rgba(88,101,242,';
+  let W, H, pts;
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+    const n = Math.min(Math.floor((W * H) / 11000), 95);
+    pts = Array.from({length: n}, () => ({
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.42,
+      vy: (Math.random() - 0.5) * 0.42,
+      r:  Math.random() * 1.6 + 0.5,
+      gold: Math.random() > 0.28
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const len = pts.length;
+    for (let i = 0; i < len; i++) {
+      for (let j = i + 1; j < len; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 135) {
+          ctx.strokeStyle = GOLD + ((1 - d/135) * 0.28) + ')';
+          ctx.lineWidth = 0.55;
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x, pts[i].y);
+          ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+      ctx.fillStyle = p.gold ? GOLD + '0.78)' : BLUE + '0.55)';
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize, {passive: true});
+  draw();
+})();
+
+/* ── GLITCH INTERVAL ────────────────────────────── */
+(function(){
+  const h1 = document.querySelector('#hero h1');
+  if (!h1 || window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  function glitch() {
+    h1.classList.add('hero-glitch');
+    setTimeout(() => h1.classList.remove('hero-glitch'), 500);
+    if (Math.random() > 0.5) {
+      setTimeout(() => {
+        h1.classList.add('hero-glitch');
+        setTimeout(() => h1.classList.remove('hero-glitch'), 280);
+      }, 700);
+    }
+    setTimeout(glitch, 3200 + Math.random() * 5800);
+  }
+  setTimeout(glitch, 2800);
+})();
+
+/* ── COUNT-UP STATS ─────────────────────────────── */
+(function(){
+  const ids = ['stat-members', 'stat-lobbies', 'stat-tournaments'];
+  let done = false;
+
+  function run() {
+    if (done) return;
+    const els = ids.map(id => document.getElementById(id));
+    if (!els.some(el => el && !isNaN(parseInt(el.textContent)))) return;
+    done = true;
+    els.forEach(el => {
+      if (!el) return;
+      const target = parseInt(el.textContent);
+      if (isNaN(target) || target <= 0) return;
+      const dur = 1600, t0 = performance.now();
+      el.textContent = '0';
+      (function step(t) {
+        const p = Math.min((t - t0) / dur, 1);
+        el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    });
+  }
+
+  const obs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    obs.disconnect();
+    const poll = setInterval(() => { run(); if (done) clearInterval(poll); }, 120);
+  }, {threshold: 0.4});
+  const ticker = document.querySelector('.hero-ticker');
+  if (ticker) obs.observe(ticker);
+})();
 
 /* ── CUSTOM CURSOR ─────────────────────────────── */
 if (window.matchMedia('(pointer:fine)').matches) {
