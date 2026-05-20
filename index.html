@@ -47,17 +47,32 @@ body::before{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;b
 .label{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
 .label-line{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
 .label-line::before{content:'';display:block;width:20px;height:2px;background:var(--gold)}
-.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.reveal{opacity:0;transform:translateY(22px) scale(.99);transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1)}
 .reveal.on{opacity:1;transform:none}
+.reveal-left{opacity:0;transform:translateX(-24px);transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1)}
+.reveal-left.on{opacity:1;transform:none}
+
+/* NAV PROGRESS */
+#nav-progress{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-hi));z-index:202;transition:width .08s linear;box-shadow:0 0 12px rgba(200,168,75,.7),0 0 24px rgba(200,168,75,.3);pointer-events:none}
+
+/* CURSOR GLOW */
+#cursor-glow{position:fixed;pointer-events:none;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle at center,rgba(200,168,75,0.05) 0%,rgba(200,168,75,0.015) 30%,transparent 60%);z-index:0;transform:translate(-50%,-50%);transition:opacity .5s;opacity:0;top:0;left:0;will-change:left,top}
+@media(pointer:coarse){#cursor-glow{display:none}}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:calc(62px + env(safe-area-inset-top));display:flex;align-items:flex-end;padding:0 clamp(1rem,4vw,3rem) 0;padding-top:env(safe-area-inset-top);padding-left:clamp(1rem,4vw,3rem);padding-right:clamp(1rem,4vw,3rem);border-bottom:1px solid rgba(255,255,255,0.12);background:rgba(16,22,32,0.96);backdrop-filter:blur(24px);gap:2rem;box-shadow:0 1px 24px rgba(0,0,0,.5)}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:calc(62px + env(safe-area-inset-top));display:flex;align-items:flex-end;padding:0 clamp(1rem,4vw,3rem) 0;padding-top:env(safe-area-inset-top);padding-left:clamp(1rem,4vw,3rem);padding-right:clamp(1rem,4vw,3rem);border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(13,17,23,0.85);backdrop-filter:blur(28px);gap:2rem;box-shadow:0 1px 0 rgba(255,255,255,0.06);transition:background .4s,box-shadow .4s}
+nav.scrolled{background:rgba(9,12,17,0.97);box-shadow:0 1px 0 rgba(255,255,255,0.06),0 8px 40px rgba(0,0,0,.6)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;transition:opacity .2s}
+.nav-logo:hover{opacity:.85}
 .nav-logo img{height:34px;width:34px;object-fit:contain;border-radius:6px}
 .nav-logo span{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--white)}
 .nav-links{display:flex;align-items:center;list-style:none;flex:1}
-.nav-links a{display:block;padding:0 1rem;height:62px;line-height:62px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,210,225,0.75);text-decoration:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
-.nav-links a:hover{color:var(--white);border-bottom-color:var(--gold)}
+.nav-links a{display:block;padding:0 1rem;height:62px;line-height:62px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,210,225,0.55);text-decoration:none;position:relative;transition:color .2s}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:1rem;right:1rem;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-hi));box-shadow:0 0 8px rgba(200,168,75,.6);transform:scaleX(0);transform-origin:left center;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.nav-links a:hover{color:var(--white)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-links a.nav-active{color:var(--white)}
+.nav-links a.nav-active::after{transform:scaleX(1)}
 .nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
 .btn-discord{display:inline-flex;align-items:center;gap:8px;background:var(--discord);color:#fff;border:none;padding:.5rem 1.2rem;font-family:'Sora',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s,box-shadow .15s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);box-shadow:0 2px 12px rgba(88,101,242,.35)}
 .btn-discord:hover{background:#4752C4;box-shadow:0 2px 18px rgba(88,101,242,.55)}
@@ -283,11 +298,13 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .lobby-empty{grid-column:1/-1;padding:2rem;text-align:center;color:var(--grey2);font-size:.85rem}
 
 /* TURNERINGSKORT */
-.tournament-card{background:var(--ink2);border:1px solid var(--wire);margin-bottom:1px}
+.tournament-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);margin-bottom:8px;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s,transform .25s}
+.tournament-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);pointer-events:none}
+.tournament-card:hover{border-color:rgba(255,255,255,0.13);box-shadow:0 12px 40px rgba(0,0,0,.35)}
 .tournament-card-head{padding:1.5rem 2rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start}
-.tournament-card-body{border-top:1px solid var(--wire);display:grid;grid-template-columns:1fr 280px;gap:0;background:var(--wire)}
-.t-card-main{background:var(--ink2);padding:1.25rem 2rem}
-.t-card-side{background:var(--ink3);padding:1.25rem 1.5rem}
+.tournament-card-body{border-top:1px solid rgba(255,255,255,0.06);display:grid;grid-template-columns:1fr 280px;gap:0;background:rgba(255,255,255,0.02)}
+.t-card-main{background:transparent;padding:1.25rem 2rem}
+.t-card-side{background:rgba(255,255,255,0.02);padding:1.25rem 1.5rem;border-left:1px solid rgba(255,255,255,0.05)}
 .t-card-actions{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
 .t-participants{margin-top:1rem;border-top:1px solid rgba(255,255,255,0.07);padding-top:.75rem}
 .t-participants-label{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,210,225,0.35);margin-bottom:.5rem}
@@ -365,13 +382,12 @@ h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.4rem);fo
 .prize-val{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;color:var(--gold)}
 
 /* CTA */
-.cta-band{border-top:1px solid var(--wire);background:var(--ink2);padding:clamp(3rem,6vw,5rem) clamp(1.5rem,6vw,5rem);display:flex;align-items:center;gap:3rem;flex-wrap:wrap}
-.cta-text{flex:1;min-width:260px}
-.cta-text p{font-size:.9rem;font-weight:300;color:var(--grey);max-width:400px;line-height:1.7}
-.cta-text .btns{margin-top:2rem;display:flex;gap:12px;flex-wrap:wrap}
-.cta-note{flex-shrink:0;background:var(--ink3);border:1px solid var(--wire2);padding:1.5rem 2rem;max-width:300px}
-.cta-note h4{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
-.cta-note ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.cta-band{border-top:1px solid var(--wire);background:var(--ink2);padding:clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(200,168,75,0.07) 0%,transparent 65%);pointer-events:none}
+.cta-band::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.02) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.cta-text{max-width:580px;text-align:center;position:relative;z-index:1}
+.cta-text p{font-size:.95rem;font-weight:300;color:var(--grey);line-height:1.75}
+.cta-text .btns{margin-top:2rem;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .cta-note li{font-size:.8rem;font-weight:300;color:var(--grey);display:flex;align-items:center;gap:8px}
 .cta-note li::before{content:'';display:block;width:6px;height:6px;background:var(--gold);clip-path:polygon(50% 0%,100% 100%,0% 100%);flex-shrink:0}
 
@@ -793,6 +809,8 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </div>
 
 <!-- ADMIN SUB-BAR -->
+<div id="nav-progress"></div>
+<div id="cursor-glow"></div>
 <div id="admin-bar">
   <span class="admin-bar-label">Admin</span>
   <button class="admin-bar-btn" onclick="openAdmin()">⚙ Innstillinger</button>
@@ -997,20 +1015,6 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
     <div class="btns" id="cta-btns">
       <a href="https://discord.gg/ADMaFnt7Dh" target="_blank" class="btn-primary">Åpne Discord</a>
       <button class="btn-ghost" id="cta-login-btn" onclick="openModal()">Logg inn på siden</button>
-    </div>
-  </div>
-  <div class="cta-note reveal" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.09);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)">
-    <h4 style="margin-bottom:.5rem">Visste du?</h4>
-    <p style="font-size:.82rem;font-weight:300;color:var(--grey);line-height:1.65;margin-bottom:1rem">Åpner du siden på telefonen og legger den til på hjemskjermen — fungerer den som en ekte app, uten app-butikk.</p>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
-        <span style="font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(200,210,225,0.4);flex-shrink:0">iOS</span>
-        <span style="font-size:.78rem;color:rgba(200,210,225,0.7);font-weight:300">Trykk <strong style="color:var(--white);font-weight:600">Del</strong> □↑ → <strong style="color:var(--white);font-weight:600">Legg til på hjemskjerm</strong></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
-        <span style="font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(200,210,225,0.4);flex-shrink:0">Android</span>
-        <span style="font-size:.78rem;color:rgba(200,210,225,0.7);font-weight:300">Trykk <strong style="color:var(--white);font-weight:600">⋮ meny</strong> → <strong style="color:var(--white);font-weight:600">Installer app</strong></span>
-      </div>
     </div>
   </div>
 </div>
@@ -2203,12 +2207,51 @@ async function deletePost(id) {
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
-      e.target.style.transitionDelay = (Array.from(e.target.parentNode.children).indexOf(e.target) % 4) * 0.06 + 's';
+      e.target.style.transitionDelay = (Array.from(e.target.parentNode.children).indexOf(e.target) % 5) * 0.07 + 's';
       e.target.classList.add('on'); obs.unobserve(e.target);
     }
   });
-}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+document.querySelectorAll('.reveal,.reveal-left').forEach(el => obs.observe(el));
+
+/* ── NAV SCROLL PROGRESS + ACTIVE ─────────────── */
+const navProgress = document.getElementById('nav-progress');
+const navEl = document.querySelector('nav');
+const navSections = ['meta','spillere','turneringer','regler'];
+const navLinkMap = {};
+document.querySelectorAll('.nav-links a').forEach(a => {
+  const hash = a.getAttribute('href').replace('#','');
+  navLinkMap[hash] = a;
+});
+
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const total = document.body.scrollHeight - window.innerHeight;
+  if (navProgress) navProgress.style.width = (total > 0 ? Math.min(scrolled/total*100,100) : 0) + '%';
+  if (navEl) navEl.classList.toggle('scrolled', scrolled > 80);
+}, { passive: true });
+
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && navLinkMap[e.target.id]) {
+      Object.values(navLinkMap).forEach(a => a.classList.remove('nav-active'));
+      navLinkMap[e.target.id].classList.add('nav-active');
+    }
+  });
+}, { threshold: 0.25 });
+navSections.forEach(id => { const el = document.getElementById(id); if (el) sectionObs.observe(el); });
+
+/* ── CURSOR GLOW ────────────────────────────────── */
+const cursorGlow = document.getElementById('cursor-glow');
+if (cursorGlow && window.matchMedia('(pointer:fine)').matches) {
+  let visible = false;
+  document.addEventListener('mousemove', e => {
+    cursorGlow.style.left = e.clientX + 'px';
+    cursorGlow.style.top  = e.clientY + 'px';
+    if (!visible) { cursorGlow.style.opacity = '1'; visible = true; }
+  }, { passive: true });
+  document.addEventListener('mouseleave', () => { cursorGlow.style.opacity = '0'; visible = false; });
+}
 
 /* FILTER PILLS */
 document.querySelectorAll('.filter-pill').forEach(btn => {
