@@ -533,10 +533,6 @@ body.c-hover .c-ring{width:54px;height:54px;border-color:rgba(200,168,75,.85);ba
 @keyframes logoGlitch{0%,100%{filter:none}50%{filter:drop-shadow(3px 0 #ff3cff) drop-shadow(-3px 0 #00e5ff)}}
 .nav-logo:hover img{animation:logoGlitch .35s steps(2)}
 
-/* Animated nav bottom stripe */
-@keyframes navStripe{from{background-position:0 0}to{background-position:40px 0}}
-nav{position:relative}
-nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,var(--gold) 0,var(--gold) 10px,transparent 10px,transparent 20px,rgba(88,101,242,.7) 20px,rgba(88,101,242,.7) 28px,transparent 28px,transparent 40px);background-size:40px 2px;animation:navStripe 1.8s linear infinite;pointer-events:none;z-index:1}
 
 /* Section h2 esports prefix */
 .section h2::before{content:'// ';color:var(--gold);font-size:.5em;opacity:.7;font-style:normal;letter-spacing:.05em;font-weight:800;vertical-align:middle}
