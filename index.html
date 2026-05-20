@@ -90,15 +90,6 @@ nav.scrolled{background:rgba(9,12,17,0.97);box-shadow:0 1px 0 rgba(255,255,255,0
 .user-name{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.06em;color:var(--white)}
 .admin-pip{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-lo);border:1px solid rgba(200,168,75,.4);padding:1px 5px}
 
-/* VIEW SYSTEM */
-.view{display:none}
-.view.active{display:block;animation:viewIn .32s cubic-bezier(.4,0,.2,1)}
-@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-section.view:not(#hero){min-height:calc(100vh - calc(62px + env(safe-area-inset-top)));padding-top:calc(62px + env(safe-area-inset-top))}
-section.view:not(#hero) .section{padding-top:clamp(2rem,4vw,3rem)}
-.cta-band.view{display:none}
-.cta-band.view.active{display:flex;animation:viewIn .32s cubic-bezier(.4,0,.2,1)}
-
 /* HERO */
 #hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding-top:calc(58px + env(safe-area-inset-top));position:relative;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 60% 20%,rgba(200,168,75,0.07) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 10% 80%,rgba(88,101,242,0.06) 0%,transparent 55%),var(--ink)}
 #hero::after{content:'';position:absolute;top:0;right:18%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.18}
@@ -850,7 +841,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </nav>
 
 <!-- HERO -->
-<section id="hero" class="view active">
+<section id="hero">
   <div class="hero-content">
     <div class="hero-kicker">Norsk TFT Community</div>
     <h1>Vallefort<br><em>TFT</em></h1>
@@ -886,7 +877,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </div>
 
 <!-- META -->
-<section id="meta" class="view" style="background:var(--ink2);position:relative;overflow:hidden"><div style="position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(200,168,75,0.06) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
+<section id="meta" style="background:var(--ink2);position:relative;overflow:hidden"><div style="position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(200,168,75,0.06) 0%,transparent 65%);pointer-events:none;z-index:0"></div>
   <div class="section">
     <div class="meta-header">
       <div>
@@ -924,7 +915,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </section>
 
 <!-- SPILLERE -->
-<section id="spillere" class="view">
+<section id="spillere">
   <div class="section">
     <div class="label-line reveal"><span class="label">Community</span></div>
     <h2 class="reveal">Spillere</h2>
@@ -982,7 +973,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </section>
 
 <!-- TURNERINGER -->
-<section id="turneringer" class="view">
+<section id="turneringer">
   <div class="section">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem">
       <div>
@@ -999,7 +990,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </section>
 
 <!-- REGLER -->
-<section id="regler" class="view" style="background:var(--ink2)">
+<section id="regler" style="background:var(--ink2)">
   <div class="section">
     <div class="label-line reveal"><span class="label">Community</span></div>
     <h2 class="reveal">Regler</h2>
@@ -1016,7 +1007,7 @@ footer{border-top:1px solid rgba(255,255,255,0.12);padding:1.75rem clamp(1.5rem,
 </section>
 
 <!-- CTA -->
-<div class="cta-band view" id="cta-band">
+<div class="cta-band">
   <div class="cta-text reveal">
     <div class="label-line"><span class="label">Bli med</span></div>
     <h2>Klar til å spille?</h2>
@@ -2240,49 +2231,15 @@ window.addEventListener('scroll', () => {
   if (navEl) navEl.classList.toggle('scrolled', scrolled > 80);
 }, { passive: true });
 
-/* ── VIEW ROUTER ────────────────────────────────── */
-const ALL_VIEWS = ['hero','meta','spillere','turneringer','regler'];
-
-function showView(id) {
-  if (!ALL_VIEWS.includes(id)) id = 'hero';
-  // Switch views
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const target = document.getElementById(id) || document.getElementById('hero');
-  target.classList.add('active');
-  // CTA band shows only on home
-  const ctaBand = document.getElementById('cta-band');
-  if (ctaBand) ctaBand.classList.toggle('active', id === 'hero');
-  // Trigger reveals inside this view
-  target.querySelectorAll('.reveal,.reveal-left').forEach((el, i) => {
-    el.classList.remove('on');
-    setTimeout(() => { el.style.transitionDelay = (i % 5) * 0.07 + 's'; el.classList.add('on'); }, 60);
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && navLinkMap[e.target.id]) {
+      Object.values(navLinkMap).forEach(a => a.classList.remove('nav-active'));
+      navLinkMap[e.target.id].classList.add('nav-active');
+    }
   });
-  // Update nav active state
-  Object.entries(navLinkMap).forEach(([hash, a]) => a.classList.toggle('nav-active', hash === id));
-  // Scroll view to top
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  // Update URL
-  history.pushState(null, '', id === 'hero' ? location.pathname : '#' + id);
-}
-
-function handleRoute() {
-  const id = location.hash.slice(1) || 'hero';
-  showView(id);
-}
-window.addEventListener('popstate', handleRoute);
-
-// Intercept all internal anchor clicks
-document.addEventListener('click', e => {
-  const a = e.target.closest('a[href^="#"]');
-  if (!a) return;
-  const id = a.getAttribute('href').slice(1);
-  if (!id || !ALL_VIEWS.includes(id)) return;
-  e.preventDefault();
-  showView(id);
-  document.getElementById('nav-links')?.classList.remove('open');
-});
-// Logo → home
-document.querySelector('.nav-logo')?.addEventListener('click', e => { e.preventDefault(); showView('hero'); });
+}, { threshold: 0.25 });
+navSections.forEach(id => { const el = document.getElementById(id); if (el) sectionObs.observe(el); });
 
 /* ── CURSOR GLOW ────────────────────────────────── */
 const cursorGlow = document.getElementById('cursor-glow');
@@ -2313,7 +2270,6 @@ document.querySelectorAll('#nav-links a').forEach(a => a.addEventListener('click
 /* ── INIT ───────────────────────────────────────── */
 (async () => {
   handleOAuthReturn();
-  handleRoute();
   await loadUser();
   loadStats();
   loadMeta();
