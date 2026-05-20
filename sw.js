@@ -1,4 +1,4 @@
-const CACHE = 'vallefort-v14';
+const CACHE = 'vallefort-v15';
 const PRECACHE = [
   '/Vallefort/',
   '/Vallefort/index.html',
