@@ -587,8 +587,71 @@ nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;backg
 @keyframes countdownGlow{0%,100%{text-shadow:0 0 6px rgba(200,168,75,.3)}50%{text-shadow:0 0 24px rgba(200,168,75,.95),0 0 50px rgba(200,168,75,.45)}}
 .t-countdown-val{color:var(--gold-hi)!important;animation:countdownGlow 2s ease-in-out infinite}
 
-/* Tournament card esports hover */
-.tournament-card:hover{transform:translateY(-3px)!important;box-shadow:0 24px 64px rgba(0,0,0,.55),0 0 50px rgba(200,168,75,.1),inset 0 1px 0 rgba(200,168,75,.2)!important}
+/* ── COMPACT TOURNAMENT CARDS ─────────────────── */
+.t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.t-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:1.5rem;cursor:pointer;transition:all .28s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);pointer-events:none}
+.t-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,168,75,.04) 0%,transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.t-card:hover{border-color:rgba(200,168,75,.35);box-shadow:0 20px 56px rgba(0,0,0,.45),0 0 40px rgba(200,168,75,.1);transform:translateY(-4px)}
+.t-card:hover::after{opacity:1}
+
+.t-card-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+.t-card-dot.open{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.8s infinite}
+.t-card-dot.ongoing{background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 1.8s infinite}
+.t-card-dot.closed,.t-card-dot.finished{background:var(--grey2)}
+.t-card-status{display:flex;align-items:center;gap:7px;font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1rem}
+
+.t-card-name{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:800;text-transform:uppercase;color:var(--white);line-height:1;margin-bottom:.3rem;letter-spacing:.02em}
+.t-card-date{font-size:.75rem;color:rgba(200,210,225,.4);margin-bottom:1.1rem}
+.t-card-countdown{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,210,225,.45);margin-top:-.5rem;margin-bottom:1rem}
+.t-card-countdown span{color:var(--gold-hi);font-size:.82rem}
+
+.t-card-bar{height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-bottom:.5rem}
+.t-card-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-hi));border-radius:2px}
+.t-card-bar-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem}
+.t-card-slots{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.06em;color:rgba(200,210,225,.45)}
+.t-card-slots b{color:var(--white)}
+.t-card-server{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,210,225,.3);border:1px solid rgba(255,255,255,.07);padding:2px 7px;border-radius:4px}
+
+.t-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.06);margin-top:auto}
+.t-card-prize{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;color:var(--gold);letter-spacing:.04em}
+.t-card-hint{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,168,75,.55);display:flex;align-items:center;gap:3px;transition:color .2s}
+.t-card:hover .t-card-hint{color:var(--gold)}
+.t-card-hint::after{content:'→';font-size:.8rem}
+.t-card-reg-badge{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);display:flex;align-items:center;gap:4px}
+
+/* ── TOURNAMENT DETAIL MODAL (BOTTOM SHEET) ────── */
+#t-detail-modal{position:fixed;inset:0;z-index:650;background:rgba(0,0,0,.82);backdrop-filter:blur(18px);display:none;align-items:flex-end;justify-content:center}
+#t-detail-modal.open{display:flex}
+.t-detail-sheet{background:linear-gradient(180deg,rgba(25,32,46,0.98) 0%,rgba(13,17,23,0.99) 100%);border:1px solid rgba(255,255,255,.09);border-bottom:none;border-radius:24px 24px 0 0;width:100%;max-width:800px;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .42s cubic-bezier(.16,1,.3,1);position:relative;box-shadow:0 -24px 80px rgba(0,0,0,.6)}
+.t-detail-sheet::-webkit-scrollbar{width:4px}
+.t-detail-sheet::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+#t-detail-modal.open .t-detail-sheet{transform:translateY(0)}
+
+.t-detail-handle{width:44px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;margin:14px auto 0}
+.t-detail-close{position:absolute;top:14px;right:1.25rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(200,210,225,.7);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.t-detail-close:hover{background:rgba(255,255,255,.15);color:var(--white)}
+
+.t-detail-head{padding:1.4rem 2rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.t-detail-body{padding:1.5rem 2rem;display:grid;grid-template-columns:1fr 240px;gap:2rem}
+.t-detail-specs{}
+.t-detail-side{display:flex;flex-direction:column;gap:1rem}
+.t-detail-actions{margin-top:1.1rem;display:flex;gap:8px;flex-wrap:wrap}
+.t-detail-admin-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:.5rem}
+
+.t-detail-prize-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.t-detail-prize-box{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:.85rem 1rem}
+.t-detail-prize-label{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,210,225,.35);margin-bottom:5px}
+.t-detail-prize-val{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;color:var(--gold);line-height:1}
+
+.t-detail-slots-bar{margin-bottom:.25rem}
+.t-detail-slots-label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;color:rgba(200,210,225,.4);margin-bottom:.4rem}
+
+@media(max-width:620px){
+  .t-grid{grid-template-columns:1fr}
+  .t-detail-body{grid-template-columns:1fr}
+  .t-detail-head,.t-detail-body{padding-left:1.25rem;padding-right:1.25rem}
+}
 
 /* Hex pattern overlay on meta section */
 #meta{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V17L28 1l28 16v33L28 66zm0 34L0 84V51l28-17 28 17v33L28 100z' fill='none' stroke='%23C8A84B' stroke-width='1'/%3E%3C/svg%3E"),linear-gradient(var(--ink2),var(--ink2));background-blend-mode:overlay;background-size:56px 100px,auto}
@@ -803,6 +866,11 @@ nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;backg
       Logg inn med Discord
     </button>
   </div>
+</div>
+
+<!-- TOURNAMENT DETAIL BOTTOM SHEET -->
+<div id="t-detail-modal">
+  <div class="t-detail-sheet" id="t-detail-sheet"></div>
 </div>
 
 <!-- ADMIN PANEL -->
@@ -1670,94 +1738,163 @@ const STATUS_CLASS = { open:'status-open', closed:'status-closed', ongoing:'stat
 
 function renderTournaments(list) {
   const container = document.getElementById('tournament-list');
-  if (!list.length) { container.innerHTML = `<div class="t-empty">Ingen turneringer ennå.</div>`; return; }
+  if (!list.length) { container.innerHTML = '<div class="t-empty">Ingen turneringer ennå.</div>'; return; }
 
-  container.innerHTML = list.map(t => {
-    const regCount   = t.registrations.length;
-    const fillPct    = Math.min((regCount / t.maxPlayers) * 100, 100).toFixed(0);
-    const isReg      = currentUser && t.registrations.some(r => r.userId === currentUser.id);
-    const canEdit    = currentUser && (currentUser.isAdmin || (currentUser.isContributor && t.createdBy === currentUser.id));
-    const canReg     = t.status === 'open' && regCount < t.maxPlayers;
-    const dateStr    = t.date ? new Date(t.date).toLocaleDateString('nb-NO', {day:'2-digit',month:'long',year:'numeric'}) : 'Dato annonseres';
+  container.innerHTML = '<div class="t-grid">' + list.map(t => {
+    const regCount = t.registrations.length;
+    const fillPct  = Math.min((regCount / t.maxPlayers) * 100, 100).toFixed(0);
+    const dateStr  = t.date ? new Date(t.date).toLocaleDateString('nb-NO', {day:'2-digit',month:'long',year:'numeric'}) : 'Dato annonseres';
+    const isReg    = currentUser && t.registrations.some(r => r.userId === currentUser.id);
 
-    const countdownHtml = t.startTime && t.status !== 'finished'
-      ? `<div class="t-countdown">Starter om <span class="t-countdown-val" id="tcv-${t.id}">…</span></div>`
-      : '';
+    const cdHtml = t.startTime && t.status !== 'finished'
+      ? '<div class="t-card-countdown">Starter om <span id="tcv-' + t.id + '">…</span></div>' : '';
 
-    const winnersHtml = t.winners
-      ? `<div class="t-winners">
-          ${t.winners.place1 ? `<div class="t-winner"><span class="t-w-rank t-w-1">1</span>${escHtml(t.winners.place1.username)}</div>` : ''}
-          ${t.winners.place2 ? `<div class="t-winner"><span class="t-w-rank t-w-2">2</span>${escHtml(t.winners.place2.username)}</div>` : ''}
-          ${t.winners.place3 ? `<div class="t-winner"><span class="t-w-rank t-w-3">3</span>${escHtml(t.winners.place3.username)}</div>` : ''}
-        </div>` : '';
+    const footerLeft = t.status === 'finished' && t.winners && t.winners.place1
+      ? '<span style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:800;color:var(--gold)">🏆 ' + escHtml(t.winners.place1.username) + '</span>'
+      : t.prize1
+        ? '<span class="t-card-prize">🏆 ' + escHtml(t.prize1) + '</span>'
+        : '<span class="t-card-server">' + escHtml(t.server) + '</span>';
 
-    const regBtn = currentUser
-      ? (isReg
-          ? `<button class="btn-reg registered" onclick="unregisterTournament('${t.id}')">✓ Påmeldt — Meld av</button>`
-          : `<button class="btn-reg" onclick="registerTournament('${t.id}')" ${canReg?'':'disabled'}>${canReg?'Meld deg på':'Fullt'}</button>`)
-      : `<button class="btn-reg" onclick="openModal()">Logg inn for å melde på</button>`;
+    const footerRight = isReg
+      ? '<span class="t-card-reg-badge">✓ Påmeldt</span>'
+      : '<span class="t-card-hint">Se detaljer</span>';
 
-    const editBtns = canEdit ? `<button class="btn-edit-t" onclick="openTournamentModal('${t.id}')">Rediger</button><button class="btn-del-t" onclick="deleteTournament('${t.id}')">Slett</button>` : '';
-    const finishBtn = currentUser?.isAdmin ? `<button class="btn-finish-t" onclick="openFinishModal('${t.id}')">Kår vinnere</button>` : '';
-    const fbUrl  = encodeURIComponent(`https://bredeespelid.github.io/Vallefort/#tc-${t.id}`);
-    const fbShare = `<a class="btn-fb" href="https://www.facebook.com/sharer/sharer.php?u=${fbUrl}" target="_blank" rel="noopener">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
-      Del på Facebook</a>`;
+    return '<div class="t-card" id="tc-' + t.id + '" onclick="openTournamentDetail('' + t.id + '')">'
+      + '<div class="t-card-status">'
+      + '<span class="t-card-dot ' + t.status + '"></span>'
+      + '<span class="' + STATUS_CLASS[t.status] + '">' + (STATUS_LABEL[t.status] || t.status) + '</span>'
+      + '</div>'
+      + '<div class="t-card-name">' + escHtml(t.name) + '</div>'
+      + '<div class="t-card-date">' + dateStr + '</div>'
+      + cdHtml
+      + '<div class="t-card-bar"><div class="t-card-bar-fill" style="width:' + fillPct + '%"></div></div>'
+      + '<div class="t-card-bar-row">'
+      + '<span class="t-card-slots"><b>' + regCount + '</b>/' + t.maxPlayers + ' spillere</span>'
+      + '<span class="t-card-server">' + escHtml(t.server) + '</span>'
+      + '</div>'
+      + '<div class="t-card-footer">' + footerLeft + footerRight + '</div>'
+      + '</div>';
+  }).join('') + '</div>';
+}
 
-    return `<div class="tournament-card" id="tc-${t.id}">
-      <div class="tournament-card-head">
-        <div>
-          <div class="t-status ${STATUS_CLASS[t.status]}"><span class="live-dot" style="background:currentColor"></span> ${STATUS_LABEL[t.status]||t.status}</div>
-          <div class="t-name">${escHtml(t.name)}</div>
-          <div class="t-date">${dateStr}${t.description ? ' · ' + escHtml(t.description) : ''}</div>
-          ${countdownHtml}
-        </div>
-        <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap">${finishBtn}${editBtns}${fbShare}</div>
-      </div>
-      <div class="tournament-card-body">
-        <div class="t-card-main">
-          <div class="t-spec"><span class="t-spec-k">Format</span><span class="t-spec-v">${escHtml(t.format)}</span></div>
-          <div class="t-spec"><span class="t-spec-k">Spillere</span><span class="t-spec-v">${t.maxPlayers} plasser</span></div>
-          <div class="t-spec"><span class="t-spec-k">Rank-krav</span><span class="t-spec-v">${escHtml(t.rankReq)}</span></div>
-          <div class="t-spec"><span class="t-spec-k">Server</span><span class="t-spec-v">${escHtml(t.server)}</span></div>
-          <div class="t-card-actions">${regBtn}</div>
-        </div>
-        <div class="t-card-side">
-          ${t.status === 'finished' && t.winners ? `<h3>Resultater</h3>${winnersHtml}` : `<h3>Påmelding</h3>
-          <div class="slots-track"><div class="slots-fill" style="width:${fillPct}%"></div></div>
-          <div class="slots-txt"><b>${regCount}</b> / ${t.maxPlayers} påmeldt</div>
-          <div class="prize-grid">
-            <div class="prize-item"><div class="prize-place">1. plass</div><div class="prize-val">${escHtml(t.prize1||'TBA')}</div></div>
-            <div class="prize-item"><div class="prize-place">2. plass</div><div class="prize-val">${escHtml(t.prize2||'TBA')}</div></div>
-          </div>`}
-          ${t.registrations.length > 0 ? (() => {
-            const show = t.registrations.slice(0, 8);
-            const rest = t.registrations.length - show.length;
-            const items = show.map(r => {
-              const pl = allPlayers.find(p => p.discordId === r.userId);
-              const tierClass = pl?.tier ? `tier-${pl.tier.toLowerCase()}` : 'tier-unranked';
-              const tierLabel = pl?.tier ? `${TIER_NO[pl.tier]||pl.tier}${!NO_RANK_TIER.has(pl.tier)&&pl.rank?' '+pl.rank:''}` : '';
-              const av = r.avatar
-                ? `<img class="t-par-av" src="${escHtml(r.avatar)}" alt="">`
-                : `<div class="t-par-av-ph">${(r.username||'?').slice(0,2).toUpperCase()}</div>`;
-              const isMe = currentUser?.id === r.userId;
-              return `<div class="t-participant">
-                ${av}
-                <span class="t-par-name${isMe?' is-me':''}">${escHtml(r.username)}</span>
-                ${tierLabel ? `<span class="tier-badge ${tierClass}" style="font-size:.58rem;padding:1px 6px">${tierLabel}</span>` : ''}
-              </div>`;
-            }).join('');
-            return `<div class="t-participants">
-              <div class="t-participants-label">Deltakere · ${t.registrations.length}</div>
-              ${items}
-              ${rest > 0 ? `<div class="t-par-more">+ ${rest} til</div>` : ''}
-            </div>`;
-          })() : ''}
-          <p style="font-size:.72rem;color:var(--grey2);margin-top:.75rem">Opprettet av ${escHtml(t.createdByUsername)}</p>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+function openTournamentDetail(id) {
+  const t = allTournaments.find(function(x){ return x.id === id; });
+  if (!t) return;
+
+  const regCount = t.registrations.length;
+  const fillPct  = Math.min((regCount / t.maxPlayers) * 100, 100).toFixed(0);
+  const dateStr  = t.date ? new Date(t.date).toLocaleDateString('nb-NO', {day:'2-digit',month:'long',year:'numeric'}) : 'Dato annonseres';
+  const isReg    = currentUser && t.registrations.some(function(r){ return r.userId === currentUser.id; });
+  const canEdit  = currentUser && (currentUser.isAdmin || (currentUser.isContributor && t.createdBy === currentUser.id));
+  const canReg   = t.status === 'open' && regCount < t.maxPlayers;
+
+  const cdHtml = t.startTime && t.status !== 'finished'
+    ? '<div class="t-countdown" style="margin-top:.4rem">Starter om <span class="t-countdown-val" id="tcv-' + t.id + '">…</span></div>' : '';
+
+  let winnersHtml = '';
+  if (t.winners) {
+    winnersHtml = '<div class="t-winners" style="margin-top:.75rem">'
+      + (t.winners.place1 ? '<div class="t-winner"><span class="t-w-rank t-w-1">1</span>' + escHtml(t.winners.place1.username) + '</div>' : '')
+      + (t.winners.place2 ? '<div class="t-winner"><span class="t-w-rank t-w-2">2</span>' + escHtml(t.winners.place2.username) + '</div>' : '')
+      + (t.winners.place3 ? '<div class="t-winner"><span class="t-w-rank t-w-3">3</span>' + escHtml(t.winners.place3.username) + '</div>' : '')
+      + '</div>';
+  }
+
+  let regBtn;
+  if (currentUser) {
+    if (isReg) {
+      regBtn = '<button class="btn-reg registered" onclick="unregisterTournament('' + t.id + '');closeTournamentDetail()">✓ Påmeldt — Meld av</button>';
+    } else {
+      regBtn = '<button class="btn-reg" onclick="registerTournament('' + t.id + '')" ' + (canReg?'':'disabled') + '>' + (canReg?'Meld deg på':'Fullt') + '</button>';
+    }
+  } else {
+    regBtn = '<button class="btn-reg" onclick="openModal()">Logg inn for å melde på</button>';
+  }
+
+  let adminBtns = '';
+  if (canEdit) {
+    adminBtns += '<button class="btn-edit-t" onclick="closeTournamentDetail();openTournamentModal('' + t.id + '')">Rediger</button>';
+    adminBtns += '<button class="btn-del-t" onclick="deleteTournament('' + t.id + '')">Slett</button>';
+  }
+  if (currentUser && currentUser.isAdmin) {
+    adminBtns += '<button class="btn-finish-t" onclick="closeTournamentDetail();openFinishModal('' + t.id + '')">Kår vinnere</button>';
+  }
+
+  const fbUrl = encodeURIComponent('https://bredeespelid.github.io/Vallefort/#tc-' + t.id);
+  const fbShare = '<a class="btn-fb" href="https://www.facebook.com/sharer/sharer.php?u=' + fbUrl + '" target="_blank" rel="noopener">'
+    + '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>'
+    + 'Del på Facebook</a>';
+
+  let participantsHtml = '<p style="font-size:.8rem;color:rgba(200,210,225,.3);padding:.5rem 0">Ingen påmeldte ennå.</p>';
+  if (t.registrations.length > 0) {
+    const show = t.registrations.slice(0, 24);
+    const rest = t.registrations.length - show.length;
+    const items = show.map(function(r) {
+      const pl = allPlayers.find(function(p){ return p.discordId === r.userId; });
+      const tierClass = pl && pl.tier ? 'tier-' + pl.tier.toLowerCase() : 'tier-unranked';
+      const tierLabel = pl && pl.tier ? (TIER_NO[pl.tier]||pl.tier) + (!NO_RANK_TIER.has(pl.tier)&&pl.rank?' '+pl.rank:'') : '';
+      const av = r.avatar
+        ? '<img class="t-par-av" src="' + escHtml(r.avatar) + '" alt="">'
+        : '<div class="t-par-av-ph">' + (r.username||'?').slice(0,2).toUpperCase() + '</div>';
+      const isMe = currentUser && currentUser.id === r.userId;
+      return '<div class="t-participant">' + av
+        + '<span class="t-par-name' + (isMe?' is-me':'') + '">' + escHtml(r.username) + '</span>'
+        + (tierLabel ? '<span class="tier-badge ' + tierClass + '" style="font-size:.55rem;padding:1px 6px">' + tierLabel + '</span>' : '')
+        + '</div>';
+    }).join('');
+    participantsHtml = '<div class="t-participants">' + items + (rest>0?'<div class="t-par-more">+'+rest+' til</div>':'') + '</div>';
+  }
+
+  const prizeHtml = (t.prize1||t.prize2)
+    ? '<div class="t-detail-prize-grid">'
+      + '<div class="t-detail-prize-box"><div class="t-detail-prize-label">1. plass</div><div class="t-detail-prize-val">' + escHtml(t.prize1||'TBA') + '</div></div>'
+      + '<div class="t-detail-prize-box"><div class="t-detail-prize-label">2. plass</div><div class="t-detail-prize-val">' + escHtml(t.prize2||'TBA') + '</div></div>'
+      + '</div>'
+    : '';
+
+  document.getElementById('t-detail-sheet').innerHTML =
+    '<div class="t-detail-handle"></div>'
+    + '<button class="t-detail-close" onclick="closeTournamentDetail()">✕</button>'
+    + '<div class="t-detail-head">'
+      + '<div class="t-status ' + STATUS_CLASS[t.status] + '" style="margin-bottom:.5rem">'
+        + '<span class="live-dot" style="background:currentColor"></span> ' + (STATUS_LABEL[t.status]||t.status)
+      + '</div>'
+      + '<div class="t-name" style="margin-bottom:.2rem">' + escHtml(t.name) + '</div>'
+      + '<div class="t-date">' + dateStr + (t.description?' · '+escHtml(t.description):'') + '</div>'
+      + cdHtml
+    + '</div>'
+    + '<div class="t-detail-body">'
+      + '<div class="t-detail-specs">'
+        + '<div class="t-spec"><span class="t-spec-k">Format</span><span class="t-spec-v">' + escHtml(t.format) + '</span></div>'
+        + '<div class="t-spec"><span class="t-spec-k">Spillere</span><span class="t-spec-v">' + t.maxPlayers + ' plasser</span></div>'
+        + '<div class="t-spec"><span class="t-spec-k">Rank-krav</span><span class="t-spec-v">' + escHtml(t.rankReq) + '</span></div>'
+        + '<div class="t-spec"><span class="t-spec-k">Server</span><span class="t-spec-v">' + escHtml(t.server) + '</span></div>'
+        + (t.status==='finished'&&winnersHtml ? '<div class="t-spec" style="flex-direction:column;align-items:flex-start"><span class="t-spec-k" style="margin-bottom:.4rem">Resultater</span>' + winnersHtml + '</div>' : '')
+        + '<div class="t-detail-actions">' + regBtn + fbShare + '</div>'
+        + (adminBtns ? '<div class="t-detail-admin-row">' + adminBtns + '</div>' : '')
+        + '<p style="font-size:.7rem;color:rgba(200,210,225,.25);margin-top:1.2rem">Opprettet av ' + escHtml(t.createdByUsername) + '</p>'
+      + '</div>'
+      + '<div class="t-detail-side">'
+        + '<div>'
+          + '<div class="t-detail-slots-label">Påmelding · ' + regCount + '/' + t.maxPlayers + '</div>'
+          + '<div class="t-card-bar t-detail-slots-bar"><div class="t-card-bar-fill" style="width:' + fillPct + '%"></div></div>'
+        + '</div>'
+        + prizeHtml
+        + '<div>'
+          + '<div class="t-participants-label" style="margin-bottom:.5rem">Deltakere · ' + t.registrations.length + '</div>'
+          + participantsHtml
+        + '</div>'
+      + '</div>'
+    + '</div>';
+
+  document.getElementById('t-detail-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateCountdowns();
+}
+
+function closeTournamentDetail() {
+  document.getElementById('t-detail-modal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 async function registerTournament(id) {
@@ -2139,6 +2276,7 @@ function closeModal() { document.getElementById('discord-modal').classList.remov
 document.getElementById('discord-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 document.getElementById('tournament-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeTournamentModal(); });
 document.getElementById('finish-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeFinishModal(); });
+document.getElementById('t-detail-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeTournamentDetail(); });
 
 /* ── HELPERS ────────────────────────────────────── */
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
